@@ -19,3 +19,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+#APP
+/src/boot/firebase.json
+/src/extension/*

@@ -5,7 +5,8 @@
   ],
   "linterOptions": {
     "exclude": [
-      "node_modules/**"
+      "node_modules/**",
+      "**/*.json"
     ]
   },
   "rules": {
@@ -14,6 +15,9 @@
     "no-consecutive-blank-lines": false,
     "object-literal-sort-keys": false,
     "ordered-imports": false,
-    "quotemark": [true, "single"]
+    "quotemark": [true, "single"],
+    "no-console": false,
+    "only-arrow-functions": false,
+    "no-string-literal": false
   }
 }
