@@ -1,6 +1,7 @@
  /* tslint:disable-next-line:interface-over-type-literal */
 type Dictionary < T > = { [key: string]: T };
 
+/* BASE STATE */
 export interface IEnvState {
   platform: EnvPlatforms;
   app: string;
@@ -12,6 +13,7 @@ export enum EnvPlatforms {
   OFFICE = 'office',
 }
 
+/* USER STATE */
 export interface IUser {
   id: string;
   name: string;
@@ -29,4 +31,25 @@ export interface ILoginData {
   email: string;
   password: string;
   redirect?: Dictionary<string | Array<string | null>>;
+}
+
+/* TASKS STATE */
+export interface IBasePayload {
+  vm: Vue;
+  user: IUser;
+}
+
+export interface ITask {
+  title: string;
+  description: string;
+  profile?: string;
+  modified?: Date;
+  publishId?: string;
+  id?: string;
+}
+
+export interface IAddTask {
+  vm: Vue;
+  user: IUser;
+  task: ITask;
 }

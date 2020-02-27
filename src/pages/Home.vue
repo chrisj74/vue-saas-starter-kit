@@ -1,5 +1,20 @@
 <template>
-    <example></example>
+  <div>
+    <v-card v-for="(task) in tasks" :key="task.id">
+      <v-toolbar
+        color="primary"
+        dark
+        flat
+      >
+        <v-toolbar-title>{{ task.title }}</v-toolbar-title>
+      </v-toolbar>
+      <v-card-text>
+        <div v-html="task.description"></div>
+      </v-card-text>
+    </v-card>
+
+    <add-task></add-task>
+  </div>
 </template>
 
 <script lang="ts">
@@ -7,16 +22,21 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
-import Example from '../components/Example.vue';
+/* App components */
+import AddTask from '../components/AddTask.vue';
+
+/* Models */
+import { ITask } from '@/types';
 
 export default Vue.extend({
   name: 'Home',
-  components: { Example },
+  components: { AddTask },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
+      tasks: 'tasks/getTasks',
     }),
   },
   methods: {
