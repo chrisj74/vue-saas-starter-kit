@@ -38,7 +38,6 @@ export default Vue.extend({
 
   watch: {
     user(value: any) {
-      console.log('watch user', this.user);
       if (value !== null && value !== undefined && !this.tasks) {
         const payload: IBasePayload = {
           vm: this,

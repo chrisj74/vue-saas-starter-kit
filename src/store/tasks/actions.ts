@@ -7,7 +7,6 @@ import uuid from 'uuidv4';
 import { IBasePayload, ITask, IAddTask } from '@/types';
 
 export const setTasks = (state: any, payload: IBasePayload) => {
-  console.log('setTasks', payload);
   return new Promise((resolve, reject) => {
     firebase
         .firestore()

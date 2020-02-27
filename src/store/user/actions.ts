@@ -85,7 +85,6 @@ export const signUserIn = (state: any, payload: ILoginData) => {
 };
 
 export const autoSignIn =  (state: any, payload: any) => {
-  console.log('redirect', payload.query);
   state.commit('setUser', {
     id: payload.user.uid,
     name: payload.user.displayName,

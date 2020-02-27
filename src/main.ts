@@ -9,8 +9,6 @@ Vue.config.productionTip = false;
 Vue.prototype.$auth = AUTH;
 Vue.prototype.$firebase = fireApp;
 
-console.log('router=', router);
-
 new Vue({
   router,
   store,

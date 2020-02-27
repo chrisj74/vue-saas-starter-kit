@@ -1,19 +1,18 @@
 <template>
   <div>
-    <v-card v-for="(task) in tasks" :key="task.id">
+    <v-card>
       <v-toolbar
         color="primary"
         dark
         flat
       >
-        <v-toolbar-title>{{ task.title }}</v-toolbar-title>
+        <v-toolbar-title>Home</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
-        <div v-html="task.description"></div>
+        <div>Home card</div>
       </v-card-text>
     </v-card>
 
-    <add-task></add-task>
   </div>
 </template>
 
@@ -23,14 +22,11 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* App components */
-import AddTask from '../components/AddTask.vue';
 
 /* Models */
-import { ITask } from '@/types';
 
 export default Vue.extend({
   name: 'Home',
-  components: { AddTask },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',
@@ -40,9 +36,7 @@ export default Vue.extend({
     }),
   },
   methods: {
-    onLogout() {
-      this.$store.dispatch('user/logout', this as Vue);
-    },
+    //
   },
 });
 </script>
