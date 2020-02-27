@@ -10,10 +10,7 @@ export const fireApp = firebase.initializeApp(config);
 export const AUTH = fireApp.auth();
 
 export const FirebaseAutoLogin = (vm: Vue) => {
-  // constructor() {
-    console.log('firebase');
     AUTH.onAuthStateChanged(async (user) => {
-      console.log('authsatechange', user);
       if (user) {
         /* Set user */
         const userObj = {
@@ -31,33 +28,27 @@ export const FirebaseAutoLogin = (vm: Vue) => {
           .firestore()
           .collection('users/')
           .doc(user.uid);
-        console.log('user.uid=', user.uid);
-        console.log('userDoc=', userDoc);
         await userDoc.get().then(async (docSnapshot: any) => {
           if (docSnapshot.exists) {
-            console.log('user exists');
             userObj.sessions = docSnapshot.data().sessions
               ? docSnapshot.data().sessions + 1
               : 1;
             userObj.images = docSnapshot.data().images
               ? docSnapshot.data().images
               : [];
-            console.log(userObj);
             userDoc
               .update(userObj)
               .then(() => {
-                console.log('updated sessions');
+                // console.log('updated sessions');
               })
               .catch((error) => {
                 console.log('error', error);
               });
-            console.log('sessions updated');
           } else {
             userObj.images = [];
             userObj.sessions = 1;
             await userDoc.set(userObj);
           }
-          console.log('call autoSignin');
           await vm.$store.dispatch('user/autoSignIn', payload);
         });
       } else {
@@ -70,5 +61,4 @@ export const FirebaseAutoLogin = (vm: Vue) => {
         await store.dispatch('user/setAuth', true); // Let the app know auth complete
       }
     });
-  // }
 };
