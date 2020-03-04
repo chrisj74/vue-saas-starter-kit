@@ -28,6 +28,19 @@ export default Vue.extend({
       };
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
+      window.chrome.runtime.sendMessage({ type: 'getTabId' }, (res: any) => {
+        console.log('inside popup tabId=', res.tabId);
+      });
+      const bodyObj = document.getElementsByTagName('body');
+      if (bodyObj) {
+        bodyObj[0].addEventListener('mouseenter', (e) => {
+          window.chrome.runtime.sendMessage({ type: 'popupMouseEnter' });
+        });
+
+        bodyObj[0].addEventListener('mouseleave', (e) => {
+          window.chrome.runtime.sendMessage({ type: 'popupMouseLeave' });
+        });
+      }
     } else {
       console.log('webserver');
 
@@ -37,6 +50,7 @@ export default Vue.extend({
       };
       this.$store.commit('base/setEnv', envPayload);
     }
+
   },
   mounted() {
     if (this.user && !this.tasks) {

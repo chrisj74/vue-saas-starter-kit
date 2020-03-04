@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" v-if="authSet">
+  <v-app id="vApp" v-if="authSet">
     <v-navigation-drawer
       v-model="leftDrawerOpen"
       app
@@ -9,7 +9,7 @@
       <v-list dense>
         <v-list-item link to="/">
           <v-list-item-action>
-            <v-icon>fas fa-home</v-icon>
+            <v-icon>mdi-home</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Home</v-list-item-title>
@@ -17,7 +17,7 @@
         </v-list-item>
         <v-list-item link to="/tasks">
           <v-list-item-action>
-            <v-icon>fas fa-check</v-icon>
+            <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Tasks</v-list-item-title>
@@ -27,7 +27,7 @@
 
       <template v-slot:append>
         <div class="pa-2">
-          <v-btn block @click="onLogout()">Logout <v-icon dark right>fas fa-power-off</v-icon></v-btn>
+          <v-btn block @click="onLogout()" color="red lighten-2" dark>Logout <v-icon dark right>mdi-power-standby</v-icon></v-btn>
         </div>
       </template>
     </v-navigation-drawer>
@@ -35,8 +35,9 @@
     <v-app-bar
       :clipped-left="$vuetify.breakpoint.mdAndUp"
       app
-      color="indigo"
+      color="secondary"
       dark
+      height="40"
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
       <v-toolbar-title>Application</v-toolbar-title>
@@ -44,7 +45,6 @@
 
     <v-content>
       <v-container
-        class="fill-height"
         fluid
       >
         <router-view></router-view>

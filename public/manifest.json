@@ -15,7 +15,7 @@
   },
 
   "browser_action": {
-    "default_title": "Flow State",
+    "default_title": "Workalongo",
     "default_icon": "icons/favicon-96x96.png",
     "default_popup": "popup.html"
   },

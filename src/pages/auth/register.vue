@@ -27,17 +27,17 @@
                 <v-text-field
                   label="Email"
                   name="email"
-                  prepend-icon="fas fa-envelope"
+                  prepend-icon="mdi-email"
                   type="email"
                   v-model="email"
                 />
 
                 <v-text-field
-                  :append-icon="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
+                  :append-icon="showPw ? 'mdi-eye' : 'mdi-eye-off'"
                   id="password"
                   label="Password"
                   name="password"
-                  prepend-icon="fas fa-lock"
+                  prepend-icon="mdi-lock"
                   :type="showPw ? 'text' : 'password'"
                   v-model="password"
                   @keyup.enter="onSignup"

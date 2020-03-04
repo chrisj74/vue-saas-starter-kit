@@ -22,4 +22,3 @@ yarn-error.log*
 
 #APP
 /src/boot/firebase.json
-/src/extension/*

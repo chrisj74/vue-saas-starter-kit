@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-container>
     <v-card>
       <v-toolbar
         color="primary"
@@ -13,7 +13,7 @@
       </v-card-text>
     </v-card>
 
-  </div>
+  </v-container>
 </template>
 
 <script lang="ts">

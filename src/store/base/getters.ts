@@ -9,3 +9,7 @@ export const getLoading = (state: any) => {
 export const getError = (state: any) => {
   return state.error;
 };
+
+export const getEnv = (state: any) => {
+  return state.env;
+};

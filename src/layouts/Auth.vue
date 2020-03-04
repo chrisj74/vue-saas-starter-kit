@@ -1,5 +1,5 @@
 <template>
-  <v-app id="app" v-if="authSet">
+  <v-app id="vApp" v-if="authSet">
     <router-view></router-view>
   </v-app>
 </template>

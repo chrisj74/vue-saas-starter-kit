@@ -3,11 +3,16 @@ type Dictionary < T > = { [key: string]: T };
 
 /* BASE STATE */
 export interface IEnvState {
-  platform: EnvPlatforms;
-  app: string;
+  platform: EnvPlatformsEnum;
+  browser: IEnvBrowser;
 }
 
-export enum EnvPlatforms {
+export interface IEnvBrowser {
+    name: string;
+    version: string | number;
+}
+
+export enum EnvPlatformsEnum {
   WEBSERVER = 'webserver',
   EXTENSION = 'extension',
   OFFICE = 'office',
@@ -52,4 +57,10 @@ export interface IAddTask {
   vm: Vue;
   user: IUser;
   task: ITask;
+}
+
+export interface IOpenSidebar {
+  url: string;
+  vm: Vue;
+  env: IEnvState;
 }

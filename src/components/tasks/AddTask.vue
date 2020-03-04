@@ -1,15 +1,28 @@
 <template>
-  <v-row
-    align="center"
-    justify="center"
-  >
+  <v-dialog
+      v-model="dialog"
+      width="500"
+    >
+    <template v-slot:activator="{ on }">
+      <v-btn
+        color="red lighten-2"
+        dark
+        v-on="on"
+      >
+        Add task
+      </v-btn>
+    </template>
     <v-card>
       <v-toolbar
-        color="primary"
-        dark
+        color="white"
         flat
+        dense
       >
         <v-toolbar-title>Add New Task</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="closeDialog();">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
       </v-toolbar>
       <v-card-text>
         <v-form>
@@ -28,8 +41,7 @@
         <v-btn color="primary" @click="addTask()" :disabled="!newTask.title">Add Task</v-btn>
       </v-card-actions>
     </v-card>
-
-  </v-row>
+  </v-dialog>
 </template>
 
 <script lang="ts">
@@ -46,6 +58,7 @@ export default Vue.extend({
 
   data() {
     return {
+      dialog: false,
       newTask: {
         title: '',
         description: '',
@@ -73,15 +86,20 @@ export default Vue.extend({
       };
       this.$store.dispatch('tasks/addTask', payload)
         .then((resp) => {
-          this.newTask = {
-            title: '',
-            description: '',
-            modified: new Date(),
-          };
+          this.closeDialog();
         })
         .catch((error) => {
           console.error('Error adding new task');
         });
+    },
+
+    closeDialog() {
+      this.newTask = {
+        title: '',
+        description: '',
+        modified: new Date(),
+      };
+      this.dialog = false;
     },
   },
 });
