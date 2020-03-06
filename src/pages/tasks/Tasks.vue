@@ -3,7 +3,7 @@
     <v-row>
       <v-col cols="9">
         <template v-for="(task) in tasks">
-          <task-item :task="task" :key="'tasks-' + task.id"></task-item>
+          <task-item :taskId="task.id" :key="'tasks-' + task.id"></task-item>
           <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
         </template>
       </v-col>

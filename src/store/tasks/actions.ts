@@ -4,30 +4,32 @@ import * as axios from 'axios';
 import uuid from 'uuidv4';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask, EnvPlatformsEnum, IOpenSidebar } from '@/types';
+import { IBasePayload, ITask, IAddTask, EnvPlatformsEnum, IOpenSidebar, IAddTaskLink, ITaskLink } from '@/types';
 
 export const setTasks = (state: any, payload: IBasePayload) => {
-  return new Promise((resolve, reject) => {
-    firebase
-        .firestore()
-        .collection('users/' + payload.user.id + '/tasks/')
-        .orderBy('modified', 'desc')
-        .onSnapshot(function(querySnapshot) {
-          const tasks: ITask[] = [];
-          querySnapshot.forEach(function(doc) {
-            tasks.push({
-              id: doc.id,
-              title: doc.data().title,
-              profile: doc.data().profile,
-              description: doc.data().description,
-              modified: doc.data().modified.toDate(),
-              publishId: doc.data().publishId,
-            });
-          });
-          payload.vm.$store.commit('tasks/setTasks', tasks);
-          resolve();
-      });
+  let tasks: ITask[] = [];
 
+  firebase
+  .firestore()
+  .collection('users/' + payload.user.id + '/tasks/')
+  .orderBy('modified', 'desc').onSnapshot(function(tasksCollectionRef: any) {
+    tasks = [];
+    tasksCollectionRef.forEach((doc: any) => {
+      const task: ITask = JSON.parse(JSON.stringify(doc.data()));
+      task.id = doc.id;
+      tasks.push(task);
+      doc.ref.collection('links/')
+      .orderBy('order', 'asc').onSnapshot((linksCollectionRef: any) => {
+        task.links = [];
+        linksCollectionRef.forEach((linkRef: any ) => {
+          const link = JSON.parse(JSON.stringify(linkRef.data()));
+          link.id = linkRef.id;
+          task.links.push(link);
+        });
+      });
+    });
+    // may need Promise all for sub collections
+    payload.vm.$store.commit('tasks/setTasks', tasks);
   });
 };
 
@@ -43,19 +45,42 @@ export const addTask = (state: any, payload: IAddTask) => {
     userDoc
       .collection('tasks').add(payload.task)
       .then(function(docRef) {
-        /*
-        // Add deeper doc if needed
-        docRef
-          .collection('pages').add(payload.page)
-            .then(function(pageRef) {
-
-            });
-        */
         resolve(docRef.id);
       })
       .catch(function(error) {
           console.error('Error adding document: ', error);
       });
+  });
+};
+
+export const updateTaskLinks = (state: any, payload: IAddTaskLink) => {
+  return new Promise((resolve, reject) => {
+    const linksCollection = firebase
+      .firestore()
+      .collection('users/' + payload.user.id + '/tasks/' + payload.taskId + '/links/');
+
+    payload.links.forEach((link: ITaskLink, index: number) => {
+      console.log('payload=', payload);
+      if (link.id) {
+        // Has id so must be in firestore already
+        linksCollection.doc(link.id)
+        .update({
+          order: index,
+        });
+      } else {
+        // New link to add
+        link.order = index;
+        linksCollection.add(link);
+      }
+    });
+    /* Need to update parent */
+    const userDoc = firebase
+      .firestore()
+      .collection('users/').doc(payload.user.id);
+    userDoc.update({
+      lastUpdated: new Date(),
+    });
+    resolve(payload.links);
   });
 };
 
@@ -74,7 +99,7 @@ export const openSidebar = (state: any, payload: IOpenSidebar) => {
         /* set the current window size */
         window.chrome.windows.update(currentWindow.id, { width: (windowWidth - popupWidth), top: 0, left: 0 });
         if (!res.popupWindowId) {
-          /* Not open so open */
+          /* Not open : so open */
           window.chrome.windows.create({
             url: popupURL + '/#' + payload.url,
             type: 'normal',

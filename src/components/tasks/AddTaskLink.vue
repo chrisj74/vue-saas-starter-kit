@@ -9,7 +9,7 @@
         dark
         v-on="on"
       >
-        Add task
+        Add link
       </v-btn>
     </template>
     <v-card>
@@ -18,7 +18,7 @@
         flat
         dense
       >
-        <v-toolbar-title>Add New Task</v-toolbar-title>
+        <v-toolbar-title>Add New Link</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="closeDialog();">
           <v-icon>mdi-close</v-icon>
@@ -27,18 +27,17 @@
       <v-card-text>
         <v-form>
           <v-text-field
-            label="Task name"
+            label="Link address"
             name="title"
             type="text"
-            v-model="newTask.title"
+            v-model="newTaskLink.url"
           />
-
         </v-form>
       </v-card-text>
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" @click="addTask()" :disabled="!newTask.title">Add Task</v-btn>
+        <v-btn color="primary" @click="addTaskLink()" :disabled="!newTaskLink.url">Add Link</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -51,20 +50,21 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask } from '@/types';
+import { IBasePayload, ITask, IAddTask, ITaskLink, IAddTaskLink } from '@/types';
 
 export default Vue.extend({
-  name: 'Addtask',
+  name: 'AddTaskLink',
+
+  props: ['task'],
 
   data() {
     return {
       dialog: false,
-      newTask: {
-        title: '',
-        description: '',
+      newTaskLink: {
+        url: '',
+        favicon: '',
         modified: new Date(),
-        links: [],
-      } as ITask,
+      } as ITaskLink,
     };
   },
 
@@ -78,28 +78,32 @@ export default Vue.extend({
   },
 
   methods: {
-    addTask(): void {
-      this.newTask.modified = new Date();
-      const payload: IAddTask = {
+    addTaskLink(): void {
+      this.newTaskLink.modified = new Date();
+      const linksArr = [...this.task.links];
+      linksArr.unshift(this.newTaskLink);
+      console.log('tasks with new task=', linksArr);
+      const payload: IAddTaskLink = {
         vm: this,
         user: this.user,
-        task: this.newTask,
+        taskId: this.task.id,
+        links: linksArr,
       };
-      this.$store.dispatch('tasks/addTask', payload)
+      this.$store.dispatch('tasks/updateTaskLinks', payload)
         .then((resp) => {
+          console.log('addTaskLink resp=', resp);
           this.closeDialog();
         })
         .catch((error) => {
-          console.error('Error adding new task');
+          console.error('Error adding new link');
         });
     },
 
     closeDialog() {
-      this.newTask = {
-        title: '',
-        description: '',
+      this.newTaskLink = {
+        url: '',
+        favicon: '',
         modified: new Date(),
-        links: [],
       };
       this.dialog = false;
     },

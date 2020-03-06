@@ -51,12 +51,29 @@ export interface ITask {
   modified?: Date;
   publishId?: string;
   id?: string;
+  order: number;
+  links: ITaskLink[];
+}
+
+export interface ITaskLink {
+  url: string;
+  favicon: string;
+  modified: Date;
+  id?: string;
+  order?: number;
 }
 
 export interface IAddTask {
   vm: Vue;
   user: IUser;
   task: ITask;
+}
+
+export interface IAddTaskLink {
+  vm: Vue;
+  user: IUser;
+  taskId: string;
+  links: ITaskLink[];
 }
 
 export interface IOpenSidebar {
