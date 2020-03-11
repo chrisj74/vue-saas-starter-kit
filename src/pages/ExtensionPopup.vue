@@ -35,7 +35,6 @@ export default Vue.extend({
     console.log('extensio mounted');
     if (this.user && !this.tasks) {
       const payload: IBasePayload = {
-        vm: this,
         user: this.user,
       };
       this.$store.dispatch('tasks/setTasks', payload);
@@ -61,7 +60,6 @@ export default Vue.extend({
       /* get the current window so we can set it back on leave */
       window.chrome.extension.sendMessage({ type: 'setLastFocusedWindowId', lastFocusedId:  currentWindow.id},
        function(res: any) {
-        console.log('currentWindow.id=', currentWindow.id);
         /* set the current window size */
         window.chrome.windows.update(currentWindow.id, { width: (windowWidth - popupWidth), top: 0, left: 0 });
         if (!res.popupWindowId) {
@@ -88,7 +86,6 @@ export default Vue.extend({
     user(value: any) {
       if (value !== null && value !== undefined && !this.tasks) {
         const payload: IBasePayload = {
-          vm: this,
           user: this.user,
         };
         this.$store.dispatch('tasks/setTasks', payload);

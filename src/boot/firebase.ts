@@ -42,7 +42,7 @@ export const FirebaseAutoLogin = (vm: Vue) => {
                 // console.log('updated sessions');
               })
               .catch((error) => {
-                console.log('error', error);
+                console.error('error', error);
               });
           } else {
             userObj.images = [];

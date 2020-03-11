@@ -1,12 +1,12 @@
 import * as firebase from 'firebase';
 import * as _ from 'lodash';
 import * as axios from 'axios';
-import uuid from 'uuidv4';
+// import uuid from 'uuidv4';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask, EnvPlatformsEnum, IOpenSidebar, IAddTaskLink, ITaskLink } from '@/types';
+import { IBasePayload, ITask, IAddTask, EnvPlatformsEnum, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
 
-export const setTasks = (state: any, payload: IBasePayload) => {
+export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
 
   firebase
@@ -29,11 +29,11 @@ export const setTasks = (state: any, payload: IBasePayload) => {
       });
     });
     // may need Promise all for sub collections
-    payload.vm.$store.commit('tasks/setTasks', tasks);
+    commit('setTasks', tasks);
   });
 };
 
-export const addTask = (state: any, payload: IAddTask) => {
+export const addTask = ({ commit }: {commit: any}, payload: IAddTask) => {
   return new Promise((resolve, reject) => {
     const userDoc = firebase
       .firestore()
@@ -53,15 +53,17 @@ export const addTask = (state: any, payload: IAddTask) => {
   });
 };
 
-export const updateTaskLinks = (state: any, payload: IAddTaskLink) => {
+export const updateTaskLinks = (state: any, payload: IUpdateTaskLinks) => {
   return new Promise((resolve, reject) => {
     const linksCollection = firebase
       .firestore()
       .collection('users/' + payload.user.id + '/tasks/' + payload.taskId + '/links/');
 
     payload.links.forEach((link: ITaskLink, index: number) => {
-      console.log('payload=', payload);
-      if (link.id) {
+      if (link.id && payload.deleteId && link.id === payload.deleteId) {
+        // Delete
+        linksCollection.doc(link.id).delete();
+      } else if (link.id) {
         // Has id so must be in firestore already
         linksCollection.doc(link.id)
         .update({
@@ -89,33 +91,52 @@ export const openSidebar = (state: any, payload: IOpenSidebar) => {
   const windowHeight = Math.floor(window.screen.availHeight);
   const popupWidth = 500;
   if (payload.env && payload.env.platform === EnvPlatformsEnum.EXTENSION) {
-    console.log('In extension');
     const popupURL = window.chrome.runtime.getURL('sidebar.html');
     window.chrome.windows.getCurrent({populate: false}, function(currentWindow: any) {
       /* get the current window so we can set it back on leave */
       window.chrome.extension.sendMessage({ type: 'setLastFocusedWindowId', lastFocusedId:  currentWindow.id},
       function(res: any) {
-        console.log('currentWindow.id=', currentWindow.id);
         /* set the current window size */
         window.chrome.windows.update(currentWindow.id, { width: (windowWidth - popupWidth), top: 0, left: 0 });
+
+        /* Set url */
+        let url = popupURL + '/#' + payload.url;
+        if (payload.external) {
+          url = payload.url;
+        }
+
         if (!res.popupWindowId) {
           /* Not open : so open */
-          window.chrome.windows.create({
-            url: popupURL + '/#' + payload.url,
+          const newWin = {
+            url,
             type: 'normal',
             height: windowHeight,
             width: popupWidth,
             top: 0,
             left: (windowWidth - popupWidth),
-          });
+          };
+          window.chrome.windows.create(newWin);
         } else {
           /* Already open so just focus */
           window.chrome.windows.update(res.popupWindowId, { focused: true });
+          if (payload.external) {
+            /* External so open new tab */
+            window.chrome.tabs.create({
+              windowId: res.popupWindowId,
+              url,
+              active: true,
+            });
+          } else {
+            /* Internal so update tab */
+            window.chrome.tabs.update(res.popupTabId, {
+              url,
+              active: true,
+            });
+          }
         }
       });
     });
   } else if (payload.env && payload.env.platform === EnvPlatformsEnum.WEBSERVER) {
-    console.log('In web app');
     window.resizeTo((windowWidth - popupWidth), windowHeight);
     window.moveTo(0, 0);
     window.open(
@@ -123,6 +144,10 @@ export const openSidebar = (state: any, payload: IOpenSidebar) => {
       'workalongo',
       'top=0, left=' + (windowWidth - popupWidth) + ', width=' + popupWidth + ', height=' + windowHeight + ',toolbar=1, scrollbars=1, location=1, statusbar=1, menubar=1');
   }
+};
+
+export const updateAllWindows = ({ commit }: {commit: any}, payload: any[]) => {
+  commit('setAllWindows', payload);
 };
 
 export const updateTask = (state: any, payload: any) => {

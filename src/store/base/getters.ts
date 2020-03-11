@@ -13,3 +13,7 @@ export const getError = (state: any) => {
 export const getEnv = (state: any) => {
   return state.env;
 };
+
+export const getExtension = (state: any) => {
+  return state.extension;
+};

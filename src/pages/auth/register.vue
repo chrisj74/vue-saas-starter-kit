@@ -157,7 +157,7 @@ export default Vue.extend({
   watch: {
     user(value: any) {
       if (value !== null && value !== undefined) {
-        this.$router.push('/');
+        this.$router.push('/tasks');
       }
     },
   },

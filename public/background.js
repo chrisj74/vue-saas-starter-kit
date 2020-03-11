@@ -41,11 +41,6 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 chrome.webRequest.onBeforeSendHeaders.addListener(
   function(details) {
-    // console.log('parent frame=', details.parentFrameId);
-    // console.log('frameId=', details.frameId);
-    // console.log('request urls=', details.url);
-    // console.log('tabId=', details.tabId);
-    // console.log('popupTabId=', popupTabId);
     if (
       popupTabId &&
       details.tabId === popupTabId &&
@@ -68,11 +63,22 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 /* MESSAGES */
 chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.type == "getTabId") {
-    /* Get tabId of popup so we only change headers on iframes in our app */
+  if (message.type == "setPopupTabId") {
+    /* Set tabId of popup so we only change headers on iframes in our app */
     popupTabId = sender.tab.id;
     sendResponse({ tabId: sender.tab.id });
     popupWindowId = sender.tab.windowId;
+    chrome.runtime.sendMessage({
+      type: 'setPopup',
+      popupWindowId: popupWindowId,
+      popupTabId: popupTabId,
+    })
+  } else if (message.type == "getPopup") {
+    /* Get popup window and tab */
+    sendResponse({
+      popupWindowId: popupWindowId,
+      popupTabId: popupTabId
+    });
   } else if (message.type == "popupMouseEnter") {
     /* focus the popup */
     chrome.windows.getCurrent({populate: true}, function (win) {
@@ -103,7 +109,10 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
   } else if (message.type == "setLastFocusedWindowId") {
     /* set last focused window id & send popup window id */
     lastFocusedWindowId = message.lastFocusedId;
-    sendResponse({ popupWindowId: popupWindowId });
+    sendResponse({
+      popupWindowId: popupWindowId,
+      popupTabId: popupTabId
+    });
   } else if (message.type == "setLastFocusedId") {
     /* Set the last focused id */
     lastFocusedWindowId = message.lastFocusedId;
@@ -115,6 +124,8 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
       lastFocusedTabLabel: lastFocusedTabLabel,
       lastFocusedWindowId: lastFocusedWindowId
     });
+  } else if (message.type == "getAllWindows") {
+    sendAllWindows();
   }
 });
 
@@ -136,8 +147,39 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 chrome.windows.onRemoved.addListener(function(windowId) {
   // If the window getting closed is the popup we created
   if (windowId === popupWindowId) {
-    // Set popupId to undefined so we know the popups not open
+    // Set popupId to undefined so we know the popup is not open
     popupId = null;
     popupWindowId = null;
+  } else {
+    sendAllWindows();
   }
 });
+
+/* When window added */
+chrome.windows.onRemoved.addListener(function() {
+  sendAllWindows();
+});
+
+/* Add tab */
+chrome.tabs.onCreated.addListener(function() {
+  sendAllWindows();
+});
+
+/* Update tab */
+chrome.tabs.onUpdated.addListener(function() {
+  sendAllWindows();
+});
+
+/* Add tab */
+chrome.tabs.onRemoved.addListener(function() {
+  sendAllWindows();
+});
+
+var sendAllWindows = function() {
+  chrome.windows.getAll({"populate" : true}, function(allWindows) {
+    chrome.runtime.sendMessage({
+      type: 'setAllWindows',
+      allWindows: allWindows,
+    });
+  });
+};

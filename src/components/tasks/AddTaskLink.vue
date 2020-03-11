@@ -27,8 +27,14 @@
       <v-card-text>
         <v-form>
           <v-text-field
-            label="Link address"
+            label="Link title"
             name="title"
+            type="text"
+            v-model="newTaskLink.title"
+          />
+          <v-text-field
+            label="Link address"
+            name="url"
             type="text"
             v-model="newTaskLink.url"
           />
@@ -50,7 +56,7 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask, ITaskLink, IAddTaskLink } from '@/types';
+import { ITask, ITaskLink, IUpdateTaskLinks } from '@/types';
 
 export default Vue.extend({
   name: 'AddTaskLink',
@@ -61,8 +67,9 @@ export default Vue.extend({
     return {
       dialog: false,
       newTaskLink: {
+        title: '',
         url: '',
-        favicon: '',
+        favIconUrl: '',
         modified: new Date(),
       } as ITaskLink,
     };
@@ -82,8 +89,7 @@ export default Vue.extend({
       this.newTaskLink.modified = new Date();
       const linksArr = [...this.task.links];
       linksArr.unshift(this.newTaskLink);
-      console.log('tasks with new task=', linksArr);
-      const payload: IAddTaskLink = {
+      const payload: IUpdateTaskLinks = {
         vm: this,
         user: this.user,
         taskId: this.task.id,
@@ -91,7 +97,6 @@ export default Vue.extend({
       };
       this.$store.dispatch('tasks/updateTaskLinks', payload)
         .then((resp) => {
-          console.log('addTaskLink resp=', resp);
           this.closeDialog();
         })
         .catch((error) => {
@@ -102,7 +107,8 @@ export default Vue.extend({
     closeDialog() {
       this.newTaskLink = {
         url: '',
-        favicon: '',
+        title: '',
+        favIconUrl: '',
         modified: new Date(),
       };
       this.dialog = false;

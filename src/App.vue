@@ -10,7 +10,7 @@ import { mapGetters } from 'vuex';
 import * as Bowser from 'bowser';
 
 /* Models */
-import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser } from '@/types';
+import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser, IExtensionState, IExtensionPopupState } from '@/types';
 
 export default Vue.extend({
   name: 'App',
@@ -20,17 +20,33 @@ export default Vue.extend({
   }),
   created() {
     const browser = Bowser.getParser(window.navigator.userAgent);
+
     if (window.chrome && window.chrome.runtime.id) {
-      console.log('chrome extension');
+      this.$store.dispatch('base/setExtensionId', window.chrome.runtime.id);
       const envPayload: IEnvState = {
         platform: EnvPlatformsEnum.EXTENSION,
         browser: browser.getBrowser() as IEnvBrowser,
       };
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
-    } else {
-      console.log('webserver');
+      window.chrome.runtime.sendMessage({ type: 'getAllWindows' });
 
+      /* Listeners */
+      const vm = this;
+      window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
+        /* Listen for window update */
+        if (response.type === 'setAllWindows') {
+          vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
+        } else if (response.type === 'setPopup') {
+          /* Listen for popup update */
+          const payload: IExtensionPopupState = {
+            popupWindowId: response.popupWindowId,
+            popupTabId: response.popupTabId,
+          };
+          vm.$store.dispatch('base/setExtensionPopup', payload);
+        }
+      });
+    } else {
       const envPayload: IEnvState = {
         platform: EnvPlatformsEnum.WEBSERVER,
         browser: browser.getBrowser() as IEnvBrowser,
@@ -41,7 +57,6 @@ export default Vue.extend({
   mounted() {
     if (this.user && !this.tasks) {
       const payload: IBasePayload = {
-        vm: this,
         user: this.user,
       };
       this.$store.dispatch('tasks/setTasks', payload);
@@ -63,7 +78,6 @@ export default Vue.extend({
     user(value: any) {
       if (value !== null && value !== undefined && !this.tasks) {
         const payload: IBasePayload = {
-          vm: this,
           user: this.user,
         };
         this.$store.dispatch('tasks/setTasks', payload);

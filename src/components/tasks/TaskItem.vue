@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-list>
     <v-toolbar
       color="primary"
       dark
@@ -9,14 +9,14 @@
     >
       <v-toolbar-title>{{ task.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
-
+      <!-- Add -->
       <v-btn icon>
         <v-icon>mdi-plus</v-icon>
       </v-btn>
-
+      <!-- Open sidebar -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on" @click="openSidebar()">
+          <v-btn icon v-on="on" @click="openSidebar('/task/' + task.id, false)">
             <v-icon>
               mdi-open-in-new
             </v-icon>
@@ -24,7 +24,7 @@
         </template>
         <span>Open Workalong</span>
       </v-tooltip>
-
+      <!-- Menu -->
       <v-menu offset-y>
         <template v-slot:activator="{ on }">
           <v-btn
@@ -73,11 +73,77 @@
       <div v-html="task.description"></div>
       <p v-if="task.links">Links {{ task.links.length }}</p>
       <!-- Links -->
-      <v-card v-for="link of task.links" :key="'link-' + link.id">
-        <v-card-text>
-          <a :href="link.url">{{ link.url }}</a>
-        </v-card-text>
-      </v-card>
+      <v-list elevation="1" dense rounded>
+        <draggable
+          v-model="task.links"
+          :move="changeOrder"
+          :group="{ name: 'itemLinks', pull: 'clone', put: true }"
+          :clone="cloneLink"
+          @add="addCloneLink">
+          <v-list-item
+            v-for="link of task.links"
+            :key="'link-' + link.id"
+            dense
+            class="mb-1"
+            >
+            <v-list-item-title>
+              <a :href="link.url">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
+              <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
+            </v-list-item-title>
+
+            <v-list-item-action>
+              <v-menu offset-y>
+                <template v-slot:activator="{ on }">
+                  <v-btn
+                    v-on="on"
+                    icon
+                  >
+                    <v-icon>mdi-dots-vertical</v-icon>
+                  </v-btn>
+                </template>
+                <v-list dense>
+                  <!-- Open tab -->
+                  <v-list-item :href="link.url">
+                    <v-list-item-content>
+                      <v-list-item-title>Open Tab</v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-icon>
+                      <v-icon small>mdi-tab-plus</v-icon>
+                    </v-list-item-icon>
+                  </v-list-item>
+                  <!-- Open sidebar -->
+                  <v-list-item @click="openSidebar(link.url, true)">
+                    <v-list-item-content>
+                      <v-list-item-title>Open Workalong</v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-icon>
+                      <v-icon small>mdi-open-in-new</v-icon>
+                    </v-list-item-icon>
+                  </v-list-item>
+                  <!-- Delete -->
+                  <v-list-item @click="deleteLink(link.id)">
+                    <v-list-item-content>
+                      <v-list-item-title>Delete link</v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-icon>
+                      <v-icon small color="error">mdi-delete</v-icon>
+                    </v-list-item-icon>
+                  </v-list-item>
+                  <!-- Edit -->
+                  <v-list-item>
+                    <v-list-item-content>
+                      <v-list-item-title>Edit title</v-list-item-title>
+                    </v-list-item-content>
+                    <v-list-item-icon>
+                      <v-icon small>mdi-pencil</v-icon>
+                    </v-list-item-icon>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+            </v-list-item-action>
+          </v-list-item>
+        </draggable>
+      </v-list>
     </v-card-text>
 
     <v-card-actions>
@@ -85,7 +151,7 @@
       <v-spacer />
       <v-btn color="primary" :to="'/task/' + task.id">View Task</v-btn>
     </v-card-actions>
-  </v-card>
+  </v-list>
 </template>
 
 <script lang="ts">
@@ -93,18 +159,20 @@
 /* Libs */
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
+import * as draggable from 'vuedraggable';
 
 /* App components */
 import AddTaskLink from './AddTaskLink.vue';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask, IOpenSidebar } from '@/types';
+import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
 
 export default Vue.extend({
   name: 'TaskItem',
   props: ['taskId'],
   components: {
     AddTaskLink,
+    draggable,
   },
   data() {
     return {
@@ -120,31 +188,62 @@ export default Vue.extend({
       user: 'user/user',
       tasks: 'tasks/getTasks',
     }),
-    task() {
+    task(): ITask {
       return this.tasks.find((task: ITask) => {
-        console.log('computed taskId=', this.taskId, ' task.id=', task.id);
         return task.id === this.taskId;
       }) as ITask;
     },
   },
 
   methods: {
-    openSidebar() {
+    changeOrder(ev: any): void {
+      const linksArr = [...this.task.links];
+      const payload: IUpdateTaskLinks = {
+        vm: this,
+        user: this.user,
+        taskId: this.task.id as string,
+        links: linksArr,
+      };
+      this.$store.dispatch('tasks/updateTaskLinks', payload);
+    },
+
+    cloneLink(item: any): ITaskLink {
+      const newItem: ITaskLink = JSON.parse(JSON.stringify(item));
+      newItem.id = undefined;
+      return newItem;
+    },
+
+    addCloneLink(ev: any): void {
+      const duplicate = this.task.links.find((link: ITaskLink, index: number) => {
+        return link.url === this.task.links[ev.newIndex].url && index !== ev.newIndex;
+      });
+      if (!duplicate) {
+        this.changeOrder(true);
+      } else {
+        // Show snackbar warning that it's a duplicate TODO
+      }
+    },
+
+    deleteLink(linkId: string): void {
+      const linksArr = [...this.task.links];
+      const payload: IUpdateTaskLinks = {
+        vm: this,
+        user: this.user,
+        taskId: this.task.id as string,
+        links: linksArr,
+        deleteId: linkId,
+      };
+      this.$store.dispatch('tasks/updateTaskLinks', payload);
+    },
+
+    openSidebar(linkUrl: string, linkExternal: boolean): void {
       const payload: IOpenSidebar = {
-        url: '/task/' + this.task.id,
+        url: linkUrl,
         vm: this,
         env: this.env,
+        external: linkExternal,
       };
       this.$store.dispatch('tasks/openSidebar', payload);
-    },
-  },
-  watch: {
-    task: {
-      deep: true,
-      immediate: true,
-      handler: function (val, oldVal) {
-        console.log('watcher task=', this.task);
-      },
     },
   },
 });

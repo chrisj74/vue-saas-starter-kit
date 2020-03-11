@@ -7,5 +7,12 @@ export default function() {
     leftDrawerOpen: false,
     loading: false,
     error: null,
+    extension: {
+      extensionId: null,
+      popup: {
+        popupWindowId: null,
+      popupTabId: null,
+      }
+    },
   };
 }

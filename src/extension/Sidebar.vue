@@ -28,7 +28,7 @@ export default Vue.extend({
       };
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
-      window.chrome.runtime.sendMessage({ type: 'getTabId' }, (res: any) => {
+      window.chrome.runtime.sendMessage({ type: 'setPopupTabId' }, (res: any) => {
         console.log('inside popup tabId=', res.tabId);
       });
       const bodyObj = document.getElementsByTagName('body');
@@ -55,7 +55,6 @@ export default Vue.extend({
   mounted() {
     if (this.user && !this.tasks) {
       const payload: IBasePayload = {
-        vm: this,
         user: this.user,
       };
       this.$store.dispatch('tasks/setTasks', payload);
@@ -77,7 +76,6 @@ export default Vue.extend({
     user(value: any) {
       if (value !== null && value !== undefined && !this.tasks) {
         const payload: IBasePayload = {
-          vm: this,
           user: this.user,
         };
         this.$store.dispatch('tasks/setTasks', payload);

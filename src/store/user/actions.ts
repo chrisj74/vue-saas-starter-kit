@@ -67,7 +67,7 @@ export const signUserIn = (state: any, payload: ILoginData) => {
                 const redirect: string = payload.redirect.redirect as string;
                 payload.vm.$router.push(redirect);
               } else {
-                payload.vm.$router.push('/');
+                payload.vm.$router.push('/tasks');
               }
               payload.vm.$store.commit('user/setAuth', true);
             }
@@ -98,9 +98,10 @@ export const autoSignIn =  (state: any, payload: any) => {
     payload.vm.$router.push(payload.redirect.redirect);
   } else if (
     payload.vm.$router.currentRoute.path === '/login'
-    || payload.vm.$router.currentRoute.path === 'register'
+    || payload.vm.$router.currentRoute.path === '/register'
   ) {
-    payload.vm.$router.push('/');
+    console.log('autologin redirect to /tasks');
+    payload.vm.$router.push('/tasks');
   }
   state.commit('setAuth', true);
 };

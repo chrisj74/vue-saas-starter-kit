@@ -51,7 +51,7 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask } from '@/types';
+import { ITask, IAddTask } from '@/types';
 
 export default Vue.extend({
   name: 'Addtask',
@@ -64,6 +64,7 @@ export default Vue.extend({
         description: '',
         modified: new Date(),
         links: [],
+        order: 0,
       } as ITask,
     };
   },
@@ -81,7 +82,6 @@ export default Vue.extend({
     addTask(): void {
       this.newTask.modified = new Date();
       const payload: IAddTask = {
-        vm: this,
         user: this.user,
         task: this.newTask,
       };
@@ -100,6 +100,7 @@ export default Vue.extend({
         description: '',
         modified: new Date(),
         links: [],
+        order: 0,
       };
       this.dialog = false;
     },

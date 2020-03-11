@@ -7,6 +7,15 @@ export interface IEnvState {
   browser: IEnvBrowser;
 }
 
+export interface IExtensionPopupState {
+  popupWindowId: number;
+  popupTabId: number;
+}
+export interface IExtensionState {
+  extensionId: string | number;
+  popup: IExtensionPopupState;
+}
+
 export interface IEnvBrowser {
     name: string;
     version: string | number;
@@ -40,7 +49,6 @@ export interface ILoginData {
 
 /* TASKS STATE */
 export interface IBasePayload {
-  vm: Vue;
   user: IUser;
 }
 
@@ -57,27 +65,29 @@ export interface ITask {
 
 export interface ITaskLink {
   url: string;
-  favicon: string;
+  favIconUrl: string;
   modified: Date;
+  title?: string;
   id?: string;
   order?: number;
 }
 
 export interface IAddTask {
-  vm: Vue;
   user: IUser;
   task: ITask;
 }
 
-export interface IAddTaskLink {
+export interface IUpdateTaskLinks {
   vm: Vue;
   user: IUser;
   taskId: string;
   links: ITaskLink[];
+  deleteId?: string;
 }
 
 export interface IOpenSidebar {
   url: string;
   vm: Vue;
   env: IEnvState;
+  external: boolean;
 }
