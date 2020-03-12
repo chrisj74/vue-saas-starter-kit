@@ -1,37 +1,8 @@
 <template>
   <v-container>
     <v-row>
-      <v-col cols="12">
-        <v-card v-if="task">
-          <v-toolbar
-            color="primary"
-            dark
-            flat
-            dense
-          >
-            <v-toolbar-title>{{ task.title }}</v-toolbar-title>
-            <v-spacer></v-spacer>
-
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on }">
-                <v-btn icon v-on="on" @click="openSidebar()">
-                  <v-icon>
-                    mdi-open-in-new
-                  </v-icon>
-                </v-btn>
-              </template>
-              <span>Open Workalong</span>
-            </v-tooltip>
-          </v-toolbar>
-          <v-card-text>
-            <div v-html="task.description"></div>
-            <v-row>
-              <v-col>
-
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
+      <v-col cols="12" v-if="task">
+        <task-item :taskId="task.id" :collection="false"></task-item>
       </v-col>
     </v-row>
     <add-task></add-task>
@@ -45,13 +16,14 @@ import { mapGetters } from 'vuex';
 
 /* App components */
 import AddTask from '@/components/tasks/AddTask.vue';
+import TaskItem from '@/components/tasks/TaskItem.vue';
 
 /* Models */
 import { ITask, EnvPlatformsEnum, IOpenSidebar } from '@/types';
 
 export default Vue.extend({
   name: 'Task',
-  components: { AddTask },
+  components: { AddTask, TaskItem },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',

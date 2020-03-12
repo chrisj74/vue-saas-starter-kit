@@ -5,11 +5,10 @@
     >
     <template v-slot:activator="{ on }">
       <v-btn
-        color="red lighten-2"
-        dark
+        icon
         v-on="on"
       >
-        Add link
+        <v-icon>mdi-plus</v-icon>
       </v-btn>
     </template>
     <v-card>

@@ -1,5 +1,5 @@
 <template>
-  <v-list>
+  <v-card>
     <v-toolbar
       color="primary"
       dark
@@ -9,10 +9,6 @@
     >
       <v-toolbar-title>{{ task.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <!-- Add -->
-      <v-btn icon>
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
       <!-- Open sidebar -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
@@ -69,89 +65,55 @@
         </v-list>
       </v-menu>
     </v-toolbar>
-    <v-card-text v-if="task.links">
-      <div v-html="task.description"></div>
-      <p v-if="task.links">Links {{ task.links.length }}</p>
-      <!-- Links -->
-      <v-list elevation="1" dense rounded>
-        <draggable
-          v-model="task.links"
-          :move="changeOrder"
-          :group="{ name: 'itemLinks', pull: 'clone', put: true }"
-          :clone="cloneLink"
-          @add="addCloneLink">
-          <v-list-item
-            v-for="link of task.links"
-            :key="'link-' + link.id"
-            dense
-            class="mb-1"
-            >
-            <v-list-item-title>
-              <a :href="link.url">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
-              <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
-            </v-list-item-title>
+    <div class="task-item-tabs">
+      <v-tabs
+        v-model="taskTab"
+        background-color="grey lighten-2"
+        centered
+        light
+        :show-arrows="true"
+        slider-size="10px"
+        height="30px"
+      >
+      <v-tabs-slider></v-tabs-slider>
 
-            <v-list-item-action>
-              <v-menu offset-y>
-                <template v-slot:activator="{ on }">
-                  <v-btn
-                    v-on="on"
-                    icon
-                  >
-                    <v-icon>mdi-dots-vertical</v-icon>
-                  </v-btn>
-                </template>
-                <v-list dense>
-                  <!-- Open tab -->
-                  <v-list-item :href="link.url">
-                    <v-list-item-content>
-                      <v-list-item-title>Open Tab</v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-icon>
-                      <v-icon small>mdi-tab-plus</v-icon>
-                    </v-list-item-icon>
-                  </v-list-item>
-                  <!-- Open sidebar -->
-                  <v-list-item @click="openSidebar(link.url, true)">
-                    <v-list-item-content>
-                      <v-list-item-title>Open Workalong</v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-icon>
-                      <v-icon small>mdi-open-in-new</v-icon>
-                    </v-list-item-icon>
-                  </v-list-item>
-                  <!-- Delete -->
-                  <v-list-item @click="deleteLink(link.id)">
-                    <v-list-item-content>
-                      <v-list-item-title>Delete link</v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-icon>
-                      <v-icon small color="error">mdi-delete</v-icon>
-                    </v-list-item-icon>
-                  </v-list-item>
-                  <!-- Edit -->
-                  <v-list-item>
-                    <v-list-item-content>
-                      <v-list-item-title>Edit title</v-list-item-title>
-                    </v-list-item-content>
-                    <v-list-item-icon>
-                      <v-icon small>mdi-pencil</v-icon>
-                    </v-list-item-icon>
-                  </v-list-item>
-                </v-list>
-              </v-menu>
-            </v-list-item-action>
-          </v-list-item>
-        </draggable>
-      </v-list>
+        <v-tab :href="'#tab-' + tab.type" v-for="tab in taskTabs" :key="'tab-' + tab.type">
+          <v-icon small>{{ tab.icon }}</v-icon>
+        </v-tab>
+      </v-tabs>
+    </div>
+    <v-card-text>
+      <v-tabs-items v-model="taskTab">
+        <v-tab-item
+          v-for="tabContent in taskTabs"
+          :key="'tabContent-' + tabContent.type"
+          :value="'tab-' + tabContent.type"
+        >
+          <v-card flat>
+            <!-- Cover -->
+            <div v-if="tabContent.type === taskTabTypesEnum.HOME">
+              <p>cover</p>
+              <div v-html="task.description"></div>
+            </div>
+            <!-- Links -->
+            <task-item-links
+              v-if="tabContent.type === taskTabTypesEnum.LINKS"
+              :taskId="taskId">
+            </task-item-links>
+            <!-- Info -->
+            <div v-if="tabContent.type === taskTabTypesEnum.INFO">
+              <p>INFO</p>
+            </div>
+          </v-card>
+        </v-tab-item>
+      </v-tabs-items>
     </v-card-text>
 
-    <v-card-actions>
-      <add-task-link :task="task"></add-task-link>
+    <v-card-actions v-if="collection">
       <v-spacer />
       <v-btn color="primary" :to="'/task/' + task.id">View Task</v-btn>
     </v-card-actions>
-  </v-list>
+  </v-card>
 </template>
 
 <script lang="ts">
@@ -163,20 +125,37 @@ import * as draggable from 'vuedraggable';
 
 /* App components */
 import AddTaskLink from './AddTaskLink.vue';
+import TaskItemLinks from './TaskItemLinks.vue';
 
 /* Models */
-import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
+import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum } from '@/types';
 
 export default Vue.extend({
   name: 'TaskItem',
-  props: ['taskId'],
+  props: ['taskId', 'collection'],
   components: {
     AddTaskLink,
     draggable,
+    TaskItemLinks,
   },
   data() {
     return {
-      //
+      taskTabTypesEnum,
+      taskTab: null,
+      taskTabs: [
+        {
+          type: taskTabTypesEnum.HOME,
+          icon: 'mdi-home',
+        },
+        {
+          type: taskTabTypesEnum.LINKS,
+          icon: 'mdi-link',
+        },
+        {
+          type: taskTabTypesEnum.INFO,
+          icon: 'mdi-information',
+        },
+      ] as ITaskTabs,
     };
   },
 
@@ -196,46 +175,6 @@ export default Vue.extend({
   },
 
   methods: {
-    changeOrder(ev: any): void {
-      const linksArr = [...this.task.links];
-      const payload: IUpdateTaskLinks = {
-        vm: this,
-        user: this.user,
-        taskId: this.task.id as string,
-        links: linksArr,
-      };
-      this.$store.dispatch('tasks/updateTaskLinks', payload);
-    },
-
-    cloneLink(item: any): ITaskLink {
-      const newItem: ITaskLink = JSON.parse(JSON.stringify(item));
-      newItem.id = undefined;
-      return newItem;
-    },
-
-    addCloneLink(ev: any): void {
-      const duplicate = this.task.links.find((link: ITaskLink, index: number) => {
-        return link.url === this.task.links[ev.newIndex].url && index !== ev.newIndex;
-      });
-      if (!duplicate) {
-        this.changeOrder(true);
-      } else {
-        // Show snackbar warning that it's a duplicate TODO
-      }
-    },
-
-    deleteLink(linkId: string): void {
-      const linksArr = [...this.task.links];
-      const payload: IUpdateTaskLinks = {
-        vm: this,
-        user: this.user,
-        taskId: this.task.id as string,
-        links: linksArr,
-        deleteId: linkId,
-      };
-      this.$store.dispatch('tasks/updateTaskLinks', payload);
-    },
-
     openSidebar(linkUrl: string, linkExternal: boolean): void {
       const payload: IOpenSidebar = {
         url: linkUrl,
@@ -248,3 +187,20 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.task-item-tabs {
+  .v-slide-group__next, .v-slide-group__prev {
+    min-width: 35px;
+  }
+  .v-tab {
+    min-width: 40px;
+    padding: 0 5px;
+    border-bottom: 2px solid inherit;
+    &.v-tab--active {
+      border-bottom: 2px solid #2fb8ac;
+    }
+  }
+}
+
+</style>

@@ -4,15 +4,21 @@
       <v-col :cols="allWindows && allWindows.length > 0 ? 9 : 12">
         <v-row>
           <v-col cols="4" v-for="(task) in tasks" :key="'tasks-' + task.id">
-            <task-item :taskId="task.id" ></task-item>
+            <task-item :taskId="task.id" :collection="true"></task-item>
             <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
           </v-col>
         </v-row>
 
       </v-col>
       <v-col cols="3" v-if="allWindows && allWindows.length > 0">
-        <v-list elevation="1" dense rounded v-for="(windowGroup, winIndex) in allWindows" :key="'windowGroup-' + winIndex">
-          <v-subheader>WINDOW {{ winIndex + 1 }} TABS</v-subheader>
+        <v-list
+          elevation="1"
+          dense
+          rounded
+          v-for="(windowGroup, winIndex) in allWindows"
+          :key="'windowGroup-' + winIndex"
+          class="mb-1">
+          <v-subheader>WINDOW {{ winIndex + 1 }} - TABS</v-subheader>
           <draggable
             v-model="allWindows[winIndex].tabs"
             :move="changeOrder"
