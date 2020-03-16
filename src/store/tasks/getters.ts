@@ -5,6 +5,10 @@ export const getTasks = (state: any) => {
   return state.tasks;
 };
 
+export const getShowLinks = (state: any) => {
+  return state.showLinks;
+};
+
 export const getTaskById = (state: any) => (id: string) => {
   if (state.tasks && id) {
     return state.tasks.find((task: ITask) => {

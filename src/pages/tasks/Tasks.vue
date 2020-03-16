@@ -81,7 +81,15 @@ export default Vue.extend({
   },
   methods: {
     cloneLink(item: any) {
+      this.$store.commit('tasks/setShowLinks');
       const clonedItem = JSON.parse(JSON.stringify(item));
+      /* Check if tab is suspended by great suspender extension */
+      if (clonedItem.url.indexOf('chrome-extension://') !== -1
+        && clonedItem.url.indexOf('suspended.html') !== -1
+        && clonedItem.url.indexOf('&uri=') !== -1
+      ) {
+        clonedItem.url = clonedItem.url.substring(clonedItem.url.indexOf('&uri=') + 5);
+      }
       const newItem: ITaskLink = {
         title: clonedItem.title,
         url: clonedItem.url,

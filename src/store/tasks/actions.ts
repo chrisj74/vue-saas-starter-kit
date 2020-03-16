@@ -4,7 +4,7 @@ import * as axios from 'axios';
 // import uuid from 'uuidv4';
 
 /* Models */
-import { IBasePayload, ITask, IAddTask, EnvPlatformsEnum, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
+import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
@@ -33,7 +33,7 @@ export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   });
 };
 
-export const addTask = ({ commit }: {commit: any}, payload: IAddTask) => {
+export const addTask = ({ commit }: {commit: any}, payload: IUpdateTask) => {
   return new Promise((resolve, reject) => {
     const userDoc = firebase
       .firestore()
@@ -150,12 +150,44 @@ export const updateAllWindows = ({ commit }: {commit: any}, payload: any[]) => {
   commit('setAllWindows', payload);
 };
 
-export const updateTask = (state: any, payload: any) => {
-  //
+export const updateTask = (state: any, payload: IUpdateTask) => {
+  return new Promise((resolve, reject) => {
+    const userDoc = firebase
+      .firestore()
+      .collection('users/').doc(payload.user.id);
+    userDoc.update({
+      lastUpdated: new Date(),
+    });
+
+    userDoc
+      .collection('tasks').doc(payload.task.id).update(payload.task)
+      .then(() => {
+        resolve(true);
+      })
+      .catch(function(error) {
+          console.error('Error deleting document: ', error);
+      });
+  });
 };
 
-export const deleteTask = (state: any, payload: any) => {
-  //
+export const deleteTask = (state: any, payload: IUpdateTask) => {
+  return new Promise((resolve, reject) => {
+    const userDoc = firebase
+      .firestore()
+      .collection('users/').doc(payload.user.id);
+    userDoc.update({
+      lastUpdated: new Date(),
+    });
+
+    userDoc
+      .collection('tasks').doc(payload.task.id).delete()
+      .then(() => {
+        resolve(true);
+      })
+      .catch(function(error) {
+          console.error('Error deleting document: ', error);
+      });
+  });
 };
 
 export const cloneTask = (state: any, payload: any) => {

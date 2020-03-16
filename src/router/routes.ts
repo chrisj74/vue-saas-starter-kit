@@ -8,7 +8,8 @@ const routes: RouteConfig[] = [
       {
         path: '',
         name: 'Home',
-        component: () => import('../pages/Home.vue'),
+        // component: () => import('../pages/Home.vue'),
+        component: () => import('../pages/tasks/Tasks.vue'),
       },
       {
         path: 'tasks',

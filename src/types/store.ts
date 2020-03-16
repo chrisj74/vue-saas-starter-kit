@@ -1,3 +1,5 @@
+import { ITask, ITaskLink } from './task';
+
  /* tslint:disable-next-line:interface-over-type-literal */
 type Dictionary < T > = { [key: string]: T };
 
@@ -52,27 +54,7 @@ export interface IBasePayload {
   user: IUser;
 }
 
-export interface ITask {
-  title: string;
-  description: string;
-  profile?: string;
-  modified?: Date;
-  publishId?: string;
-  id?: string;
-  order: number;
-  links: ITaskLink[];
-}
-
-export interface ITaskLink {
-  url: string;
-  favIconUrl: string;
-  modified: Date;
-  title?: string;
-  id?: string;
-  order?: number;
-}
-
-export interface IAddTask {
+export interface IUpdateTask {
   user: IUser;
   task: ITask;
 }

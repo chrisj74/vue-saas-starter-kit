@@ -8,3 +8,7 @@ export const setTasks = (state: any, payload: ITask[]) => {
 export const setAllWindows = (state: any, payload: any[]) => {
   Vue.set(state, 'allWindows', [...payload]);
 };
+
+export const setShowLinks = (state: any) => {
+  state.showLinks++;
+};

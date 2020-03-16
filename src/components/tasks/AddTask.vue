@@ -51,7 +51,8 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Models */
-import { ITask, IAddTask } from '@/types';
+import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs } from '@/types';
+import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
   name: 'Addtask',
@@ -65,6 +66,7 @@ export default Vue.extend({
         modified: new Date(),
         links: [],
         order: 0,
+        tabs: newTaskTabs(),
       } as ITask,
     };
   },
@@ -81,7 +83,7 @@ export default Vue.extend({
   methods: {
     addTask(): void {
       this.newTask.modified = new Date();
-      const payload: IAddTask = {
+      const payload: IUpdateTask = {
         user: this.user,
         task: this.newTask,
       };
@@ -101,6 +103,7 @@ export default Vue.extend({
         modified: new Date(),
         links: [],
         order: 0,
+        tabs: newTaskTabs(),
       };
       this.dialog = false;
     },

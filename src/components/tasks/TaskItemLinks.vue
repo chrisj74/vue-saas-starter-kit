@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="task-item-links">
     <p v-if="task.links">Links {{ task.links.length }} <add-task-link :task="task"></add-task-link></p>
-    <v-list elevation="1" dense rounded>
+    <v-list dense>
       <draggable
         v-model="task.links"
         :move="changeOrder"
@@ -14,10 +14,13 @@
           dense
           class="mb-1"
           >
+          <v-list-item-avatar v-if="link.favIconUrl" size="20">
+            <v-img :src="link.favIconUrl"></v-img>
+          </v-list-item-avatar>
           <v-list-item-title>
             <a :href="link.url">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
-            <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
           </v-list-item-title>
+          <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
 
           <v-list-item-action>
             <v-menu offset-y>
@@ -48,15 +51,6 @@
                     <v-icon small>mdi-open-in-new</v-icon>
                   </v-list-item-icon>
                 </v-list-item>
-                <!-- Delete -->
-                <v-list-item @click="deleteLink(link.id)">
-                  <v-list-item-content>
-                    <v-list-item-title>Delete link</v-list-item-title>
-                  </v-list-item-content>
-                  <v-list-item-icon>
-                    <v-icon small color="error">mdi-delete</v-icon>
-                  </v-list-item-icon>
-                </v-list-item>
                 <!-- Edit -->
                 <v-list-item>
                   <v-list-item-content>
@@ -64,6 +58,15 @@
                   </v-list-item-content>
                   <v-list-item-icon>
                     <v-icon small>mdi-pencil</v-icon>
+                  </v-list-item-icon>
+                </v-list-item>
+                <!-- Delete -->
+                <v-list-item @click="deleteLink(link.id)">
+                  <v-list-item-content>
+                    <v-list-item-title>Delete link</v-list-item-title>
+                  </v-list-item-content>
+                  <v-list-item-icon>
+                    <v-icon small color="error">mdi-delete</v-icon>
                   </v-list-item-icon>
                 </v-list-item>
               </v-list>
@@ -169,3 +172,24 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.task-item-links {
+  .v-list {
+    padding: 0;
+    .v-list-item {
+      padding: 0;
+      .v-list-item__action {
+        margin: 0;
+      }
+      .v-application--is-ltr .v-list-item__action:last-of-type:not(:only-child),
+      .v-application--is-ltr .v-list-item__avatar:last-of-type:not(:only-child),
+      .v-application--is-ltr .v-list-item__icon:last-of-type:not(:only-child){
+        margin-left: 0;
+      }
+    }
+  }
+
+}
+
+</style>
