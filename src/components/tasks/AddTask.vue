@@ -66,6 +66,7 @@ export default Vue.extend({
         modified: new Date(),
         links: [],
         order: 0,
+        currentTab: null,
         tabs: newTaskTabs(),
       } as ITask,
     };
@@ -103,6 +104,7 @@ export default Vue.extend({
         modified: new Date(),
         links: [],
         order: 0,
+        currentTab: null,
         tabs: newTaskTabs(),
       };
       this.dialog = false;

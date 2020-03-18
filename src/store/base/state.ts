@@ -9,10 +9,12 @@ export default function() {
     error: null,
     extension: {
       extensionId: null,
-      popup: {
-        popupWindowId: null,
-      popupTabId: null,
-      }
+      windowId: null,
+      tabId: null,
+      sidebar: {
+        sidebarWindowId: null,
+        sidebarTabId: null,
+      },
     },
   };
 }

@@ -1,7 +1,7 @@
 var HEADERS_TO_STRIP_LOWERCASE = ["content-security-policy", "x-frame-options", "access-control-allow-origin", "x-content-type-options"];
 
-var popupTabId = null;
-var popupWindowId = null;
+var sidebarTabId = null;
+var sidebarWindowId = null;
 var lastFocusedWindowId = null;
 var lastFocusedTabId = null;
 var lastFocusedTabUrl = null;
@@ -42,8 +42,8 @@ chrome.webRequest.onHeadersReceived.addListener(
 chrome.webRequest.onBeforeSendHeaders.addListener(
   function(details) {
     if (
-      popupTabId &&
-      details.tabId === popupTabId &&
+      sidebarTabId &&
+      details.tabId === sidebarTabId &&
       details.frameId !== -1 &&
       (details.url.indexOf("www.google.") !== -1 || details.url.indexOf('https://github.com/') !== -1)
     ) {
@@ -63,24 +63,31 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
 /* MESSAGES */
 chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.type == "setPopupTabId") {
-    /* Set tabId of popup so we only change headers on iframes in our app */
-    popupTabId = sender.tab.id;
+  if (message.type == "setSidebarTabId") {
+    /* Set tabId of sidebar so we only change headers on iframes in our app */
+    sidebarTabId = sender.tab.id;
     sendResponse({ tabId: sender.tab.id });
-    popupWindowId = sender.tab.windowId;
+    sidebarWindowId = sender.tab.windowId;
     chrome.runtime.sendMessage({
-      type: 'setPopup',
-      popupWindowId: popupWindowId,
-      popupTabId: popupTabId,
-    })
-  } else if (message.type == "getPopup") {
-    /* Get popup window and tab */
-    sendResponse({
-      popupWindowId: popupWindowId,
-      popupTabId: popupTabId
+      type: 'setSidebar',
+      sidebarWindowId: sidebarWindowId,
+      sidebarTabId: sidebarTabId,
     });
-  } else if (message.type == "popupMouseEnter") {
-    /* focus the popup */
+  } else if (message.type == "getsidebar") {
+    /* Get sidebar window and tab */
+    sendResponse({
+      sidebarWindowId: sidebarWindowId,
+      sidebarTabId: sidebarTabId
+    });
+  } else if (message.type == "getMyWindow") {
+    /* return sender details */
+    lastFocusedWindowId = message.lastFocusedId;
+    sendResponse({
+      tabId: sender.tab.id,
+      windowId: sender.tab.windowId
+    });
+  } else if (message.type == "sidebarMouseEnter") {
+    /* focus the sidebar */
     chrome.windows.getCurrent({populate: true}, function (win) {
       /* get the current window so we can set it back on leave */
       if (win.id !== sender.tab.windowId) {
@@ -101,17 +108,21 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
         }
         chrome.windows.update(sender.tab.windowId, { focused: true });
         lastFocusedWindowId = win.id;
+        chrome.runtime.sendMessage({
+          type: 'setLastFocussedWindow',
+          windowId: lastFocusedWindowId,
+        })
       }
     })
-  } else if (message.type == 'popupMouseLeave' && lastFocusedWindowId) {
+  } else if (message.type == 'sidebarMouseLeave' && lastFocusedWindowId) {
     /* re-focus on the last focused window */
     chrome.windows.update(lastFocusedWindowId, { focused: true });
   } else if (message.type == "setLastFocusedWindowId") {
-    /* set last focused window id & send popup window id */
+    /* set last focused window id & send sidebar window id */
     lastFocusedWindowId = message.lastFocusedId;
     sendResponse({
-      popupWindowId: popupWindowId,
-      popupTabId: popupTabId
+      sidebarWindowId: sidebarWindowId,
+      sidebarTabId: sidebarTabId
     });
   } else if (message.type == "setLastFocusedId") {
     /* Set the last focused id */
@@ -133,11 +144,11 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
   if (!noFocus && windowId == -1) {
     /* All windows have lost focus */
     noFocus = true;
-  } else if (noFocus && popupWindowId && windowId != popupWindowId) {
-    /* bring popup to front */
+  } else if (noFocus && sidebarWindowId && windowId != sidebarWindowId) {
+    /* bring sidebar to front */
     noFocus = false;
     lastFocusedWindowId = windowId;
-    chrome.windows.update(popupWindowId, { focused: true }, function(win) {
+    chrome.windows.update(sidebarWindowId, { focused: true }, function(win) {
       chrome.windows.update(lastFocusedWindowId, { focused: true })
     });
   }
@@ -145,11 +156,11 @@ chrome.windows.onFocusChanged.addListener(function(windowId) {
 
 // When a window is closed
 chrome.windows.onRemoved.addListener(function(windowId) {
-  // If the window getting closed is the popup we created
-  if (windowId === popupWindowId) {
-    // Set popupId to undefined so we know the popup is not open
-    popupId = null;
-    popupWindowId = null;
+  // If the window getting closed is the sidebar we created
+  if (windowId === sidebarWindowId) {
+    // Set sidebarId to undefined so we know the sidebar is not open
+    sidebarId = null;
+    sidebarWindowId = null;
   } else {
     sendAllWindows();
   }

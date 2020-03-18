@@ -10,7 +10,7 @@ import { mapGetters } from 'vuex';
 import * as Bowser from 'bowser';
 
 /* Models */
-import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser, IExtensionState, IExtensionPopupState } from '@/types';
+import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser, IExtensionState, IExtensionSidebarState } from '@/types';
 
 export default Vue.extend({
   name: 'App',
@@ -20,7 +20,7 @@ export default Vue.extend({
   }),
   created() {
     const browser = Bowser.getParser(window.navigator.userAgent);
-
+    const vm = this;
     if (window.chrome && window.chrome.runtime.id) {
       this.$store.dispatch('base/setExtensionId', window.chrome.runtime.id);
       const envPayload: IEnvState = {
@@ -30,20 +30,25 @@ export default Vue.extend({
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
       window.chrome.runtime.sendMessage({ type: 'getAllWindows' });
+      /* Get this window details */
+      window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
+        vm.$store.commit('base/setExtensionIds', res);
+      });
 
       /* Listeners */
-      const vm = this;
       window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
         /* Listen for window update */
         if (response.type === 'setAllWindows') {
           vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
-        } else if (response.type === 'setPopup') {
-          /* Listen for popup update */
-          const payload: IExtensionPopupState = {
-            popupWindowId: response.popupWindowId,
-            popupTabId: response.popupTabId,
+        } else if (response.type === 'setSidebar') {
+          /* Listen for sidebar update */
+          const payload: IExtensionSidebarState = {
+            sidebarWindowId: response.sidebarWindowId,
+            sidebarTabId: response.sidebarTabId,
           };
-          vm.$store.dispatch('base/setExtensionPopup', payload);
+          vm.$store.dispatch('base/setExtensionSidebar', payload);
+        } else if (response.type === 'setLastFocussedWindow') {
+          vm.$store.commit('base/setExtensionLastFocussed', response.windowId);
         }
       });
     } else {

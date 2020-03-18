@@ -4,7 +4,8 @@ import * as axios from 'axios';
 // import uuid from 'uuidv4';
 
 /* Models */
-import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
+import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum,
+   IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, IExtensionSidebarState } from '@/types';
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
@@ -86,66 +87,6 @@ export const updateTaskLinks = (state: any, payload: IUpdateTaskLinks) => {
   });
 };
 
-export const openSidebar = (state: any, payload: IOpenSidebar) => {
-  const windowWidth = Math.floor(window.screen.availWidth);
-  const windowHeight = Math.floor(window.screen.availHeight);
-  const popupWidth = 500;
-  if (payload.env && payload.env.platform === EnvPlatformsEnum.EXTENSION) {
-    const popupURL = window.chrome.runtime.getURL('sidebar.html');
-    window.chrome.windows.getCurrent({populate: false}, function(currentWindow: any) {
-      /* get the current window so we can set it back on leave */
-      window.chrome.extension.sendMessage({ type: 'setLastFocusedWindowId', lastFocusedId:  currentWindow.id},
-      function(res: any) {
-        /* set the current window size */
-        window.chrome.windows.update(currentWindow.id, { width: (windowWidth - popupWidth), top: 0, left: 0 });
-
-        /* Set url */
-        let url = popupURL + '/#' + payload.url;
-        if (payload.external) {
-          url = payload.url;
-        }
-
-        if (!res.popupWindowId) {
-          /* Not open : so open */
-          const newWin = {
-            url,
-            type: 'normal',
-            height: windowHeight,
-            width: popupWidth,
-            top: 0,
-            left: (windowWidth - popupWidth),
-          };
-          window.chrome.windows.create(newWin);
-        } else {
-          /* Already open so just focus */
-          window.chrome.windows.update(res.popupWindowId, { focused: true });
-          if (payload.external) {
-            /* External so open new tab */
-            window.chrome.tabs.create({
-              windowId: res.popupWindowId,
-              url,
-              active: true,
-            });
-          } else {
-            /* Internal so update tab */
-            window.chrome.tabs.update(res.popupTabId, {
-              url,
-              active: true,
-            });
-          }
-        }
-      });
-    });
-  } else if (payload.env && payload.env.platform === EnvPlatformsEnum.WEBSERVER) {
-    window.resizeTo((windowWidth - popupWidth), windowHeight);
-    window.moveTo(0, 0);
-    window.open(
-      '/#' + payload.url,
-      'workalongo',
-      'top=0, left=' + (windowWidth - popupWidth) + ', width=' + popupWidth + ', height=' + windowHeight + ',toolbar=1, scrollbars=1, location=1, statusbar=1, menubar=1');
-  }
-};
-
 export const updateAllWindows = ({ commit }: {commit: any}, payload: any[]) => {
   commit('setAllWindows', payload);
 };
@@ -165,7 +106,7 @@ export const updateTask = (state: any, payload: IUpdateTask) => {
         resolve(true);
       })
       .catch(function(error) {
-          console.error('Error deleting document: ', error);
+          console.error('Error updating document: ', error);
       });
   });
 };
@@ -192,4 +133,108 @@ export const deleteTask = (state: any, payload: IUpdateTask) => {
 
 export const cloneTask = (state: any, payload: any) => {
   //
+};
+
+export const openSidebar =
+  ({state, rootState, commit, rootGetters}: {state: any, rootState: any, commit: any, rootGetters: any},
+   payload: IOpenSidebar) => {
+  const windowWidth = Math.floor(window.screen.availWidth);
+  const windowHeight = Math.floor(window.screen.availHeight);
+  const sidebarWidth = 500;
+  if (rootState.base.env && rootState.base.env.platform === EnvPlatformsEnum.EXTENSION) {
+    const sidebarURL = window.chrome.runtime.getURL('sidebar.html');
+    const windowType = rootGetters['base/getWindowType'];
+    const extension = rootGetters['base/getExtension'];
+    /* Set url */
+    let url = sidebarURL + '/#' + payload.url;
+    if (payload.external) {
+      url = payload.url;
+    }
+
+    if (windowType !== windowTypeEnum.SIDEBAR) {
+      window.chrome.windows.getCurrent({populate: false}, function(currentWindow: any) {
+        /* get the current window so we can set it back on leave */
+        if (windowType === windowTypeEnum.TAB) {
+          window.chrome.extension.sendMessage({ type: 'setLastFocusedWindowId', lastFocusedId:  currentWindow.id},
+            function(res: any) {
+              /* set the current window size */
+              window.chrome.windows.update(currentWindow.id, { width: (windowWidth - sidebarWidth), top: 0, left: 0 });
+            },
+          );
+        }
+
+        if (!extension.sidebar.sidebarWindowId) {
+          /* Not open : so open */
+          const newWin = {
+            url,
+            type: 'normal',
+            height: windowHeight,
+            width: sidebarWidth,
+            top: 0,
+            left: (windowWidth - sidebarWidth),
+          };
+          window.chrome.windows.create(newWin, (sidebarWin: any) => {
+            const sidebar: IExtensionSidebarState = {
+              sidebarTabId: payload.external ? null : sidebarWin.tabs[0].id,
+              sidebarWindowId: sidebarWin.id,
+            };
+            payload.vm.$store.dispatch('base/setExtensionSidebar', sidebar);
+          });
+        } else {
+          /* Already open so just focus */
+          window.chrome.windows.update(extension.sidebar.sidebarWindowId, { focused: true });
+          if (payload.external) {
+            /* External so open new tab */
+            window.chrome.tabs.create({
+              windowId: extension.sidebar.sidebarWindowId,
+              url,
+              active: true,
+            });
+          } else if (extension.sidebar.sidebarTabId) {
+            /* Internal and already has app open so update tab */
+            window.chrome.tabs.update(extension.sidebar.sidebarTabId, {
+              url,
+              active: true,
+            });
+          } else {
+            /* Internal but no tab open so create */
+            window.chrome.tabs.create({
+              windowId: extension.sidebar.sidebarWindowId,
+              url,
+              index: 0,
+              active: true,
+            },
+            (sidebarTab: any): void => {
+              // console.log('sidebar=', sidebarTab);
+            });
+          }
+        }
+      });
+    } else {
+      /* Already in sidebar */
+      if (payload.external) {
+        /* External so open new tab */
+        window.chrome.tabs.create({
+          windowId: extension.sidebar.sidebarWindowId,
+          url,
+          active: true,
+        });
+      } else {
+        /* Internal so update tab */
+        window.chrome.tabs.update(extension.sidebar.sidebarTabId, {
+          url,
+          active: true,
+        });
+      }
+    }
+
+  } else if (rootState.base.env && rootState.base.env.platform === EnvPlatformsEnum.WEBSERVER) {
+    const url: string = payload.external ? payload.url : '/#' + payload.url;
+    window.resizeTo((windowWidth - sidebarWidth), windowHeight);
+    window.moveTo(0, 0);
+    window.open(
+      url,
+      'workalongo',
+      'top=0, left=' + (windowWidth - sidebarWidth) + ', width=' + sidebarWidth + ', height=' + windowHeight + ',toolbar=1, scrollbars=1, location=1, statusbar=1, menubar=1');
+  }
 };

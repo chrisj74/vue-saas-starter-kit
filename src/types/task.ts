@@ -2,6 +2,7 @@ export interface ITask {
   title: string;
   description: string;
   tabs: ITaskTab[];
+  currentTab: string | null;
   videoPath?: string;
   videoObj?: ITaskVideoObj;
   profile?: string;
@@ -30,6 +31,7 @@ export enum taskTabTypesEnum {
   HOME = 'home',
   LINKS = 'links',
   INFO = 'info',
+  NOTES = 'notes',
   DOCS = 'docs',
   CALCULATOR = 'calculator',
   YOUTUBE = 'youtube',

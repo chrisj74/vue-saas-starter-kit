@@ -9,13 +9,21 @@ export interface IEnvState {
   browser: IEnvBrowser;
 }
 
-export interface IExtensionPopupState {
-  popupWindowId: number;
-  popupTabId: number;
+export interface IExtensionSidebarState {
+  sidebarWindowId: number;
+  sidebarTabId: number;
+}
+
+export interface IExtensionIds {
+  windowId: number;
+  tabId: number;
 }
 export interface IExtensionState {
   extensionId: string | number;
-  popup: IExtensionPopupState;
+  windowId: number;
+  tabId: number;
+  lastFocussedWindow: number;
+  sidebar: IExtensionSidebarState;
 }
 
 export interface IEnvBrowser {
@@ -27,6 +35,13 @@ export enum EnvPlatformsEnum {
   WEBSERVER = 'webserver',
   EXTENSION = 'extension',
   OFFICE = 'office',
+}
+
+export enum windowTypeEnum {
+  BROWSER = 'browser',
+  SIDEBAR = 'sidebar',
+  TAB = 'tab',
+  POPUP = 'popup',
 }
 
 /* USER STATE */

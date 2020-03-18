@@ -10,7 +10,7 @@ import { mapGetters } from 'vuex';
 import * as Bowser from 'bowser';
 
 /* Models */
-import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser } from '@/types';
+import { IBasePayload, IEnvState, EnvPlatformsEnum, IEnvBrowser, IExtensionSidebarState } from '@/types';
 
 export default Vue.extend({
   name: 'App',
@@ -20,27 +20,52 @@ export default Vue.extend({
   }),
   created() {
     const browser = Bowser.getParser(window.navigator.userAgent);
+    const vm = this;
     if (window.chrome && window.chrome.runtime.id) {
-      console.log('chrome extension');
+      this.$store.dispatch('base/setExtensionId', window.chrome.runtime.id);
       const envPayload: IEnvState = {
         platform: EnvPlatformsEnum.EXTENSION,
         browser: browser.getBrowser() as IEnvBrowser,
       };
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
-      window.chrome.runtime.sendMessage({ type: 'setPopupTabId' }, (res: any) => {
-        console.log('inside popup tabId=', res.tabId);
+      window.chrome.runtime.sendMessage({ type: 'setSidebarTabId' }, (res: any) => {
+        // console.log('inside sidebar tabId=', res.tabId);
       });
+
+      /* Get this window details */
+      window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
+        vm.$store.commit('base/setExtensionIds', res);
+      });
+
+      /* Mouse events */
       const bodyObj = document.getElementsByTagName('body');
       if (bodyObj) {
         bodyObj[0].addEventListener('mouseenter', (e) => {
-          window.chrome.runtime.sendMessage({ type: 'popupMouseEnter' });
+          window.chrome.runtime.sendMessage({ type: 'sidebarMouseEnter' });
         });
 
         bodyObj[0].addEventListener('mouseleave', (e) => {
-          window.chrome.runtime.sendMessage({ type: 'popupMouseLeave' });
+          window.chrome.runtime.sendMessage({ type: 'sidebarMouseLeave' });
         });
       }
+
+      /* Listeners */
+      window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
+        /* Listen for window update */
+        if (response.type === 'setAllWindows') {
+          vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
+        } else if (response.type === 'setSidebar') {
+          /* Listen for sidebar update */
+          const payload: IExtensionSidebarState = {
+            sidebarWindowId: response.sidebarWindowId,
+            sidebarTabId: response.sidebarTabId,
+          };
+          vm.$store.dispatch('base/setExtensionSidebar', payload);
+        } else if (response.type === 'setLastFocussedWindow') {
+          vm.$store.commit('base/setExtensionLastFocussed', response.windowId);
+        }
+      });
     } else {
       console.log('webserver');
 

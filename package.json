@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@tinymce/tinymce-vue": "^3.2.0",
     "@types/lodash": "^4.14.149",
     "axios": "^0.19.2",
     "bowser": "^2.9.0",

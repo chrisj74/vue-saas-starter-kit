@@ -10,7 +10,7 @@
         </v-row>
 
       </v-col>
-      <v-col cols="3" v-if="allWindows && allWindows.length > 0">
+      <v-col cols="3" v-if="allWindows && allWindows.length > 0" class="tab-list">
         <v-list
           elevation="1"
           dense
@@ -101,3 +101,10 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss">
+.tab-list {
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+}
+</style>

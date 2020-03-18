@@ -76,7 +76,8 @@
         </v-list>
       </v-menu>
     </v-toolbar>
-    <div v-if="task.videoObj && task.videoObj.id">
+    <!-- Video -->
+    <div v-if="task.videoObj && task.videoObj.id" class="task-video">
       <iframe
         style="width: 100%"
         :src="'https://www.youtube.com/embed/' + task.videoObj.id + '?playsinline=1'"
@@ -206,7 +207,7 @@ export default Vue.extend({
   data() {
     return {
       taskTabTypesEnum,
-      taskTab: null as unknown as string,
+      taskTab: null as string | null,
       showEditDialog: false,
     };
   },
@@ -216,6 +217,8 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       env: 'base/getEnv',
+      extension: 'base/getEextension',
+      windowtype: 'base/getWindowType',
       user: 'user/user',
       tasks: 'tasks/getTasks',
       showLinks: 'tasks/getShowLinks',
@@ -248,13 +251,32 @@ export default Vue.extend({
 
   },
   watch: {
-    showLinks: function(newVal, oldVal): void {
-      console.log('this.taskTab=', this.taskTab);
-      this.taskTab = 'tab-' + taskTabTypesEnum.LINKS;
+    showLinks: {
+      handler: function(newVal, oldVal): void {
+        this.taskTab = 'tab-' + taskTabTypesEnum.LINKS;
+      },
     },
 
-    showEditDialog: function(newVal, oldVal): void {
-      console.log('this.showEditDialog=', this.showEditDialog);
+    taskTab: {
+      handler: function(newVal, oldVal): void {
+        const task = {...this.task};
+        task.currentTab = this.taskTab ? this.taskTab : null;
+        const payload: IUpdateTask = {
+        user: this.user,
+        task,
+        };
+        this.$store.dispatch('tasks/updateTask', payload);
+      },
+    },
+
+    task: {
+      handler: function(newVal, oldVal): void {
+        if (this.task.currentTab !== this.taskTab) {
+          this.taskTab = this.task.currentTab;
+        }
+      },
+      immediate: true,
+      deep: true,
     },
   },
 });
@@ -264,6 +286,18 @@ export default Vue.extend({
 .task-item-content {
   max-height: 50vh;
   overflow: auto;
+}
+.task-video {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 */
+  height: 0;
+  iframe, object, embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 .task-item-tabs {
   .v-slide-group__next, .v-slide-group__prev {

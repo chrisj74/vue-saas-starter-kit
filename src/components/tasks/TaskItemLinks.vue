@@ -18,7 +18,7 @@
             <v-img :src="link.favIconUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-title>
-            <a :href="link.url">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
+            <a :href="link.url" :target="windowType === windowTypes.TAB ? '_self' : '_blank'">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
           </v-list-item-title>
           <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
 
@@ -89,7 +89,7 @@ import * as draggable from 'vuedraggable';
 import AddTaskLink from './AddTaskLink.vue';
 
 /* Models */
-import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink } from '@/types';
+import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum } from '@/types';
 
 export default Vue.extend({
   name: 'TaskItemLinks',
@@ -100,7 +100,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      //
+      windowTypes: windowTypeEnum,
     };
   },
 
@@ -109,6 +109,7 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       env: 'base/getEnv',
+      windowType: 'base/getWindowType',
       user: 'user/user',
       tasks: 'tasks/getTasks',
     }),

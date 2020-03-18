@@ -17,6 +17,13 @@ export function newTaskTabs(): ITaskTab[] {
       active: true,
     },
     {
+      type: taskTabTypesEnum.NOTES,
+      icon: 'mdi-lead-pencil',
+      label: 'Notes',
+      description: 'Take notes while you work.',
+      active: true,
+    },
+    {
       type: taskTabTypesEnum.DOCS,
       icon: 'mdi-file-document-outline',
       label: 'Documents',
