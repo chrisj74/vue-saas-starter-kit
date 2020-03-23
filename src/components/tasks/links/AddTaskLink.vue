@@ -95,10 +95,10 @@ export default Vue.extend({
         links: linksArr,
       };
       this.$store.dispatch('tasks/updateTaskLinks', payload)
-        .then((resp) => {
+        .then((resp: any) => {
           this.closeDialog();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Error adding new link');
         });
     },

@@ -51,7 +51,7 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Models */
-import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs } from '@/types';
+import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs, taskRolesEnum, IUser } from '@/types';
 import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
@@ -61,6 +61,8 @@ export default Vue.extend({
     return {
       dialog: false,
       newTask: {
+        members: [],
+        roles: {},
         title: '',
         description: '',
         modified: new Date(),
@@ -83,22 +85,26 @@ export default Vue.extend({
 
   methods: {
     addTask(): void {
+      this.newTask.members.push(this.user.id);
+      this.newTask.roles[this.user.id] = taskRolesEnum.OWNER;
       this.newTask.modified = new Date();
       const payload: IUpdateTask = {
         user: this.user,
         task: this.newTask,
       };
       this.$store.dispatch('tasks/addTask', payload)
-        .then((resp) => {
+        .then((resp: any) => {
           this.closeDialog();
         })
-        .catch((error) => {
+        .catch((error: any) => {
           console.error('Error adding new task');
         });
     },
 
     closeDialog() {
       this.newTask = {
+        members: [],
+        roles: {},
         title: '',
         description: '',
         modified: new Date(),

@@ -86,7 +86,6 @@ export default Vue.extend({
   },
   data() {
     return {
-      dialog: true,
       task: null as unknown as ITask,
       videoPath: null as unknown as string,
     };
@@ -117,7 +116,7 @@ export default Vue.extend({
   },
   watch: {
     tasks: {
-      handler: function(newVal, oldVal): void {
+      handler(newVal, oldVal): void {
         const task: ITask = this.tasks.find((tsk: ITask) => {
           return tsk.id === this.taskId;
         });
@@ -139,8 +138,9 @@ export default Vue.extend({
       immediate: true,
       deep: true,
     },
+
     videoPath: {
-      handler: function(newVal, oldVal): void {
+      handler(newVal, oldVal): void {
         if (this.videoPath) {
           this.task.videoPath = this.videoPath;
           this.task.videoObj = getVideoId(this.videoPath);

@@ -12,7 +12,7 @@
       <!-- Open sidebar -->
       <v-tooltip bottom>
         <template v-slot:activator="{ on }">
-          <v-btn icon v-on="on" @click="openSidebar('/task/' + task.id, false)">
+          <v-btn icon v-on="on" @click.native="openSidebar('/task/' + task.id, false)">
             <v-icon>
               mdi-open-in-new
             </v-icon>
@@ -31,14 +31,20 @@
           </v-btn>
         </template>
         <v-list dense>
-          <!-- Add -->
-          <v-list-item>
+          <!-- Convert to template -->
+          <v-list-item @click.stop="showConvertDialog = true">
             <v-list-item-content>
-              <v-list-item-title>Add item</v-list-item-title>
+              <v-list-item-title>Convert to template</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
-              <v-icon small>mdi-plus</v-icon>
+              <v-icon small>mdi-swap-horizontal-variant</v-icon>
             </v-list-item-icon>
+            <v-dialog
+              v-model="showConvertDialog"
+              width="80vw"
+            >
+              <convert-task-to-template @doClose="showConvertDialog = false" :taskId="task.id"></convert-task-to-template>
+            </v-dialog>
           </v-list-item>
           <!-- Edit -->
           <v-list-item @click.stop="showEditDialog = true">
@@ -55,10 +61,19 @@
               <edit-task @doClose="showEditDialog = false" :taskId="task.id"></edit-task>
             </v-dialog>
           </v-list-item>
+          <!-- Copy Link -->
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>Copy link</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon small>mdi-link</v-icon>
+            </v-list-item-icon>
+          </v-list-item>
           <!-- Copy -->
           <v-list-item>
             <v-list-item-content>
-              <v-list-item-title>Copy</v-list-item-title>
+              <v-list-item-title>Create copy</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
               <v-icon small>mdi-content-copy</v-icon>
@@ -146,10 +161,8 @@
                 <div v-html="task.description"></div>
               </div>
               <!-- Links -->
-              <div>
-                <task-item-links
-                  v-if="tabContent.type === taskTabTypesEnum.LINKS"
-                  :taskId="taskId">
+              <div v-if="tabContent.type === taskTabTypesEnum.LINKS">
+                <task-item-links :taskId="taskId">
                 </task-item-links>
               </div>
               <!-- Info -->
@@ -157,12 +170,18 @@
                 <p>INFO</p>
               </div>
 
-              <!-- Info -->
+              <!-- Docs -->
               <div v-if="tabContent.type === taskTabTypesEnum.DOCS">
                 <p>DOCS</p>
               </div>
 
-              <!-- Info -->
+              <!-- Notes -->
+              <div v-if="tabContent.type === taskTabTypesEnum.NOTES">
+                <task-item-notes :taskId="taskId">
+                </task-item-notes>
+              </div>
+
+              <!-- Youtube -->
               <div v-if="tabContent.type === taskTabTypesEnum.YOUTUBE">
                 <p>YOUTUBE</p>
               </div>
@@ -188,9 +207,11 @@ import { mapGetters } from 'vuex';
 import * as draggable from 'vuedraggable';
 
 /* App components */
-import AddTaskLink from './AddTaskLink.vue';
-import TaskItemLinks from './TaskItemLinks.vue';
+import AddTaskLink from './links/AddTaskLink.vue';
+import TaskItemLinks from './links/TaskItemLinks.vue';
+import TaskItemNotes from './notes/TaskItemNotes.vue';
 import EditTask from './EditTask.vue';
+import ConvertTaskToTemplate from './ConvertTaskToTemplate.vue';
 
 /* Models */
 import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum, IUpdateTask } from '@/types';
@@ -202,13 +223,16 @@ export default Vue.extend({
     AddTaskLink,
     draggable,
     TaskItemLinks,
+    TaskItemNotes,
     EditTask,
+    ConvertTaskToTemplate,
   },
   data() {
     return {
       taskTabTypesEnum,
       taskTab: null as string | null,
       showEditDialog: false,
+      showConvertDialog: false,
     };
   },
 
@@ -252,13 +276,13 @@ export default Vue.extend({
   },
   watch: {
     showLinks: {
-      handler: function(newVal, oldVal): void {
+      handler(newVal, oldVal): void {
         this.taskTab = 'tab-' + taskTabTypesEnum.LINKS;
       },
     },
 
     taskTab: {
-      handler: function(newVal, oldVal): void {
+      handler(newVal, oldVal): void {
         const task = {...this.task};
         task.currentTab = this.taskTab ? this.taskTab : null;
         const payload: IUpdateTask = {
@@ -270,7 +294,7 @@ export default Vue.extend({
     },
 
     task: {
-      handler: function(newVal, oldVal): void {
+      handler(newVal, oldVal): void {
         if (this.task.currentTab !== this.taskTab) {
           this.taskTab = this.task.currentTab;
         }

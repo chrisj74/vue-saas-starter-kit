@@ -3,7 +3,7 @@
     <v-row>
       <v-col :cols="allWindows && allWindows.length > 0 ? 9 : 12">
         <v-row>
-          <v-col cols="4" v-for="(task) in tasks" :key="'tasks-' + task.id">
+          <v-col sm="12" md="6" lg="4" xl="3" v-for="(task) in tasks" :key="'tasks-' + task.id">
             <task-item :taskId="task.id" :collection="true"></task-item>
             <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
           </v-col>

@@ -5,15 +5,17 @@ import * as axios from 'axios';
 
 /* Models */
 import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum,
-   IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, IExtensionSidebarState } from '@/types';
+   IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, IExtensionSidebarState, taskRolesEnum } from '@/types';
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
 
   firebase
   .firestore()
-  .collection('users/' + payload.user.id + '/tasks/')
-  .orderBy('modified', 'desc').onSnapshot(function(tasksCollectionRef: any) {
+  .collection('/tasks/')
+  .where('members', 'array-contains', payload.user.id)
+  .orderBy('modified', 'desc')
+  .onSnapshot((function(tasksCollectionRef: any) {
     tasks = [];
     tasksCollectionRef.forEach((doc: any) => {
       const task: ITask = JSON.parse(JSON.stringify(doc.data()));
@@ -31,7 +33,7 @@ export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
     });
     // may need Promise all for sub collections
     commit('setTasks', tasks);
-  });
+  }));
 };
 
 export const addTask = ({ commit }: {commit: any}, payload: IUpdateTask) => {
@@ -43,7 +45,8 @@ export const addTask = ({ commit }: {commit: any}, payload: IUpdateTask) => {
       lastUpdated: new Date(),
     });
 
-    userDoc
+    firebase
+      .firestore()
       .collection('tasks').add(payload.task)
       .then(function(docRef) {
         resolve(docRef.id);
@@ -58,7 +61,7 @@ export const updateTaskLinks = (state: any, payload: IUpdateTaskLinks) => {
   return new Promise((resolve, reject) => {
     const linksCollection = firebase
       .firestore()
-      .collection('users/' + payload.user.id + '/tasks/' + payload.taskId + '/links/');
+      .collection('/tasks/' + payload.taskId + '/links/');
 
     payload.links.forEach((link: ITaskLink, index: number) => {
       if (link.id && payload.deleteId && link.id === payload.deleteId) {
@@ -100,7 +103,8 @@ export const updateTask = (state: any, payload: IUpdateTask) => {
       lastUpdated: new Date(),
     });
 
-    userDoc
+    firebase
+      .firestore()
       .collection('tasks').doc(payload.task.id).update(payload.task)
       .then(() => {
         resolve(true);
@@ -119,13 +123,25 @@ export const deleteTask = (state: any, payload: IUpdateTask) => {
     userDoc.update({
       lastUpdated: new Date(),
     });
+    /* Delete nested links first */
+    const taskDoc = firebase
+      .firestore()
+      .collection('tasks/').doc(payload.task.id);
 
-    userDoc
-      .collection('tasks').doc(payload.task.id).delete()
+    taskDoc
+      .collection('/links/')
+      .get().then((linksSnapshot: any) => {
+        linksSnapshot.forEach((val: any) => {
+          val.ref.delete();
+        });
+      });
+
+    /* Delete task doc */
+    taskDoc.delete()
       .then(() => {
         resolve(true);
       })
-      .catch(function(error) {
+      .catch(function(error: any) {
           console.error('Error deleting document: ', error);
       });
   });
@@ -230,7 +246,7 @@ export const openSidebar =
 
   } else if (rootState.base.env && rootState.base.env.platform === EnvPlatformsEnum.WEBSERVER) {
     const url: string = payload.external ? payload.url : '/#' + payload.url;
-    window.resizeTo((windowWidth - sidebarWidth), windowHeight);
+    window.resizeTo((windowWidth - sidebarWidth), 200);
     window.moveTo(0, 0);
     window.open(
       url,
