@@ -11,6 +11,7 @@ export default function() {
       extensionId: null,
       windowId: null,
       tabId: null,
+      lastFocused: null,
       sidebar: {
         sidebarWindowId: null,
         sidebarTabId: null,

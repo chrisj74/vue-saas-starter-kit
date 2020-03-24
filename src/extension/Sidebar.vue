@@ -32,6 +32,10 @@ export default Vue.extend({
       window.chrome.runtime.sendMessage({ type: 'setSidebarTabId' }, (res: any) => {
         // console.log('inside sidebar tabId=', res.tabId);
       });
+      window.chrome.runtime.sendMessage({ type: 'getLastFocused' }, (res: any) => {
+        // Set initial value of main window
+        vm.$store.commit('base/setExtensionLastFocused', res.lastFocusedWindowId);
+      });
 
       /* Get this window details */
       window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
@@ -53,17 +57,15 @@ export default Vue.extend({
       /* Listeners */
       window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
         /* Listen for window update */
-        if (response.type === 'setAllWindows') {
-          vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
-        } else if (response.type === 'setSidebar') {
+        if (response.type === 'setSidebar') {
           /* Listen for sidebar update */
           const payload: IExtensionSidebarState = {
             sidebarWindowId: response.sidebarWindowId,
             sidebarTabId: response.sidebarTabId,
           };
           vm.$store.dispatch('base/setExtensionSidebar', payload);
-        } else if (response.type === 'setLastFocussedWindow') {
-          vm.$store.commit('base/setExtensionLastFocussed', response.windowId);
+        } else if (response.type === 'setLastFocusedWindow') {
+          vm.$store.commit('base/setExtensionLastFocused', response.windowId);
         }
       });
     } else {

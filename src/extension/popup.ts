@@ -4,7 +4,7 @@ import router from '@/router/extension';
 import store from '@/store';
 import vuetify from '@/plugins/vuetify';
 import { FirebaseAutoLogin, AUTH, fireApp } from '@/boot/firebase';
-import { IExtensionSidebarState } from '@/types';
+
 
 Vue.config.productionTip = false;
 Vue.prototype.$auth = AUTH;
@@ -22,19 +22,6 @@ new Vue({
   vuetify,
   created() {
     FirebaseAutoLogin(this as Vue);
-
-    /* Listen for window update */
-    const vm = this;
-    /* Listen for popup update */
-    window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
-      if (response.type === 'setPopup') {
-        const payload: IExtensionSidebarState = {
-          sidebarWindowId: response.sidebarWindowId,
-          sidebarTabId: response.sidebarTabId,
-        };
-        vm.$store.dispatch('base/setExtension', payload);
-      }
-    });
   },
   render: (h) => h(App),
 }).$mount('#app');

@@ -18,7 +18,7 @@
             <v-img :src="link.favIconUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-title>
-            <a :href="link.url" :target="windowType === windowTypes.TAB ? '_self' : '_blank'">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
+            <a :href="link.url" @click.stop="openMain($event, link.url)" :target="windowType === windowTypes.TAB ? '_self' : '_blank'">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
           </v-list-item-title>
           <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
 
@@ -89,7 +89,7 @@ import * as draggable from 'vuedraggable';
 import AddTaskLink from './AddTaskLink.vue';
 
 /* Models */
-import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum } from '@/types';
+import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, EnvPlatformsEnum } from '@/types';
 
 export default Vue.extend({
   name: 'TaskItemLinks',
@@ -109,6 +109,7 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       env: 'base/getEnv',
+      extension: 'base/getExtension',
       windowType: 'base/getWindowType',
       user: 'user/user',
       tasks: 'tasks/getTasks',
@@ -159,6 +160,24 @@ export default Vue.extend({
         deleteId: linkId,
       };
       this.$store.dispatch('tasks/updateTaskLinks', payload);
+    },
+
+    openMain(e: any, linkUrl: string) {
+      /* If we are in the sidebar target the main window */
+      if (this.windowType === windowTypeEnum.SIDEBAR ) {
+        if (this.env.platform === EnvPlatformsEnum.EXTENSION && this.extension.lastFocusedWindow) {
+          /* External so open new tab */
+          window.chrome.tabs.create({
+            windowId: this.extension.lastFocusedWindow,
+            url: linkUrl,
+            active: true,
+          });
+        } else {
+          return true;
+        }
+      } else {
+        return true;
+      }
     },
 
     openSidebar(linkUrl: string, linkExternal: boolean): void {

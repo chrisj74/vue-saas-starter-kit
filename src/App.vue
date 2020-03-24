@@ -30,6 +30,9 @@ export default Vue.extend({
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
       window.chrome.runtime.sendMessage({ type: 'getAllWindows' });
+      /* Check if sidebar is set */
+      window.chrome.runtime.sendMessage({ type: 'getSidebar' });
+
       /* Get this window details */
       window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
         vm.$store.commit('base/setExtensionIds', res);
@@ -40,6 +43,8 @@ export default Vue.extend({
         /* Listen for window update */
         if (response.type === 'setAllWindows') {
           vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
+          /* TODO: if has sidebar, check if it still exists - else destroy sidebar in store */
+
         } else if (response.type === 'setSidebar') {
           /* Listen for sidebar update */
           const payload: IExtensionSidebarState = {
@@ -47,8 +52,8 @@ export default Vue.extend({
             sidebarTabId: response.sidebarTabId,
           };
           vm.$store.dispatch('base/setExtensionSidebar', payload);
-        } else if (response.type === 'setLastFocussedWindow') {
-          vm.$store.commit('base/setExtensionLastFocussed', response.windowId);
+        } else if (response.type === 'setLastFocusedWindow') {
+          vm.$store.commit('base/setExtensionLastFocused', response.windowId);
         }
       });
     } else {

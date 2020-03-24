@@ -7,6 +7,8 @@ var lastFocusedTabId = null;
 var lastFocusedTabUrl = null;
 var lastFocusedTabFavicon = null;
 var lastFocusedTabLabel = null;
+var popupWindowId = null;
+var popupTabId = null;
 var noFocus = false;
 
 chrome.webRequest.onHeadersReceived.addListener(
@@ -73,11 +75,12 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
       sidebarWindowId: sidebarWindowId,
       sidebarTabId: sidebarTabId,
     });
-  } else if (message.type == "getsidebar") {
+  } else if (message.type == "getSidebar") {
     /* Get sidebar window and tab */
-    sendResponse({
+    chrome.runtime.sendMessage({
+      type: 'setSidebar',
       sidebarWindowId: sidebarWindowId,
-      sidebarTabId: sidebarTabId
+      sidebarTabId: sidebarTabId,
     });
   } else if (message.type == "getMyWindow") {
     /* return sender details */
@@ -109,7 +112,7 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
         chrome.windows.update(sender.tab.windowId, { focused: true });
         lastFocusedWindowId = win.id;
         chrome.runtime.sendMessage({
-          type: 'setLastFocussedWindow',
+          type: 'setLastFocusedWindow',
           windowId: lastFocusedWindowId,
         })
       }
@@ -137,6 +140,8 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
     });
   } else if (message.type == "getAllWindows") {
     sendAllWindows();
+  } else if (message.type == "setPopup") {
+    popupWindowId = message.sender.windowId;
   }
 });
 
@@ -159,8 +164,14 @@ chrome.windows.onRemoved.addListener(function(windowId) {
   // If the window getting closed is the sidebar we created
   if (windowId === sidebarWindowId) {
     // Set sidebarId to undefined so we know the sidebar is not open
-    sidebarId = null;
+    sidebarTabId = null;
     sidebarWindowId = null;
+    chrome.runtime.sendMessage({
+      type: 'setSidebar',
+      sidebarWindowId: sidebarWindowId,
+      sidebarTabId: sidebarTabId,
+    });
+    sendAllWindows();
   } else {
     sendAllWindows();
   }

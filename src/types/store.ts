@@ -22,7 +22,7 @@ export interface IExtensionState {
   extensionId: string | number;
   windowId: number;
   tabId: number;
-  lastFocussedWindow: number;
+  lastFocusedWindow: number;
   sidebar: IExtensionSidebarState;
 }
 

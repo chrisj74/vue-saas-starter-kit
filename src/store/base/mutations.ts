@@ -18,8 +18,8 @@ export const setExtensionIds = (state: any, payload: IExtensionIds) => {
   Vue.set(state.extension, 'tabId', payload.tabId);
 };
 
-export const setExtensionLastFocussed = (state: any, payload: number) => {
-  Vue.set(state.extension, 'lastFocussedWindow', payload);
+export const setExtensionLastFocused = (state: any, payload: number) => {
+  Vue.set(state.extension, 'lastFocusedWindow', payload);
 };
 
 export const setLeftDrawerOpen = (state: any, payload: boolean) => {

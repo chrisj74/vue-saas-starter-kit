@@ -9,11 +9,11 @@ import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum,
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
-
+  console.log(payload);
   firebase
   .firestore()
   .collection('/tasks/')
-  .where('members', 'array-contains', payload.user.id)
+  .where('members', 'array-contains', firebase.auth().currentUser?.uid)
   .orderBy('modified', 'desc')
   .onSnapshot((function(tasksCollectionRef: any) {
     tasks = [];
