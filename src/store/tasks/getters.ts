@@ -32,5 +32,8 @@ export const getAllWindows = (state: any, getters: any, rootState: any) => {
   } else {
     return [];
   }
+};
 
+export const getTemplates = (state: any) => {
+  return state.templates;
 };

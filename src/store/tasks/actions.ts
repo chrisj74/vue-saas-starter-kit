@@ -1,19 +1,19 @@
 import * as firebase from 'firebase';
 import * as _ from 'lodash';
-import * as axios from 'axios';
+// import * as axios from 'axios';
 // import uuid from 'uuidv4';
 
 /* Models */
 import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum,
-   IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, IExtensionSidebarState, taskRolesEnum } from '@/types';
+   IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowTypeEnum, IExtensionSidebarState, IUpdateTemplate, ITemplate } from '@/types';
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
-  console.log(payload);
   firebase
   .firestore()
   .collection('/tasks/')
   .where('members', 'array-contains', firebase.auth().currentUser?.uid)
+  .where('template', '==', false)
   .orderBy('modified', 'desc')
   .onSnapshot((function(tasksCollectionRef: any) {
     tasks = [];
@@ -105,7 +105,7 @@ export const updateTask = (state: any, payload: IUpdateTask) => {
 
     firebase
       .firestore()
-      .collection('tasks').doc(payload.task.id).update(payload.task)
+      .collection('tasks').doc(payload.task.id as string).update(payload.task)
       .then(() => {
         resolve(true);
       })
@@ -126,7 +126,7 @@ export const deleteTask = (state: any, payload: IUpdateTask) => {
     /* Delete nested links first */
     const taskDoc = firebase
       .firestore()
-      .collection('tasks/').doc(payload.task.id);
+      .collection('tasks/').doc(payload.task.id as string);
 
     taskDoc
       .collection('/links/')
@@ -147,8 +147,61 @@ export const deleteTask = (state: any, payload: IUpdateTask) => {
   });
 };
 
-export const cloneTask = (state: any, payload: any) => {
-  //
+export const setTemplates = ({ commit }: {commit: any}, payload: IBasePayload) => {
+  let templates: ITask[] = [];
+  firebase
+  .firestore()
+  .collection('/tasks/')
+  .where('members', 'array-contains', firebase.auth().currentUser?.uid)
+  .where('template', '==', true)
+  .orderBy('modified', 'desc')
+  .onSnapshot((function(templateCollectionRef: any) {
+    templates = [];
+    templateCollectionRef.forEach((doc: any) => {
+      const template: ITask = JSON.parse(JSON.stringify(doc.data()));
+      template.id = doc.id;
+      templates.push(template);
+      doc.ref.collection('links/')
+      .orderBy('order', 'asc').onSnapshot((linksCollectionRef: any) => {
+        template.links = [];
+        linksCollectionRef.forEach((linkRef: any ) => {
+          const link = JSON.parse(JSON.stringify(linkRef.data()));
+          link.id = linkRef.id;
+          template.links.push(link);
+        });
+      });
+    });
+    // may need Promise all for sub collections
+    commit('setTemplates', templates);
+  }));
+};
+
+export const cloneTask = (state: any, payload: IUpdateTask) => {
+  return new Promise((resolve, reject) => {
+    const userDoc = firebase
+      .firestore()
+      .collection('users/').doc(payload.user.id);
+    userDoc.update({
+      lastUpdated: new Date(),
+    });
+
+    /* copy and remove links */
+    const links = payload.task.links;
+    delete(payload.task.links);
+    console.log('links=', links);
+    firebase
+      .firestore()
+      .collection('/tasks/').add(payload.task)
+      .then(function(docRef) {
+        links.forEach((link: ITaskLink) => {
+          docRef.collection('/links/').add(link);
+        });
+        resolve(docRef.id);
+      })
+      .catch(function(error) {
+          console.error('Error adding document: ', error);
+      });
+  });
 };
 
 export const openSidebar =

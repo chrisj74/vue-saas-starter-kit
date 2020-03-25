@@ -10,7 +10,7 @@
       <v-toolbar-title>{{ task.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- Open sidebar -->
-      <v-tooltip bottom>
+      <v-tooltip bottom v-if="!isTemplate">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on" @click.native="openSidebar('/task/' + task.id, false)">
             <v-icon>
@@ -32,7 +32,7 @@
         </template>
         <v-list dense>
           <!-- Convert to template -->
-          <v-list-item @click.stop="showConvertDialog = true">
+          <v-list-item @click.stop="showConvertDialog = true" v-if="!isTemplate">
             <v-list-item-content>
               <v-list-item-title>Convert to template</v-list-item-title>
             </v-list-item-content>
@@ -49,7 +49,7 @@
           <!-- Edit -->
           <v-list-item @click.stop="showEditDialog = true">
             <v-list-item-content>
-              <v-list-item-title>Edit</v-list-item-title>
+              <v-list-item-title>Edit {{ isTemplate? 'Template' : 'Task' }}</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
               <v-icon small>mdi-pencil</v-icon>
@@ -245,13 +245,18 @@ export default Vue.extend({
       windowtype: 'base/getWindowType',
       user: 'user/user',
       tasks: 'tasks/getTasks',
+      templates: 'tasks/getTemplates',
       showLinks: 'tasks/getShowLinks',
     }),
     task(): ITask {
-      return this.tasks.find((task: ITask) => {
+      const allTasks = [...this.tasks, ...this.templates]
+      return allTasks.find((task: ITask) => {
         return task.id === this.taskId;
       }) as ITask;
     },
+    isTemplate(): boolean {
+      return this.task && this.task.template;
+    }
   },
 
   methods: {

@@ -62,7 +62,20 @@ export default Vue.extend({
       dialog: false,
       newTask: {
         members: [],
-        roles: {},
+        roles: {
+          owners: [],
+          writers: [],
+          viewers: [],
+        },
+        sourceId: null,
+        template: false,
+        keywords: [],
+        categories: [],
+        public: false,
+        author: {
+          name: '',
+          avatar: '',
+        },
         title: '',
         description: '',
         modified: new Date(),
@@ -86,7 +99,11 @@ export default Vue.extend({
   methods: {
     addTask(): void {
       this.newTask.members.push(this.user.id);
-      this.newTask.roles[this.user.id] = taskRolesEnum.OWNER;
+      this.newTask.roles.owners.push(this.user.id);
+      this.newTask.author = {
+        name: this.user.name,
+        avatar: this.user.photoUrl,
+      };
       this.newTask.modified = new Date();
       const payload: IUpdateTask = {
         user: this.user,
@@ -104,7 +121,20 @@ export default Vue.extend({
     closeDialog() {
       this.newTask = {
         members: [],
-        roles: {},
+        roles: {
+          owners: [],
+          writers: [],
+          viewers: [],
+        },
+        sourceId: null,
+        template: false,
+        keywords: [],
+        categories: [],
+        public: false,
+        author: {
+          name: '',
+          avatar: '',
+        },
         title: '',
         description: '',
         modified: new Date(),
@@ -112,7 +142,7 @@ export default Vue.extend({
         order: 0,
         currentTab: null,
         tabs: newTaskTabs(),
-      };
+      } as ITask;
       this.dialog = false;
     },
   },

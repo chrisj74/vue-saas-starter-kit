@@ -5,7 +5,7 @@
       flat
       dense
     >
-      <v-toolbar-title>Edit Task</v-toolbar-title>
+      <v-toolbar-title>Convert Task to Template</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="closeDialog();">
         <v-icon>mdi-close</v-icon>
@@ -29,6 +29,11 @@
         />
       </v-form>
     </v-card-text>
+
+    <v-card-actions v-if="task">
+      <v-spacer />
+      <v-btn color="primary" @click="addTemplate()" :disabled="!task.title">Convert to Template</v-btn>
+    </v-card-actions>
   </v-card>
 </template>
 
@@ -37,9 +42,10 @@
 /* Libs */
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
+import * as _ from 'lodash';
 
 /* Models */
-import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs, ITemplate } from '@/types';
+import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs, ITemplate, IUpdateTemplate } from '@/types';
 import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
@@ -61,8 +67,22 @@ export default Vue.extend({
   },
 
   methods: {
+    addTemplate() {
+      const payload: IUpdateTask = {
+        user: this.user,
+        task: JSON.parse(JSON.stringify(this.task)),
+      };
+      this.$store.dispatch('tasks/cloneTask', payload)
+        .then((resp: any) => {
+          this.closeDialog();
+        })
+        .catch((error: any) => {
+          console.error('Error converting to template:', error);
+        });
+    },
 
     closeDialog() {
+      this.task = null;
       this.$emit('doClose');
     },
 
@@ -74,7 +94,19 @@ export default Vue.extend({
           return tsk.id === this.taskId;
         });
         if (!this.task) {
-          this.task = JSON.parse(JSON.stringify(task)) as ITask;
+          this.task = JSON.parse(JSON.stringify(task)) as ITemplate;
+          /* Make template */
+          this.task.template = true;
+
+          /* Empty members and roles */
+          this.task.members = [this.user.id];
+          this.task.roles.owners = [this.user.id];
+          this.task.roles.writers = [];
+          this.task.roles.viewers = [];
+          /* Set & Reset ID */
+          this.task.sourceId = this.task.id;
+          delete(this.task.id);
+
         }
       },
       immediate: true,

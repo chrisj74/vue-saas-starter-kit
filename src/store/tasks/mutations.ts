@@ -1,8 +1,12 @@
 import Vue from 'vue';
-import { ITask } from '@/types';
+import { ITask, ITemplate } from '@/types';
 
 export const setTasks = (state: any, payload: ITask[]) => {
   Vue.set(state, 'tasks', [...payload]);
+};
+
+export const setTemplates = (state: any, payload: ITask[]) => {
+  Vue.set(state, 'templates', [...payload]);
 };
 
 export const setAllWindows = (state: any, payload: any[]) => {

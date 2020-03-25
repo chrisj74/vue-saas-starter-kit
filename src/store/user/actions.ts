@@ -100,7 +100,6 @@ export const autoSignIn =  (state: any, payload: any) => {
     payload.vm.$router.currentRoute.path === '/login'
     || payload.vm.$router.currentRoute.path === '/register'
   ) {
-    console.log('autologin redirect to /tasks');
     payload.vm.$router.push('/tasks');
   }
   state.commit('setAuth', true);

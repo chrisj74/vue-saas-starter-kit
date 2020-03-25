@@ -9,7 +9,18 @@ export interface ITaskRole  {
 }
 export interface ITask {
   roles: {
-    [key: string]: taskRolesEnum;
+    owners: string[];
+    writers: string[];
+    viewers: string[];
+  };
+  template: boolean;
+  sourceId: string | null | undefined;
+  keywords: string[];
+  categories: string[];
+  public: boolean;
+  author: {
+    name: string;
+    avatar: string | null;
   };
   members: string[];
   title: string;
@@ -22,7 +33,7 @@ export interface ITask {
   profile?: string;
   modified?: Date;
   publishId?: string;
-  id?: string;
+  id?: string | null;
   order: number;
   links: ITaskLink[];
 }

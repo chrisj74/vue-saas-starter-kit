@@ -33,12 +33,12 @@ export default Vue.extend({
     //
   }),
   mounted() {
-    console.log('extensio mounted');
     if (this.user && !this.tasks) {
       const payload: IBasePayload = {
         user: this.user,
       };
       this.$store.dispatch('tasks/setTasks', payload);
+      this.$store.dispatch('tasks/setTemplates', payload);
     }
   },
   computed: {
@@ -110,6 +110,7 @@ export default Vue.extend({
           user: this.user,
         };
         this.$store.dispatch('tasks/setTasks', payload);
+        this.$store.dispatch('tasks/setTemplates', payload);
       }
     },
   },

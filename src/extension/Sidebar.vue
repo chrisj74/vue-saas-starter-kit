@@ -69,8 +69,6 @@ export default Vue.extend({
         }
       });
     } else {
-      console.log('webserver');
-
       const envPayload: IEnvState = {
         platform: EnvPlatformsEnum.WEBSERVER,
         browser: browser.getBrowser() as IEnvBrowser,
@@ -85,6 +83,7 @@ export default Vue.extend({
         user: this.user,
       };
       this.$store.dispatch('tasks/setTasks', payload);
+      this.$store.dispatch('tasks/setTemplates', payload);
     }
   },
   computed: {
@@ -106,6 +105,7 @@ export default Vue.extend({
           user: this.user,
         };
         this.$store.dispatch('tasks/setTasks', payload);
+        this.$store.dispatch('tasks/setTemplates', payload);
       }
     },
   },

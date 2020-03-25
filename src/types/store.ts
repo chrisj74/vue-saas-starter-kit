@@ -1,4 +1,5 @@
 import { ITask, ITaskLink } from './task';
+import { ITemplate } from './template';
 
  /* tslint:disable-next-line:interface-over-type-literal */
 type Dictionary < T > = { [key: string]: T };
@@ -72,6 +73,11 @@ export interface IBasePayload {
 export interface IUpdateTask {
   user: IUser;
   task: ITask;
+}
+
+export interface IUpdateTemplate {
+  user: IUser;
+  template: ITemplate;
 }
 
 export interface IUpdateTaskLinks {

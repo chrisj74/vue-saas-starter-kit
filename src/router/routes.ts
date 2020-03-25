@@ -21,6 +21,16 @@ const routes: RouteConfig[] = [
         name: 'Task',
         component: () => import('../pages/tasks/Task.vue'),
       },
+      {
+        path: 'templates',
+        name: 'Templates',
+        component: () => import('../pages/templates/Templates.vue'),
+      },
+      {
+        path: '/template/:id',
+        name: 'Template',
+        component: () => import('../pages/templates/Template.vue'),
+      },
     ],
   },
   {

@@ -130,7 +130,9 @@ export default Vue.extend({
 
     editorContent: {
       handler(oldText, newText) {
-        this.updateTask();
+        if (this.editorContent !== this.task.notes.content) {
+          this.updateTask();
+        }
       },
     },
   },
