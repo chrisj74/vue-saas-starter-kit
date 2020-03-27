@@ -10,7 +10,7 @@
       <v-toolbar-title>{{ task.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <!-- Open sidebar -->
-      <v-tooltip bottom v-if="!isTemplate">
+      <v-tooltip bottom v-if="!isTemplate && windowType !== windowTypeEnum.SIDEBAR">
         <template v-slot:activator="{ on }">
           <v-btn icon v-on="on" @click.native="openSidebar('/task/' + task.id, false)">
             <v-icon>
@@ -21,7 +21,7 @@
         <span>Open Workalong</span>
       </v-tooltip>
       <!-- Menu -->
-      <v-menu offset-y>
+      <v-menu offset-y v-model="showTaskMenu">
         <template v-slot:activator="{ on }">
           <v-btn
             v-on="on"
@@ -43,7 +43,7 @@
               v-model="showConvertDialog"
               width="80vw"
             >
-              <convert-task-to-template @doClose="showConvertDialog = false" :taskId="task.id"></convert-task-to-template>
+              <convert-task-to-template @doClose="showConvertDialog = false; showTaskMenu = false;" :task="task"></convert-task-to-template>
             </v-dialog>
           </v-list-item>
           <!-- Edit -->
@@ -58,7 +58,7 @@
               v-model="showEditDialog"
               width="80vw"
             >
-              <edit-task @doClose="showEditDialog = false" :taskId="task.id"></edit-task>
+              <edit-task @doClose="showEditDialog = false; showTaskMenu = false;" :task="task"></edit-task>
             </v-dialog>
           </v-list-item>
           <!-- Copy Link -->
@@ -71,7 +71,7 @@
             </v-list-item-icon>
           </v-list-item>
           <!-- Copy -->
-          <v-list-item>
+          <v-list-item @click="copyTask()">
             <v-list-item-content>
               <v-list-item-title>Create copy</v-list-item-title>
             </v-list-item-content>
@@ -162,7 +162,7 @@
               </div>
               <!-- Links -->
               <div v-if="tabContent.type === taskTabTypesEnum.LINKS">
-                <task-item-links :taskId="taskId">
+                <task-item-links :task="task">
                 </task-item-links>
               </div>
               <!-- Info -->
@@ -205,6 +205,7 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 import * as draggable from 'vuedraggable';
+import * as _ from 'lodash';
 
 /* App components */
 import AddTaskLink from './links/AddTaskLink.vue';
@@ -214,11 +215,11 @@ import EditTask from './EditTask.vue';
 import ConvertTaskToTemplate from './ConvertTaskToTemplate.vue';
 
 /* Models */
-import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum, IUpdateTask } from '@/types';
+import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum, IUpdateTask, windowTypeEnum } from '@/types';
 
 export default Vue.extend({
   name: 'TaskItem',
-  props: ['taskId', 'collection'],
+  props: ['taskId', 'collection', 'task'],
   components: {
     AddTaskLink,
     draggable,
@@ -233,6 +234,8 @@ export default Vue.extend({
       taskTab: null as string | null,
       showEditDialog: false,
       showConvertDialog: false,
+      windowTypeEnum,
+      showTaskMenu: false,
     };
   },
 
@@ -242,18 +245,18 @@ export default Vue.extend({
       error: 'base/getError',
       env: 'base/getEnv',
       extension: 'base/getEextension',
-      windowtype: 'base/getWindowType',
+      windowType: 'base/getWindowType',
       user: 'user/user',
       tasks: 'tasks/getTasks',
       templates: 'tasks/getTemplates',
       showLinks: 'tasks/getShowLinks',
     }),
-    task(): ITask {
-      const allTasks = [...this.tasks, ...this.templates]
+    /* task(): ITask {
+      const allTasks = _.concat(this.tasks, this.templates)
       return allTasks.find((task: ITask) => {
         return task.id === this.taskId;
       }) as ITask;
-    },
+    }, */
     isTemplate(): boolean {
       return this.task && this.task.template;
     }
@@ -278,6 +281,22 @@ export default Vue.extend({
       this.$store.dispatch('tasks/deleteTask', payload);
     },
 
+    copyTask() {
+      const newTask: ITask = JSON.parse(JSON.stringify(this.task));
+      newTask.title = newTask.title + ' copy';
+      const payload: IUpdateTask = {
+        user: this.user,
+        task: newTask,
+      };
+      this.$store.dispatch('tasks/cloneTask', payload)
+      .then((newTaskId: string) => {
+        this.$router.push('/task/' + newTaskId);
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
+    },
+
   },
   watch: {
     showLinks: {
@@ -288,19 +307,21 @@ export default Vue.extend({
 
     taskTab: {
       handler(newVal, oldVal): void {
-        const task = {...this.task};
-        task.currentTab = this.taskTab ? this.taskTab : null;
-        const payload: IUpdateTask = {
-        user: this.user,
-        task,
-        };
-        this.$store.dispatch('tasks/updateTask', payload);
+        if (this.task && this.task.currentTab !== this.taskTab) {
+          const task = {...this.task};
+          task.currentTab = this.taskTab ? this.taskTab : null;
+          const payload: IUpdateTask = {
+          user: this.user,
+          task,
+          };
+          this.$store.dispatch('tasks/updateTask', payload);
+        }
       },
     },
 
     task: {
       handler(newVal, oldVal): void {
-        if (this.task.currentTab !== this.taskTab) {
+        if (this.task && this.task.currentTab !== this.taskTab) {
           this.taskTab = this.task.currentTab;
         }
       },

@@ -4,13 +4,18 @@
       <v-container
         fluid
       >
-        <h2>Extension</h2>
+        <div v-if="user">
+          <h2>Extension</h2>
 
-        <v-list>
-          <v-list-item v-for="(task) in tasks" :key="task.id">
-            <v-list-item-title @click.stop="openSidebar('/task/' + task.id, false)">{{ task.title }}</v-list-item-title>
-          </v-list-item>
-        </v-list>
+          <v-list>
+            <v-list-item v-for="(task) in tasks" :key="task.id">
+              <v-list-item-title @click.stop="openSidebar('/task/' + task.id, false)">{{ task.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </div>
+        <div v-else>
+          <home-auth></home-auth>
+        </div>
       </v-container>
     </v-content>
   </v-app>
@@ -23,12 +28,17 @@ import { mapGetters } from 'vuex';
 /* External libs */
 import * as Bowser from 'bowser';
 
+/* App components */
+import HomeAuth from '@/components/home/HomeAuth.vue';
+
 /* Models */
 import { IBasePayload, IOpenSidebar, IExtensionSidebarState, IEnvState, EnvPlatformsEnum, IEnvBrowser  } from '@/types';
 
 export default Vue.extend({
   name: 'ExtensionPopup',
-
+  components: {
+    HomeAuth,
+  },
   data: () => ({
     //
   }),

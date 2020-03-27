@@ -11,28 +11,28 @@
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-toolbar>
-    <v-card-text v-if="task">
+    <v-card-text v-if="taskTemplate">
       <v-form>
-        <v-switch v-model="task.public" class="ma-2" label="Make public"></v-switch>
+        <v-switch v-model="taskTemplate.public" class="ma-2" label="Make public"></v-switch>
         <v-text-field
           label="Task name"
           name="title"
           type="text"
-          v-model="task.title"
+          v-model="taskTemplate.title"
         />
         <v-spacer></v-spacer>
         <v-text-field
           label="Description"
           name="description"
           type="text"
-          v-model="task.description"
+          v-model="taskTemplate.description"
         />
       </v-form>
     </v-card-text>
 
-    <v-card-actions v-if="task">
+    <v-card-actions v-if="taskTemplate">
       <v-spacer />
-      <v-btn color="primary" @click="addTemplate()" :disabled="!task.title">Convert to Template</v-btn>
+      <v-btn color="primary" @click="addTemplate()" :disabled="!taskTemplate.title">Convert to Template</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -50,10 +50,10 @@ import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
   name: 'ConvertTaskToTemplate',
-  props: ['taskId'],
+  props: ['task'],
   data() {
     return {
-      task: null as unknown as ITemplate,
+      taskTemplate: null as unknown as ITemplate,
     };
   },
 
@@ -88,24 +88,21 @@ export default Vue.extend({
 
   },
   watch: {
-    tasks: {
+    task: {
       handler(newVal, oldVal): void {
-        const task: ITask = this.tasks.find((tsk: ITask) => {
-          return tsk.id === this.taskId;
-        });
-        if (!this.task) {
-          this.task = JSON.parse(JSON.stringify(task)) as ITemplate;
+        if (!this.taskTemplate) {
+          this.taskTemplate = JSON.parse(JSON.stringify(this.task)) as ITemplate;
           /* Make template */
-          this.task.template = true;
+          this.taskTemplate.template = true;
 
           /* Empty members and roles */
-          this.task.members = [this.user.id];
-          this.task.roles.owners = [this.user.id];
-          this.task.roles.writers = [];
-          this.task.roles.viewers = [];
+          this.taskTemplate.members = [this.user.id];
+          this.taskTemplate.roles.owners = [this.user.id];
+          this.taskTemplate.roles.writers = [];
+          this.taskTemplate.roles.viewers = [];
           /* Set & Reset ID */
-          this.task.sourceId = this.task.id;
-          delete(this.task.id);
+          this.taskTemplate.sourceId = this.taskTemplate.id;
+          delete(this.taskTemplate.id);
 
         }
       },

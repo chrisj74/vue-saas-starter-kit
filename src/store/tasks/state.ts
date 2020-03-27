@@ -1,4 +1,4 @@
-import { ITask, ITemplate } from '@/types';
+import { ITask } from '@/types';
 
 export default function() {
   return {

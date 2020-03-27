@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { ITask, ITemplate } from '@/types';
+import { ITask } from '@/types';
 
 export const setTasks = (state: any, payload: ITask[]) => {
   Vue.set(state, 'tasks', [...payload]);

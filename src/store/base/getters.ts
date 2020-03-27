@@ -29,6 +29,8 @@ export const getWindowType = (state: any, getters: any, rootState: any, rootGett
     return windowTypeEnum.SIDEBAR;
   } else if (state.env.platform === EnvPlatformsEnum.EXTENSION) {
     return windowTypeEnum.TAB;
+  } else if (window.name === 'workalongo') {
+    return windowTypeEnum.SIDEBAR;
   } else {
     return windowTypeEnum.BROWSER;
   }

@@ -80,13 +80,12 @@ import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
   name: 'EditTask',
-  props: ['taskId'],
+  props: ['task'],
   components: {
     draggable,
   },
   data() {
     return {
-      task: null as unknown as ITask,
       videoPath: null as unknown as string,
     };
   },
@@ -115,30 +114,6 @@ export default Vue.extend({
     },
   },
   watch: {
-    tasks: {
-      handler(newVal, oldVal): void {
-        const task: ITask = this.tasks.find((tsk: ITask) => {
-          return tsk.id === this.taskId;
-        });
-        if (!this.task) {
-          this.task = JSON.parse(JSON.stringify(task)) as ITask;
-          this.videoPath = this.task.videoPath as string;
-          const newTabs = newTaskTabs();
-          /* Make sure new tab types are added */
-          newTabs.forEach((tab: ITaskTab) => {
-            const matchedTab = this.task.tabs.find((taskTab: ITaskTab) => {
-              return taskTab.type === tab.type;
-            });
-            if (!matchedTab) {
-              this.task.tabs.push(tab);
-            }
-          });
-        }
-      },
-      immediate: true,
-      deep: true,
-    },
-
     videoPath: {
       handler(newVal, oldVal): void {
         if (this.videoPath) {

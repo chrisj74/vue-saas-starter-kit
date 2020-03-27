@@ -20,7 +20,7 @@ export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
     tasksCollectionRef.forEach((doc: any) => {
       const task: ITask = JSON.parse(JSON.stringify(doc.data()));
       task.id = doc.id;
-      tasks.push(task);
+
       doc.ref.collection('links/')
       .orderBy('order', 'asc').onSnapshot((linksCollectionRef: any) => {
         task.links = [];
@@ -28,12 +28,17 @@ export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
           const link = JSON.parse(JSON.stringify(linkRef.data()));
           link.id = linkRef.id;
           task.links.push(link);
+        }, (error: any) => {
+          console.error('Problem accessing Task links data: ', error);
         });
       });
+      tasks.push(task);
     });
     // may need Promise all for sub collections
     commit('setTasks', tasks);
-  }));
+  }), (error: any) => {
+    console.error('Problem accessing Task data: ', error);
+  });
 };
 
 export const addTask = ({ commit }: {commit: any}, payload: IUpdateTask) => {
@@ -134,6 +139,9 @@ export const deleteTask = (state: any, payload: IUpdateTask) => {
         linksSnapshot.forEach((val: any) => {
           val.ref.delete();
         });
+      })
+      .catch((error: any) => {
+        console.error('Problem accessing Delete Task data: ', error);
       });
 
     /* Delete task doc */
@@ -160,7 +168,7 @@ export const setTemplates = ({ commit }: {commit: any}, payload: IBasePayload) =
     templateCollectionRef.forEach((doc: any) => {
       const template: ITask = JSON.parse(JSON.stringify(doc.data()));
       template.id = doc.id;
-      templates.push(template);
+
       doc.ref.collection('links/')
       .orderBy('order', 'asc').onSnapshot((linksCollectionRef: any) => {
         template.links = [];
@@ -169,11 +177,16 @@ export const setTemplates = ({ commit }: {commit: any}, payload: IBasePayload) =
           link.id = linkRef.id;
           template.links.push(link);
         });
+      }, (error: any) => {
+        console.error('Problem accessing Template links data: ', error);
       });
+      templates.push(template);
     });
     // may need Promise all for sub collections
     commit('setTemplates', templates);
-  }));
+  }), (error: any) => {
+    console.error('Problem accessing Template data: ', error);
+  });
 };
 
 export const cloneTask = (state: any, payload: IUpdateTask) => {

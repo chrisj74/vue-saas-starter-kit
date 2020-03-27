@@ -22,47 +22,23 @@
             >
               <v-toolbar-title>Login form</v-toolbar-title>
             </v-toolbar>
-            <v-card-text>
-              <v-form>
-                <v-text-field
-                  label="Email"
-                  name="email"
-                  prepend-icon="mdi-email"
-                  type="email"
-                  v-model="email"
-                />
 
-                <v-text-field
-                  :append-icon="showPw ? 'mdi-eye' : 'mdi-eye-off'"
-                  id="password"
-                  label="Password"
-                  name="password"
-                  prepend-icon="mdi-lock"
-                  :type="showPw ? 'text' : 'password'"
-                  v-model="password"
-                  @keyup.enter="onSignin"
-                  @click:append="showPw = !showPw"
-                />
-              </v-form>
-              <v-alert
-                v-if="userError"
-                color="error"
-                border="top"
-                type="error"
-                text
-                dense
-              >
-                <slot name="default">
-                  <div >{{ userError.message }} <br> Don't have an account?
-                    <router-link :to="{ path: 'register' }">Register now</router-link>
-                  </div>
-                </slot>
-              </v-alert>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer />
-              <v-btn color="primary" @click="onSignin" :disabled="!password || !email">Login</v-btn>
-            </v-card-actions>
+            <login-form></login-form>
+
+            <v-alert
+              v-if="userError"
+              color="error"
+              border="top"
+              type="error"
+              text
+              dense
+            >
+              <slot name="default">
+                <div >{{ userError.message }} <br> Don't have an account?
+                  <router-link :to="{ path: 'register' }">Register now</router-link>
+                </div>
+              </slot>
+            </v-alert>
 
             <v-divider class="mx-4"></v-divider>
 
@@ -81,17 +57,16 @@
 // import SocialSignIn from '../../components/user/SocialSignIn.vue';
 import { mapGetters } from 'vuex';
 import Vue from 'vue';
-import { IUser, ILoginData } from '../../types';
+
+import LoginForm from '@/components/auth/LoginForm.vue';
 
 export default Vue.extend({
   components: {
-    // SocialSignIn
+    LoginForm,
   },
   data() {
     return {
-      email: '' as string,
-      password: '' as string,
-      showPw: false,
+
     };
   },
   computed: {
@@ -105,42 +80,7 @@ export default Vue.extend({
     }),
   },
   methods: {
-    showForgottenPassword() {
-    // this.$q
-    //   .dialog({
-    //     title: 'Forgotten Password',
-    //     message: 'Enter the password you used to create an account
-    // and we\'ll send you an email with a link to reset your password.',
-    //     prompt: {
-    //       model: this.email,
-    //       type: 'text' // optional
-    //     },
-    //     cancel: true,
-    //     color: 'primary'
-    //   })
-    //   .onOk((forgottenEmail: any) => {
-    //     this.$store.dispatch('user/forgottenPassword', forgottenEmail).then(() => {
-    //       this.$q.notify({
-    //         message: 'Check your email for instructions on how to reset your password.',
-    //         color: 'positive',
-    //         textColor: 'black',
-    //         icon: 'mdi-email'});
-    //     });
-    //   });
-    },
 
-    onSignin() {
-      const payload: ILoginData = {
-        vm: this as Vue,
-        email: this.email as string,
-        password: this.password as string,
-        redirect: this.$router.currentRoute.query,
-      };
-      this.$store.dispatch('user/signUserIn', payload);
-    },
-  },
-  mounted() {
-    this.$store.dispatch('user/setUserError', null);
   },
 });
 </script>

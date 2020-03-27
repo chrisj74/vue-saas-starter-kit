@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import firebase from 'firebase';
 
 Vue.use(VueRouter);
 
@@ -8,6 +9,7 @@ const routes = [
     path: '/',
     name: 'Home',
     component: () => import('../pages/ExtensionPopup.vue'),
+    meta: { requiresAuth: false },
   },
   {
     path: '/login',
@@ -42,6 +44,23 @@ const router = new VueRouter({
   mode: 'hash',
   base: process.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
+    if (!firebase.auth().currentUser) {
+      next({
+        path: '/',
+        query: {
+          redirect: to.fullPath,
+        },
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;

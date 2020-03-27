@@ -18,12 +18,18 @@
             <v-img :src="link.favIconUrl"></v-img>
           </v-list-item-avatar>
           <v-list-item-title>
-            <a :href="link.url" @click.stop="openMain($event, link.url)" :target="windowType === windowTypes.TAB ? '_self' : '_blank'">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
+            <a :href="link.url" @click.stop="openMain($event, link.url)" :target="windowType === windowTypeEnum.TAB ? '_self' : '_blank'">{{ link.title && link.title.length > 0 ? link.title : link.url }}</a>
           </v-list-item-title>
-          <v-btn dense icon @click="openSidebar(link.url, true)"><v-icon small>mdi-open-in-new</v-icon></v-btn>
+          <v-btn
+            v-if="!(env.platform === EnvPlatformsEnum.WEBSERVER && windowType === windowTypeEnum.SIDEBAR)"
+            dense
+            icon
+            @click="openSidebar(link.url, true)">
+            <v-icon small>mdi-open-in-new</v-icon>
+          </v-btn>
 
           <v-list-item-action>
-            <v-menu offset-y>
+            <v-menu offset-y :close-on-click="true">
               <template v-slot:activator="{ on }">
                 <v-btn
                   v-on="on"
@@ -34,7 +40,7 @@
               </template>
               <v-list dense>
                 <!-- Open tab -->
-                <v-list-item :href="link.url">
+                <v-list-item :href="link.url" @click.stop="openMain($event, link.url)" :target="windowType === windowTypeEnum.TAB ? '_self' : '_blank'">
                   <v-list-item-content>
                     <v-list-item-title>Open Tab</v-list-item-title>
                   </v-list-item-content>
@@ -43,7 +49,7 @@
                   </v-list-item-icon>
                 </v-list-item>
                 <!-- Open sidebar -->
-                <v-list-item @click="openSidebar(link.url, true)">
+                <v-list-item v-if="!(env.platform === EnvPlatformsEnum.WEBSERVER && windowType === windowTypeEnum.SIDEBAR)" @click="openSidebar(link.url, true)">
                   <v-list-item-content>
                     <v-list-item-title>Open Workalong</v-list-item-title>
                   </v-list-item-content>
@@ -93,14 +99,15 @@ import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink, windowT
 
 export default Vue.extend({
   name: 'TaskItemLinks',
-  props: ['taskId'],
+  props: ['task'],
   components: {
     draggable,
     AddTaskLink,
   },
   data() {
     return {
-      windowTypes: windowTypeEnum,
+      windowTypeEnum,
+      EnvPlatformsEnum,
     };
   },
 
@@ -114,11 +121,6 @@ export default Vue.extend({
       user: 'user/user',
       tasks: 'tasks/getTasks',
     }),
-    task(): ITask {
-      return this.tasks.find((task: ITask) => {
-        return task.id === this.taskId;
-      }) as ITask;
-    },
   },
 
   methods: {
@@ -166,12 +168,15 @@ export default Vue.extend({
       /* If we are in the sidebar target the main window */
       if (this.windowType === windowTypeEnum.SIDEBAR ) {
         if (this.env.platform === EnvPlatformsEnum.EXTENSION && this.extension.lastFocusedWindow) {
+          console.log('sidebar');
+          e.preventDefault();
           /* External so open new tab */
           window.chrome.tabs.create({
             windowId: this.extension.lastFocusedWindow,
             url: linkUrl,
             active: true,
           });
+          return false;
         } else {
           return true;
         }

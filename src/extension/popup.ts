@@ -3,12 +3,10 @@ import App from '@/App.vue';
 import router from '@/router/extension';
 import store from '@/store';
 import vuetify from '@/plugins/vuetify';
-import { FirebaseAutoLogin, AUTH, fireApp } from '@/boot/firebase';
+import firebase from 'firebase';
 
 
 Vue.config.productionTip = false;
-Vue.prototype.$auth = AUTH;
-Vue.prototype.$firebase = fireApp;
 
 declare global {
   interface Window { chrome: any; }
@@ -16,12 +14,25 @@ declare global {
 
 window.chrome = window.chrome;
 
-new Vue({
-  router,
-  store,
-  vuetify,
-  created() {
-    FirebaseAutoLogin(this as Vue);
-  },
-  render: (h) => h(App),
-}).$mount('#app');
+let vue: Vue | null = null;
+
+firebase.auth().onAuthStateChanged((user: any) => {
+  if (user) {
+    const payload = {
+      user,
+      query: router.currentRoute.query,
+    };
+    store.dispatch('user/autoSignIn', payload);
+  } else {
+    store.dispatch('user/setAuth', true);
+  }
+
+  if (!vue) {
+    vue = new Vue({
+      router,
+      store,
+      vuetify,
+      render: (h) => h(App),
+    }).$mount('#app');
+  }
+});

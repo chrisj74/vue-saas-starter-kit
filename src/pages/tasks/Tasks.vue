@@ -1,10 +1,11 @@
 <template>
   <v-container fluid>
+    <add-task></add-task>
     <v-row>
       <v-col :cols="allWindows && allWindows.length > 0 ? 9 : 12">
         <v-row>
           <v-col sm="12" md="6" lg="4" xl="3" v-for="(task) in tasks" :key="'tasks-' + task.id">
-            <task-item :taskId="task.id" :collection="true"></task-item>
+            <task-item :taskId="task.id" :task="task" :collection="true"></task-item>
             <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
           </v-col>
         </v-row>
@@ -41,9 +42,6 @@
         </v-list>
       </v-col>
     </v-row>
-
-
-    <add-task></add-task>
   </v-container>
 </template>
 

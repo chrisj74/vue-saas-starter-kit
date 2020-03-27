@@ -2,10 +2,10 @@
   <v-container>
     <v-row>
       <v-col cols="12" v-if="task">
-        <task-item :taskId="task.id" :collection="false"></task-item>
+        <task-item :taskId="task.id" :task="task" :collection="false"></task-item>
       </v-col>
     </v-row>
-    <add-task></add-task>
+    <!-- <add-task></add-task> -->
   </v-container>
 </template>
 

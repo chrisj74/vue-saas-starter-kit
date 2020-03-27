@@ -4,7 +4,7 @@
       <v-col :cols="allWindows && allWindows.length > 0 ? 9 : 12">
         <v-row>
           <v-col sm="12" md="6" lg="4" xl="3" v-for="(template) in templates" :key="'templates-' + template.id">
-            <task-item :taskId="template.id" :collection="true"></task-item>
+            <task-item :taskId="template.id" :task="template" :collection="true"></task-item>
             <v-spacer :key="'spacer-' + template.id" class="mb-2"></v-spacer>
           </v-col>
         </v-row>

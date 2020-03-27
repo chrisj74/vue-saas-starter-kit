@@ -1,12 +1,14 @@
 <template>
   <v-app id="vApp" v-if="authSet">
     <v-navigation-drawer
+      v-if="user"
       v-model="leftDrawerOpen"
       app
       :mobile-break-point="768"
       :clipped="$vuetify.breakpoint.mdAndUp"
       >
       <v-list dense>
+        <!-- HOME -->
         <v-list-item link to="/">
           <v-list-item-action>
             <v-icon>mdi-home</v-icon>
@@ -15,6 +17,7 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+        <!-- TASKS -->
         <v-list-item link to="/tasks">
           <v-list-item-action>
             <v-icon>mdi-check</v-icon>
@@ -23,7 +26,7 @@
             <v-list-item-title>Tasks</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-
+        <!-- TEMPLATES -->
         <v-list-item link to="/templates">
           <v-list-item-action>
             <v-icon>mdi-check</v-icon>
@@ -33,7 +36,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-
+      <!-- LOGOUT -->
       <template v-slot:append>
         <div class="pa-2">
           <v-btn block @click="onLogout()" color="red lighten-2" dark>Logout <v-icon dark right>mdi-power-standby</v-icon></v-btn>
@@ -48,7 +51,7 @@
       dark
       height="40"
       >
-      <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
+      <v-app-bar-nav-icon v-if="user" @click.stop="toggleLeftDawer()" />
       <v-toolbar-title>Application</v-toolbar-title>
     </v-app-bar>
 
@@ -93,7 +96,6 @@ export default Vue.extend({
     },
   },
 });
-
 </script>
 
 <style lang="scss">
