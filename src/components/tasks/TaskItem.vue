@@ -177,7 +177,7 @@
 
               <!-- Notes -->
               <div v-if="tabContent.type === taskTabTypesEnum.NOTES">
-                <task-item-notes :taskId="taskId">
+                <task-item-notes :task="task">
                 </task-item-notes>
               </div>
 

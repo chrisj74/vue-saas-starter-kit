@@ -5,13 +5,34 @@
         fluid
       >
         <div v-if="user">
-          <h2>Extension</h2>
+          <v-card>
+            <v-toolbar
+              color="white"
+              flat
+              dense
+              >
+              <v-toolbar-title>Tasks</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-btn icon @click="closePopup();">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </v-toolbar>
+            <v-card-text>
+              <v-autocomplete
+                :items="tasks"
+                color="white"
+                item-text="title"
+                item-value="id"
+                label="Select task"
+                v-model="selectedTask"
+              ></v-autocomplete>
+            </v-card-text>
 
-          <v-list>
-            <v-list-item v-for="(task) in tasks" :key="task.id">
-              <v-list-item-title @click.stop="openSidebar('/task/' + task.id, false)">{{ task.title }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
+            <v-card-actions>
+              <v-spacer />
+              <v-btn @click="openSidebar('/task/' + selectedTask, false)" :disabled="!selectedTask">Open</v-btn>
+            </v-card-actions>
+          </v-card>
         </div>
         <div v-else>
           <home-auth></home-auth>
@@ -40,7 +61,7 @@ export default Vue.extend({
     HomeAuth,
   },
   data: () => ({
-    //
+    selectedTask: null,
   }),
   mounted() {
     if (this.user && !this.tasks) {
@@ -69,9 +90,13 @@ export default Vue.extend({
       browser: browser.getBrowser() as IEnvBrowser,
     };
     this.$store.commit('base/setEnv', envPayload);
+    window.chrome.windows.getLastFocused((windowObj: any) => {
+      console.log('popup lastFocused Window=', windowObj);
+    });
+
 
     /* Get this window details */
-    window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
+    window.chrome.runtime.sendMessage({ type: 'getMyWindow', setLastFocused: false }, (res: any) => {
       vm.$store.commit('base/setExtensionIds', res);
     });
 
@@ -102,6 +127,10 @@ export default Vue.extend({
     });
   },
   methods: {
+    closePopup() {
+      window.close();
+    },
+
     openSidebar(linkUrl: string, linkExternal: boolean): void {
       const payload: IOpenSidebar = {
         url: linkUrl,
@@ -110,6 +139,7 @@ export default Vue.extend({
         external: linkExternal,
       };
       this.$store.dispatch('tasks/openSidebar', payload);
+      window.close();
     },
   },
 
@@ -128,7 +158,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-#app {
+#vApp {
   width: 500px;
 }
 </style>

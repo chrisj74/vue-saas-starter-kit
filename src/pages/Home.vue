@@ -14,8 +14,10 @@
         <v-card-text>
           <v-row>
             <v-col sm="12" md="6" lg="4" xl="3" v-for="(task, taskIndex) in tasks" :key="'tasks-' + task.id">
-              <task-item :taskId="task.id" :task="task" :collection="true" v-if="taskIndex <= 4"></task-item>
-              <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
+              <div v-if="taskIndex < maxCols">
+                <task-item :taskId="task.id" :task="task" :collection="true"></task-item>
+                <v-spacer :key="'spacer-' + task.id" class="mb-2"></v-spacer>
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -38,9 +40,11 @@
         </v-toolbar>
         <v-card-text>
           <v-row>
-            <v-col sm="12" md="6" lg="4" xl="3" v-for="(template) in templates" :key="'templates-' + template.id">
-              <task-item :taskId="template.id" :task="template" :collection="true"></task-item>
-              <v-spacer :key="'spacer-' + template.id" class="mb-2"></v-spacer>
+            <v-col sm="12" md="6" lg="4" xl="3" v-for="(template, templateIndex) in templates" :key="'templates-' + template.id">
+              <div v-if="templateIndex < maxCols">
+                <task-item :taskId="template.id" :task="template" :collection="true"></task-item>
+                <v-spacer :key="'spacer-' + template.id" class="mb-2"></v-spacer>
+              </div>
             </v-col>
           </v-row>
         </v-card-text>
@@ -75,6 +79,17 @@ export default Vue.extend({
       tasks: 'tasks/getTasks',
       templates: 'tasks/getTemplates',
     }),
+    maxCols() {
+      let max: number = 1;
+      if (this.$vuetify.breakpoint.name === 'md') {
+        max = 2;
+      } else if (this.$vuetify.breakpoint.name === 'lg') {
+        max = 3;
+      } else if (this.$vuetify.breakpoint.name === 'xl') {
+        max = 4;
+      }
+      return max;
+    }
   },
   methods: {
     //

@@ -29,7 +29,7 @@ import { IBasePayload, ITask, IOpenSidebar, IUpdateTaskLinks, ITaskLink,
 
 export default Vue.extend({
   name: 'TaskItemNotes',
-  props: ['taskId'],
+  props: ['task'],
   components: {
     draggable,
     'tinymce-editor': Editor,
@@ -73,11 +73,6 @@ export default Vue.extend({
       user: 'user/user',
       tasks: 'tasks/getTasks',
     }),
-    task(): ITask {
-      return this.tasks.find((task: ITask) => {
-        return task.id === this.taskId;
-      }) as ITask;
-    },
   },
 
   methods: {
@@ -109,12 +104,6 @@ export default Vue.extend({
   watch: {
     task: {
       handler(newVal, oldVal): void {
-
-        if (this.task.notes) {
-          console.log('component commit=', this.editorCommits);
-          console.log('inbound commit=', this.task.notes.commit);
-        }
-
         if (this.task.notes && this.editorCommits < this.task.notes.commit) {
           const notes: ITaskNotesObj = JSON.parse(JSON.stringify(this.task.notes));
           this.editorContent = notes.content;
@@ -122,6 +111,7 @@ export default Vue.extend({
         } else if (!this.task.notes) {
           /* No stored notes obj set to empty string */
           this.editorContent = '';
+          this.updateTask();
         }
       },
       immediate: true,
@@ -130,7 +120,10 @@ export default Vue.extend({
 
     editorContent: {
       handler(oldText, newText) {
-        if (this.task.notes && this.editorContent !== this.task.notes.content) {
+        if (this.task.notes
+          && this.editorContent !== this.task.notes.content
+          && this.user
+        ) {
           this.updateTask();
         } else if (!this.task.notes) {
           this.updateTask();

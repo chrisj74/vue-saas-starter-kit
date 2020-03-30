@@ -34,7 +34,7 @@ export default Vue.extend({
       window.chrome.runtime.sendMessage({ type: 'getSidebar' });
 
       /* Get this window details */
-      window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
+      window.chrome.runtime.sendMessage({ type: 'getMyWindow', setLastFocused: true }, (res: any) => {
         vm.$store.commit('base/setExtensionIds', res);
       });
 

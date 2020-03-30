@@ -101,22 +101,28 @@ export const updateAllWindows = ({ commit }: {commit: any}, payload: any[]) => {
 
 export const updateTask = (state: any, payload: IUpdateTask) => {
   return new Promise((resolve, reject) => {
-    const userDoc = firebase
+    if (payload.user) {
+      const userDoc = firebase
       .firestore()
       .collection('users/').doc(payload.user.id);
-    userDoc.update({
-      lastUpdated: new Date(),
-    });
-
-    firebase
-      .firestore()
-      .collection('tasks').doc(payload.task.id as string).update(payload.task)
-      .then(() => {
-        resolve(true);
-      })
-      .catch(function(error) {
-          console.error('Error updating document: ', error);
+      userDoc.update({
+        lastUpdated: new Date(),
       });
+
+      payload.task.modified = new Date();
+      firebase
+        .firestore()
+        .collection('tasks').doc(payload.task.id as string).update(payload.task)
+        .then(() => {
+          resolve(true);
+        })
+        .catch(function(error) {
+            console.error('Error updating document: ', error);
+        });
+    } else {
+      resolve();
+    }
+
   });
 };
 
@@ -189,6 +195,36 @@ export const setTemplates = ({ commit }: {commit: any}, payload: IBasePayload) =
   });
 };
 
+export const fetchTemplate = (state: any, payload: string) => {
+  return new Promise((resolve, reject) => {
+    let newTask: ITask;
+    firebase
+      .firestore()
+      .doc('/tasks/' + payload)
+      .get()
+      .then(function(docRef) {
+        newTask = JSON.parse(JSON.stringify(docRef.data())) as ITask;
+        docRef.ref.collection('links')
+        .orderBy('order', 'asc')
+        .get()
+        .then((linksCollectionRef: any) => {
+          newTask.links = [];
+          linksCollectionRef.forEach((linkRef: any ) => {
+            const link = JSON.parse(JSON.stringify(linkRef.data()));
+            link.id = linkRef.id;
+            newTask.links.push(link);
+          });
+        }, (error: any) => {
+          console.error('Problem accessing Template links data: ', error);
+        });
+        resolve(newTask);
+      })
+      .catch(function(error) {
+          console.error('Error fetching document: ', error);
+      });
+  });
+};
+
 export const cloneTask = (state: any, payload: IUpdateTask) => {
   return new Promise((resolve, reject) => {
     const userDoc = firebase
@@ -236,13 +272,15 @@ export const openSidebar =
     if (windowType !== windowTypeEnum.SIDEBAR) {
       window.chrome.windows.getCurrent({populate: false}, function(currentWindow: any) {
         /* get the current window so we can set it back on leave */
-        if (windowType === windowTypeEnum.TAB) {
+        if (windowType !== windowTypeEnum.SIDEBAR) {
           window.chrome.extension.sendMessage({ type: 'setLastFocusedWindowId', lastFocusedId:  currentWindow.id},
             function(res: any) {
-              /* set the current window size */
-              window.chrome.windows.update(currentWindow.id, { width: (windowWidth - sidebarWidth), top: 0, left: 0 });
+              // response
             },
           );
+          /* set the current window size */
+          window.chrome.windows
+          .update(extension.lastFocusedWindow, { width: (windowWidth - (sidebarWidth + 5)), top: 0, left: 0 });
         }
 
         if (!extension.sidebar.sidebarWindowId) {
@@ -253,7 +291,7 @@ export const openSidebar =
             height: windowHeight,
             width: sidebarWidth,
             top: 0,
-            left: (windowWidth - sidebarWidth),
+            left: (windowWidth - (sidebarWidth)),
           };
           window.chrome.windows.create(newWin, (sidebarWin: any) => {
             const sidebar: IExtensionSidebarState = {

@@ -38,7 +38,7 @@ export default Vue.extend({
       });
 
       /* Get this window details */
-      window.chrome.runtime.sendMessage({ type: 'getMyWindow' }, (res: any) => {
+      window.chrome.runtime.sendMessage({ type: 'getMyWindow', setLastFocused: false }, (res: any) => {
         vm.$store.commit('base/setExtensionIds', res);
       });
 

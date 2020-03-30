@@ -24,3 +24,7 @@ yarn-error.log*
 #APP
 /src/boot/firebase.json
 /src/boot/firestore.rules.js
+dist.zip
+/.firebase*
+firebase*
+

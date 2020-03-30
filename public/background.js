@@ -63,6 +63,12 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
   ["blocking", "requestHeaders"]
 );
 
+/* Initial */
+
+window.chrome.windows.getLastFocused((lastWindow) => {
+  lastFocusedWindowId = lastWindow.id;
+});
+
 /* MESSAGES */
 chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
   if (message.type == "setSidebarTabId") {
@@ -84,7 +90,13 @@ chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
     });
   } else if (message.type == "getMyWindow") {
     /* return sender details */
-    lastFocusedWindowId = message.lastFocusedId;
+    if (message.setLastFocused) {
+      lastFocusedWindowId = sender.tab.windowId;
+      chrome.runtime.sendMessage({
+        type: 'setLastFocusedWindow',
+        windowId: lastFocusedWindowId,
+      })
+    }
     sendResponse({
       tabId: sender.tab.id,
       windowId: sender.tab.windowId
