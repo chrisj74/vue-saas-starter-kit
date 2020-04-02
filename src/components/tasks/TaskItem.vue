@@ -31,8 +31,24 @@
           </v-btn>
         </template>
         <v-list dense>
+          <!-- Share -->
+          <v-list-item @click.stop="showShareDialog = true">
+            <v-list-item-content>
+              <v-list-item-title>Share</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon small>mdi-account-plus-outline</v-icon>
+            </v-list-item-icon>
+
+            <v-dialog
+              v-model="showShareDialog"
+              width="80vw"
+            >
+              <share-task @doClose="showShareDialog = false; showTaskMenu = false;" :task="task"></share-task>
+            </v-dialog>
+          </v-list-item>
           <!-- Convert to template -->
-          <v-list-item @click.stop="showConvertDialog = true" v-if="!isTemplate">
+          <v-list-item @click.stop="showConvertTaskToTemplateDialog = true" v-if="!isTemplate">
             <v-list-item-content>
               <v-list-item-title>Convert to template</v-list-item-title>
             </v-list-item-content>
@@ -40,10 +56,26 @@
               <v-icon small>mdi-swap-horizontal-variant</v-icon>
             </v-list-item-icon>
             <v-dialog
-              v-model="showConvertDialog"
+              v-model="showConvertTaskToTemplateDialog"
               width="80vw"
             >
-              <convert-task-to-template @doClose="showConvertDialog = false; showTaskMenu = false;" :task="task"></convert-task-to-template>
+              <convert-task-to-template @doClose="showConvertTaskToTemplateDialog = false; showTaskMenu = false;" :task="task"></convert-task-to-template>
+            </v-dialog>
+          </v-list-item>
+
+          <!-- Convert to task -->
+          <v-list-item @click.stop="showConvertTemplateToTaskDialog = true" v-if="isTemplate">
+            <v-list-item-content>
+              <v-list-item-title>Create New Task</v-list-item-title>
+            </v-list-item-content>
+            <v-list-item-icon>
+              <v-icon small>mdi-plus</v-icon>
+            </v-list-item-icon>
+            <v-dialog
+              v-model="showConvertTemplateToTaskDialog"
+              width="80vw"
+            >
+              <convert-template-to-task @doClose="showConvertTemplateToTaskDialog = false; showTaskMenu = false;" :task="task"></convert-template-to-task>
             </v-dialog>
           </v-list-item>
           <!-- Edit -->
@@ -56,15 +88,18 @@
             </v-list-item-icon>
             <v-dialog
               v-model="showEditDialog"
-              width="80vw"
+              :fullscreen="true"
             >
               <edit-task @doClose="showEditDialog = false; showTaskMenu = false;" :task="task"></edit-task>
             </v-dialog>
           </v-list-item>
           <!-- Copy Link -->
-          <v-list-item>
+          <v-list-item
+            v-if="templateLink"
+            v-clipboard:copy="templateLink"
+            v-clipboard:success="onClipboardCopy">
             <v-list-item-content>
-              <v-list-item-title>Copy link</v-list-item-title>
+              <v-list-item-title>Copy public link</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
               <v-icon small>mdi-link</v-icon>
@@ -139,24 +174,7 @@
               >
               <!-- Cover -->
               <div v-if="tabContent.type === taskTabTypesEnum.HOME">
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
-                <p>cover</p>
+                <p>cover - this will be editable.</p>
 
                 <div v-html="task.description"></div>
               </div>
@@ -167,12 +185,12 @@
               </div>
               <!-- Info -->
               <div v-if="tabContent.type === taskTabTypesEnum.INFO">
-                <p>INFO</p>
+                <p>INFO - this will be where you can add guides and lessons</p>
               </div>
 
               <!-- Docs -->
               <div v-if="tabContent.type === taskTabTypesEnum.DOCS">
-                <p>DOCS</p>
+                <p>DOCS - add links to cloud documents</p>
               </div>
 
               <!-- Notes -->
@@ -183,7 +201,17 @@
 
               <!-- Youtube -->
               <div v-if="tabContent.type === taskTabTypesEnum.YOUTUBE">
-                <p>YOUTUBE</p>
+                <p>YOUTUBE - safe search</p>
+              </div>
+
+              <!-- Calculator -->
+              <div v-if="tabContent.type === taskTabTypesEnum.YOUTUBE">
+                <p>CALCULATOR</p>
+              </div>
+
+              <!-- Embed -->
+              <div v-if="tabContent.type === taskTabTypesEnum.YOUTUBE">
+                <p>EMBED - embed html widgets</p>
               </div>
             </v-tab-item>
 
@@ -194,7 +222,7 @@
 
     <v-card-actions v-if="collection">
       <v-spacer />
-      <v-btn color="primary" :to="'/task/' + task.id">View Task</v-btn>
+      <v-btn color="primary" :to="task.template ? '/template/' + task.id : '/task/' + task.id">View Task</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -212,7 +240,9 @@ import AddTaskLink from './links/AddTaskLink.vue';
 import TaskItemLinks from './links/TaskItemLinks.vue';
 import TaskItemNotes from './notes/TaskItemNotes.vue';
 import EditTask from './EditTask.vue';
+import ShareTask from './ShareTask.vue';
 import ConvertTaskToTemplate from './ConvertTaskToTemplate.vue';
+import ConvertTemplateToTask from './ConvertTemplateToTask.vue';
 
 /* Models */
 import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum, IUpdateTask, windowTypeEnum } from '@/types';
@@ -227,13 +257,17 @@ export default Vue.extend({
     TaskItemNotes,
     EditTask,
     ConvertTaskToTemplate,
+    ShareTask,
+    ConvertTemplateToTask,
   },
   data() {
     return {
       taskTabTypesEnum,
       taskTab: null as string | null,
       showEditDialog: false,
-      showConvertDialog: false,
+      showConvertTaskToTemplateDialog: false,
+      showConvertTemplateToTaskDialog: false,
+      showShareDialog: false,
       windowTypeEnum,
       showTaskMenu: false,
     };
@@ -259,7 +293,18 @@ export default Vue.extend({
     }, */
     isTemplate(): boolean {
       return this.task && this.task.template;
-    }
+    },
+    templateLink(): string | boolean {
+      if (this.task && this.task.template && this.task.public) {
+        if (this.$router.mode === 'hash') {
+          return window.location.protocol + '//' + window.location.host + '/#/new/' + this.task.id;
+        } else {
+          return window.location.protocol + '//' + window.location.host + '/new/' + this.task.id;
+        }
+      } else {
+        return false;
+      }
+    },
   },
 
   methods: {
@@ -279,6 +324,13 @@ export default Vue.extend({
         user: this.user,
       };
       this.$store.dispatch('tasks/deleteTask', payload);
+      if (!this.collection) {
+        if (this.task.template) {
+          this.$router.push('/templates/');
+        } else {
+          this.$router.push('/tasks/');
+        }
+      }
     },
 
     copyTask() {
@@ -295,6 +347,10 @@ export default Vue.extend({
       .catch((error: any) => {
         console.error(error);
       });
+    },
+
+    onClipboardCopy() {
+      //
     },
 
   },

@@ -5,7 +5,7 @@
       flat
       dense
     >
-      <v-toolbar-title>Convert Task to Template</v-toolbar-title>
+      <v-toolbar-title>New Task from Template</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon @click="closeDialog();">
         <v-icon>mdi-close</v-icon>
@@ -32,7 +32,7 @@
 
     <v-card-actions v-if="taskTemplate">
       <v-spacer />
-      <v-btn color="primary" @click="addTemplate()" :disabled="!taskTemplate.title">Convert to Template</v-btn>
+      <v-btn color="primary" @click="addTemplate()" :disabled="!taskTemplate.title">Create Task</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -49,7 +49,7 @@ import { ITask, IUpdateTask, taskTabTypesEnum, ITaskTabs, ITemplate, IUpdateTemp
 import { newTaskTabs } from '@/utils';
 
 export default Vue.extend({
-  name: 'ConvertTaskToTemplate',
+  name: 'ConvertTemplateToTask',
   props: ['task'],
   data() {
     return {
@@ -75,10 +75,10 @@ export default Vue.extend({
       this.$store.dispatch('tasks/cloneTask', payload)
         .then((newTaskId: string) => {
           this.closeDialog();
-          this.$router.push('/template/' + newTaskId);
+          this.$router.push('/task/' + newTaskId);
         })
         .catch((error: any) => {
-          console.error('Error converting to template:', error);
+          console.error('Error converting to task:', error);
         });
     },
 
@@ -94,7 +94,8 @@ export default Vue.extend({
         if (!this.taskTemplate) {
           this.taskTemplate = JSON.parse(JSON.stringify(this.task)) as ITemplate;
           /* Make template */
-          this.taskTemplate.template = true;
+          this.taskTemplate.template = false;
+          this.taskTemplate.public = false;
 
           /* Empty members and roles */
           this.taskTemplate.members = [this.user.email];

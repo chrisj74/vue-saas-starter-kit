@@ -8,8 +8,8 @@
             <v-spacer :key="'spacer-' + template.id" class="mb-2"></v-spacer>
           </v-col>
         </v-row>
-
       </v-col>
+      <!-- TABS -->
       <v-col cols="3" v-if="allWindows && allWindows.length > 0" class="tab-list">
         <v-list
           elevation="1"

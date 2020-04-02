@@ -9,10 +9,11 @@ import { IBasePayload, ITask, IUpdateTask, EnvPlatformsEnum,
 
 export const setTasks = ({ commit }: {commit: any}, payload: IBasePayload) => {
   let tasks: ITask[] = [];
+  console.log();
   firebase
   .firestore()
   .collection('/tasks/')
-  .where('members', 'array-contains', firebase.auth().currentUser?.uid)
+  .where('members', 'array-contains', firebase.auth().currentUser?.email)
   .where('template', '==', false)
   .orderBy('modified', 'desc')
   .onSnapshot((function(tasksCollectionRef: any) {
@@ -166,7 +167,7 @@ export const setTemplates = ({ commit }: {commit: any}, payload: IBasePayload) =
   firebase
   .firestore()
   .collection('/tasks/')
-  .where('members', 'array-contains', firebase.auth().currentUser?.uid)
+  .where('members', 'array-contains', firebase.auth().currentUser?.email)
   .where('template', '==', true)
   .orderBy('modified', 'desc')
   .onSnapshot((function(templateCollectionRef: any) {
@@ -237,7 +238,6 @@ export const cloneTask = (state: any, payload: IUpdateTask) => {
     /* copy and remove links */
     const links = payload.task.links;
     delete(payload.task.links);
-    console.log('links=', links);
     firebase
       .firestore()
       .collection('/tasks/').add(payload.task)

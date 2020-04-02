@@ -13,6 +13,7 @@
     </v-toolbar>
     <v-card-text v-if="task">
       <v-form>
+        <v-switch v-model="task.public" class="ma-2" label="Make public"></v-switch>
         <v-text-field
           label="Task name"
           name="title"
@@ -35,7 +36,7 @@
           <v-col
             v-for="tab in task.tabs"
             :key="tab.type"
-            cols="3">
+            sm="12" md="6" lg="4" xl="3">
             <v-card dense>
               <v-toolbar
                 :color="tab.active ? 'secondary' : 'grey'"

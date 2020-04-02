@@ -19,7 +19,7 @@ import AddTask from '@/components/tasks/AddTask.vue';
 import TaskItem from '@/components/tasks/TaskItem.vue';
 
 /* Models */
-import { ITask, EnvPlatformsEnum, IOpenSidebar } from '@/types';
+import { ITask, EnvPlatformsEnum, IOpenSidebar, IUpdateTask } from '@/types';
 
 export default Vue.extend({
   name: 'TaskFromTemplate',
@@ -38,19 +38,31 @@ export default Vue.extend({
     }),
   },
   mounted() {
-    if (this.user) {
-      // work out what to do.
-    } else {
-      this.$store.dispatch('tasks/fetchTemplate', this.$router.currentRoute.params.id)
-      .then((newTask: ITask) => {
-        this.task = JSON.parse(JSON.stringify(newTask));
-        this.task.template = false;
-        delete(this.task.id);
-      })
-      .catch((error: any) => {
-        console.error('Error getting template: ', error);
-      });
-    }
+    this.$store.dispatch('tasks/fetchTemplate', this.$router.currentRoute.params.id)
+    .then((newTask: ITask) => {
+      this.task = JSON.parse(JSON.stringify(newTask));
+      this.task.template = false;
+      delete(this.task.id);
+      if (this.user) {
+        /* Create a new task */
+        this.task.public = false;
+        const payload: IUpdateTask = {
+          user: this.user,
+          task: this.task,
+        };
+        this.$store.dispatch('tasks/addTask', payload)
+          .then((newTaskId: string) => {
+            this.$router.push('/task/' + newTaskId);
+            this.closeDialog();
+          })
+          .catch((error: any) => {
+            console.error('Error adding new task');
+          });
+      }
+    })
+    .catch((error: any) => {
+      console.error('Error getting template: ', error);
+    });
   },
   methods: {
     openSidebar() {

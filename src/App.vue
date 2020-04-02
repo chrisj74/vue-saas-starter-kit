@@ -86,14 +86,20 @@ export default Vue.extend({
   },
 
   watch: {
-    user(value: any) {
-      if (value !== null && value !== undefined && !this.tasks) {
-        const payload: IBasePayload = {
-          user: this.user,
-        };
-        this.$store.dispatch('tasks/setTasks', payload);
-        this.$store.dispatch('tasks/setTemplates', payload);
-      }
+    user: {
+      handler(newVal, oldVal): void {
+        if (newVal !== null && newVal !== undefined && !this.tasks) {
+          const payload: IBasePayload = {
+            user: this.user,
+          };
+          this.$store.dispatch('tasks/setTasks', payload);
+          this.$store.dispatch('tasks/setTemplates', payload);
+        } else if (!newVal) {
+          this.$store.commit('tasks/clearAll');
+        }
+      },
+      immediate: true,
+      deep: true,
     },
   },
 });

@@ -98,7 +98,7 @@ export default Vue.extend({
 
   methods: {
     addTask(): void {
-      this.newTask.members.push(this.user.id);
+      this.newTask.members.push(this.user.email);
       this.newTask.roles.owners.push(this.user.id);
       this.newTask.author = {
         name: this.user.name,
@@ -110,7 +110,8 @@ export default Vue.extend({
         task: this.newTask,
       };
       this.$store.dispatch('tasks/addTask', payload)
-        .then((resp: any) => {
+        .then((newTaskId: string) => {
+          this.$router.push('/task/' + newTaskId);
           this.closeDialog();
         })
         .catch((error: any) => {

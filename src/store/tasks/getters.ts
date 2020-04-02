@@ -19,6 +19,16 @@ export const getTaskById = (state: any) => (id: string) => {
   }
 };
 
+export const getTemplateById = (state: any) => (id: string) => {
+  if (state.templates && id) {
+    return state.templates.find((task: ITask) => {
+      return task.id === id;
+    });
+  } else {
+    return null;
+  }
+};
+
 export const getAllWindows = (state: any, getters: any, rootState: any) => {
   if (state.allWindows) {
     const extensionUrl = 'chrome-extension://' + rootState.base.extension.extensionId;

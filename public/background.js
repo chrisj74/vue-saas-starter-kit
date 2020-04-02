@@ -56,11 +56,27 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
           break;
         }
       }
+    } else if (
+      details.initiator.indexOf(chrome.runtime.id) != -1
+      && (details.url.indexOf("cdn.tiny.cloud") !== -1)
+    ) {
+      var newRef = "https://workalongo.web.app";
+      var gotRef = false;
+      for(var n in details.requestHeaders){
+        gotRef = details.requestHeaders[n].name.toLowerCase()=="referer";
+        if(gotRef){
+          details.requestHeaders[n].value = newRef;
+          break;
+        }
+      }
+      if(!gotRef){
+        details.requestHeaders.push({name:"Referer",value:newRef});
+      }
     }
     return { requestHeaders: details.requestHeaders };
   },
   { urls: ["<all_urls>"] },
-  ["blocking", "requestHeaders"]
+  ["blocking", "requestHeaders", "extraHeaders"]
 );
 
 /* Initial */

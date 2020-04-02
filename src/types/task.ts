@@ -65,6 +65,7 @@ export enum taskTabTypesEnum {
   DOCS = 'docs',
   CALCULATOR = 'calculator',
   YOUTUBE = 'youtube',
+  EMBED = 'embed',
 }
 
 export interface ITaskTab {
