@@ -4,16 +4,16 @@ import VuexPersist from 'vuex-persist';
 import base from './base';
 import user from './user';
 
-const vuexPersist = new VuexPersist({
+/* const vuexPersist = new VuexPersist({
   key: 'workalongo-extension',
   storage: window.localStorage,
   modules: ['base'],
-});
+}); */
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  plugins: [vuexPersist.plugin],
+  // plugins: [vuexPersist.plugin],
   modules: {
     base,
     user,

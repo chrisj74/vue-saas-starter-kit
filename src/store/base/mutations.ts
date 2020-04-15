@@ -1,7 +1,25 @@
-import { IEnvState } from '@/types';
+import Vue from 'vue';
+import { IEnvState, IExtensionSidebarState, IExtensionIds } from '@/types';
 
 export const setEnv = (state: any, payload: IEnvState) => {
-  state.env = payload;
+  Vue.set(state, 'env', payload);
+};
+
+export const setExtensionId = (state: any, payload: string | number) => {
+  Vue.set(state.extension, 'extensionId', payload);
+};
+
+export const setExtensionSidebar = (state: any, payload: IExtensionSidebarState) => {
+  Vue.set(state.extension, 'sidebar', {...payload});
+};
+
+export const setExtensionIds = (state: any, payload: IExtensionIds) => {
+  Vue.set(state.extension, 'windowId', payload.windowId);
+  Vue.set(state.extension, 'tabId', payload.tabId);
+};
+
+export const setExtensionLastFocused = (state: any, payload: number) => {
+  Vue.set(state.extension, 'lastFocusedWindow', payload);
 };
 
 export const setLeftDrawerOpen = (state: any, payload: boolean) => {

@@ -1,0 +1,44 @@
+{
+  "manifest_version": 2,
+  "name": "Learnalongo",
+  "version": "1.1.1",
+
+  "description": "Learn more with one click worksheet editing alongside your lessons.",
+  "icons": {
+    "16": "icons/favicon-16x16.png",
+    "48": "icons/favicon-96x96.png",
+    "128": "icons/icon-256x256.png"
+  },
+
+  "background": {
+    "scripts": ["background.js"]
+  },
+
+  "browser_action": {
+    "default_title": "Workalongo",
+    "default_icon": "icons/favicon-96x96.png",
+    "default_popup": "popup.html"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "run_at": "document_start",
+      "js": ["learnalongo.js"],
+      "all_frames": true
+    }
+  ],
+
+  "chrome_url_overrides" : {
+    "newtab": "index.html"
+  },
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>",
+    "tabs"
+  ],
+
+  "content_security_policy": "script-src 'self' https://cdn.tiny.cloud;"
+}

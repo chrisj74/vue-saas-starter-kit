@@ -7,6 +7,9 @@
     "exclude": [
       "node_modules/**",
       "**/*.json"
+    ],
+    "include": [
+      "**/*.vue"
     ]
   },
   "rules": {
@@ -18,6 +21,7 @@
     "quotemark": [true, "single"],
     "no-console": false,
     "only-arrow-functions": false,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "no-implicit-this": false
   }
 }

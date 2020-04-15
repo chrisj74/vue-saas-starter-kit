@@ -7,16 +7,19 @@ const routes: RouteConfig[] = [
     children: [
       {
         path: '',
+        name: 'Home',
         component: () => import('../pages/Home.vue'),
       },
       {
-        path: 'deeper',
-        component: () => import('../pages/Home.vue'),
+        path: 'editor',
+        component: () => import('../pages/editor/View.vue'),
+        meta: { requiresAuth: false },
       },
     ],
   },
   {
     path: '/login',
+    name: 'Login',
     component: () => import('../layouts/Auth.vue'),
     meta: { requiresAuth: false },
     children: [
@@ -29,6 +32,7 @@ const routes: RouteConfig[] = [
   },
   {
     path: '/register',
+    name: 'Register',
     component: () => import('../layouts/Auth.vue'),
     meta: { requiresAuth: false },
     children: [
@@ -39,7 +43,6 @@ const routes: RouteConfig[] = [
       },
     ],
   },
-
 ];
 
 export default routes;

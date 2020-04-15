@@ -1,4 +1,6 @@
-export const user = (state: any) => {
+import { IUser } from '@/types';
+
+export const user = (state: any): IUser => {
   return state.user;
 };
 

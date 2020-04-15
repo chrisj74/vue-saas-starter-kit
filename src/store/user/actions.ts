@@ -66,7 +66,7 @@ export const signUserIn = (state: any, payload: ILoginData) => {
               if (payload.redirect && payload.redirect.hasOwnProperty('redirect')) {
                 const redirect: string = payload.redirect.redirect as string;
                 payload.vm.$router.push(redirect);
-              } else {
+              } else if (payload.vm.$router.currentRoute.path !== '/') {
                 payload.vm.$router.push('/');
               }
               payload.vm.$store.commit('user/setAuth', true);
@@ -85,25 +85,52 @@ export const signUserIn = (state: any, payload: ILoginData) => {
 };
 
 export const autoSignIn =  (state: any, payload: any) => {
-  console.log('redirect', payload.query);
   state.commit('setUser', {
     id: payload.user.uid,
     name: payload.user.displayName,
     email: payload.user.email,
     photoUrl: payload.user.photoURL,
   });
-
-  if (payload.query.hasOwnProperty('redirect')
-    && payload.vm.$router.currentRoute.path !== payload.query.redirect
-  ) {
-    payload.vm.$router.push(payload.redirect.redirect);
-  } else if (
-    payload.vm.$router.currentRoute.path === '/login'
-    || payload.vm.$router.currentRoute.path === 'register'
-  ) {
-    payload.vm.$router.push('/');
-  }
   state.commit('setAuth', true);
+
+  const userObj = {
+    lastUpdated: new Date(),
+    lastLoggedIn: new Date(),
+    sessions: 0,
+    images: [],
+  };
+
+  /* Update user record */
+  const userDoc = firebase
+    .firestore()
+    .collection('users/')
+    .doc(payload.user.uid);
+
+  userDoc.get().then((docSnapshot: any) => {
+    if (docSnapshot.exists) {
+      userObj.sessions = docSnapshot.data().sessions
+        ? docSnapshot.data().sessions + 1
+        : 1;
+      userObj.images = docSnapshot.data().images
+        ? docSnapshot.data().images
+        : [];
+      userDoc
+        .update(userObj)
+        .then(() => {
+          // console.log('updated sessions');
+        })
+        .catch((error) => {
+          console.error('error', error);
+        });
+    } else {
+      userObj.images = [];
+      userObj.sessions = 1;
+      userDoc.set(userObj);
+    }
+  })
+  .catch((error: any) => {
+    console.error('Problem accessing User data: ', error);
+  });
 };
 
 export const logout = ( state: any, vm: Vue ) => {
@@ -111,7 +138,17 @@ export const logout = ( state: any, vm: Vue ) => {
   AUTH.signOut();
   vm.$store.commit('user/setUser', null);
   vm.$store.commit('user/setAuth', true ); // Let the app know auth complete
-  vm.$router.push('/login').catch((err) => {
-    console.error('Error:', err);
-  });
+  if (vm.$router.currentRoute.path !== '/') {
+    vm.$router.push('/')
+    .then(() => {
+      vm.$store.commit('tasks/setTasks', null);
+      vm.$store.commit('tasks/setTemplates', null);
+    })
+    .catch((err) => {
+      console.error('Error:', err);
+    });
+  } else {
+    vm.$store.commit('tasks/setTasks', []);
+    vm.$store.commit('tasks/setTemplates', []);
+  }
 };
