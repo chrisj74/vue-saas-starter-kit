@@ -36,6 +36,12 @@ const routes: RouteConfig[] = [
         meta: { requiresAuth: true },
       },
       {
+        path: 'settings',
+        name: 'Settings',
+        component: () => import('../pages/settings/Settings.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: '/new/:id',
         name: 'TaskFromTemplate',
         component: () => import('../pages/tasks/TaskFromTemplate.vue'),

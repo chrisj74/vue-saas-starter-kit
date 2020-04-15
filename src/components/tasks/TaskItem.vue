@@ -18,7 +18,7 @@
             </v-icon>
           </v-btn>
         </template>
-        <span>Open Workalong</span>
+        <span>Open {{ appStrings.TASK }}</span>
       </v-tooltip>
       <!-- Menu -->
       <v-menu offset-y v-model="showTaskMenu">
@@ -66,7 +66,7 @@
           <!-- Convert to task -->
           <v-list-item @click.stop="showConvertTemplateToTaskDialog = true" v-if="isTemplate">
             <v-list-item-content>
-              <v-list-item-title>Create New Task</v-list-item-title>
+              <v-list-item-title>Create New {{ appStrings.TASK }}</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
               <v-icon small>mdi-plus</v-icon>
@@ -81,7 +81,7 @@
           <!-- Edit -->
           <v-list-item @click.stop="showEditDialog = true">
             <v-list-item-content>
-              <v-list-item-title>Edit {{ isTemplate? 'Template' : 'Task' }}</v-list-item-title>
+              <v-list-item-title>Edit {{ isTemplate? 'Template' : appStrings.TASK }}</v-list-item-title>
             </v-list-item-content>
             <v-list-item-icon>
               <v-icon small>mdi-pencil</v-icon>
@@ -222,7 +222,7 @@
 
     <v-card-actions v-if="collection">
       <v-spacer />
-      <v-btn color="primary" :to="task.template ? '/template/' + task.id : '/task/' + task.id">View Task</v-btn>
+      <v-btn color="primary" :to="task.template ? '/template/' + task.id : '/task/' + task.id">View {{ appStrings.TASK }}</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -247,6 +247,9 @@ import ConvertTemplateToTask from './ConvertTemplateToTask.vue';
 /* Models */
 import { ITask, IOpenSidebar, ITaskTabs, taskTabTypesEnum, IUpdateTask, windowTypeEnum } from '@/types';
 
+/* Utils */
+import { appStrings } from '@/utils';
+
 export default Vue.extend({
   name: 'TaskItem',
   props: ['taskId', 'collection', 'task'],
@@ -270,6 +273,7 @@ export default Vue.extend({
       showShareDialog: false,
       windowTypeEnum,
       showTaskMenu: false,
+      appStrings,
     };
   },
 

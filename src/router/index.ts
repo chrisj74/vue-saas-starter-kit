@@ -1,15 +1,20 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import Home from '../views/Home.vue';
 import routes from './routes';
-import store from '@/store';
 import firebase from 'firebase';
 
 Vue.use(VueRouter);
 
+let extension: boolean;
+if (window.chrome && window.chrome.runtime.id) {
+  extension = true;
+} else {
+  extension = false;
+}
+console.log('extension=', extension);
 const router = new VueRouter({
   scrollBehavior: () => ({ x: 0, y: 0 }),
-  mode: 'hash',
+  mode: extension ? 'hash' : 'history',
   base: process.env.BASE_URL,
   routes,
 });

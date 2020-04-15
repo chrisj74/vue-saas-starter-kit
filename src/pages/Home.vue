@@ -9,7 +9,7 @@
           flat
           dense
         >
-          <v-toolbar-title>Recent Tasks</v-toolbar-title>
+          <v-toolbar-title>Recent {{ appStrings.TASK }}s</v-toolbar-title>
         </v-toolbar>
         <v-card-text>
           <v-row>
@@ -36,7 +36,7 @@
           flat
           dense
         >
-          <v-toolbar-title><router-link :to="'/templates'">Templates</router-link></v-toolbar-title>
+          <v-toolbar-title><router-link :to="'/templates'">Recent Templates</router-link></v-toolbar-title>
         </v-toolbar>
         <v-card-text>
           <v-row>
@@ -66,11 +66,18 @@ import { mapGetters } from 'vuex';
 import AddTask from '@/components/tasks/AddTask.vue';
 import TaskItem from '@/components/tasks/TaskItem.vue';
 import HomeAuth from '@/components/home/HomeAuth.vue';
-/* Models */
+
+/* Utils */
+import { appStrings } from '@/utils';
 
 export default Vue.extend({
   name: 'Home',
   components: { AddTask, TaskItem, HomeAuth },
+  data() {
+    return {
+      appStrings,
+    };
+  },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',

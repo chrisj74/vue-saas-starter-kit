@@ -23,7 +23,7 @@
             <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>Tasks</v-list-item-title>
+            <v-list-item-title>{{ appStrings.TASK }}s</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
         <!-- TEMPLATES -->
@@ -33,6 +33,16 @@
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title>Templates</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!-- SETTINGS -->
+        <v-list-item link to="/settings">
+          <v-list-item-action>
+            <v-icon>mdi-cog</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>Settings</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -52,7 +62,7 @@
       height="40"
       >
       <v-app-bar-nav-icon v-if="user" @click.stop="toggleLeftDawer()" />
-      <v-toolbar-title>Application</v-toolbar-title>
+      <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title>
     </v-app-bar>
 
     <v-content>
@@ -69,7 +79,15 @@
 import { mapGetters } from 'vuex';
 import Vue from 'vue';
 
+/* Utils */
+import { appStrings } from '@/utils';
+
 export default Vue.extend({
+  data() {
+    return {
+      appStrings,
+    };
+  },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',
