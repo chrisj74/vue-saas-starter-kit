@@ -29,31 +29,13 @@ export default Vue.extend({
       };
       this.$store.commit('base/setEnv', envPayload);
       /* Send message to background to pass tabId */
-      window.chrome.runtime.sendMessage({ type: 'getAllWindows' });
-      /* Check if sidebar is set */
-      window.chrome.runtime.sendMessage({ type: 'getSidebar' });
-
-      /* Get this window details */
-      window.chrome.runtime.sendMessage({ type: 'getMyWindow', setLastFocused: true }, (res: any) => {
-        vm.$store.commit('base/setExtensionIds', res);
-      });
+      window.chrome.runtime.sendMessage({ type: 'xxx' });
 
       /* Listeners */
       window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
         /* Listen for window update */
-        if (response.type === 'setAllWindows') {
-          vm.$store.dispatch('tasks/updateAllWindows', response.allWindows);
-          /* TODO: if has sidebar, check if it still exists - else destroy sidebar in store */
-
-        } else if (response.type === 'setSidebar') {
-          /* Listen for sidebar update */
-          const payload: IExtensionSidebarState = {
-            sidebarWindowId: response.sidebarWindowId,
-            sidebarTabId: response.sidebarTabId,
-          };
-          vm.$store.dispatch('base/setExtensionSidebar', payload);
-        } else if (response.type === 'setLastFocusedWindow') {
-          vm.$store.commit('base/setExtensionLastFocused', response.windowId);
+        if (response.type === 'xxx') {
+          // Do something
         }
       });
     } else {
@@ -65,12 +47,11 @@ export default Vue.extend({
     }
   },
   mounted() {
-    if (this.user && !this.tasks) {
+    if (this.user) {
       const payload: IBasePayload = {
         user: this.user,
       };
-      this.$store.dispatch('tasks/setTasks', payload);
-      this.$store.dispatch('tasks/setTemplates', payload);
+      // DISPATCH
     }
   },
   computed: {
@@ -78,7 +59,6 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
-      tasks: 'tasks/getTasks',
     }),
   },
   methods: {
@@ -88,14 +68,13 @@ export default Vue.extend({
   watch: {
     user: {
       handler(newVal, oldVal): void {
-        if (newVal !== null && newVal !== undefined && !this.tasks) {
+        if (newVal !== null && newVal !== undefined) {
           const payload: IBasePayload = {
             user: this.user,
           };
-          this.$store.dispatch('tasks/setTasks', payload);
-          this.$store.dispatch('tasks/setTemplates', payload);
+          // DISPATCH
         } else if (!newVal) {
-          this.$store.commit('tasks/clearAll');
+          // DISPATCH CLEAR
         }
       },
       immediate: true,

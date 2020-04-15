@@ -1,5 +1,5 @@
 export enum appStrings {
-  APP_NAME = 'Workalongo',
-  TASK = 'Workalong',
+  APP_NAME = 'Learnalongo',
+  TASK = 'Learnalong',
 }
 

@@ -11,26 +11,19 @@
               flat
               dense
               >
-              <v-toolbar-title>Tasks</v-toolbar-title>
+              <v-toolbar-title>TITLE</v-toolbar-title>
               <v-spacer></v-spacer>
               <v-btn icon @click="closePopup();">
                 <v-icon>mdi-close</v-icon>
               </v-btn>
             </v-toolbar>
             <v-card-text>
-              <v-autocomplete
-                :items="tasks"
-                color="white"
-                item-text="title"
-                item-value="id"
-                label="Select task"
-                v-model="selectedTask"
-              ></v-autocomplete>
+              TEXT
             </v-card-text>
 
             <v-card-actions>
               <v-spacer />
-              <v-btn @click="openSidebar('/task/' + selectedTask, false)" :disabled="!selectedTask">Open</v-btn>
+              <v-btn>ACTION</v-btn>
             </v-card-actions>
           </v-card>
         </div>
@@ -68,8 +61,7 @@ export default Vue.extend({
       const payload: IBasePayload = {
         user: this.user,
       };
-      this.$store.dispatch('tasks/setTasks', payload);
-      this.$store.dispatch('tasks/setTemplates', payload);
+      /* DISPATCH */
     }
   },
   computed: {
@@ -77,7 +69,6 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
-      tasks: 'tasks/getTasks',
       authSet: 'user/getAuthSet',
     }),
   },
@@ -90,55 +81,18 @@ export default Vue.extend({
       browser: browser.getBrowser() as IEnvBrowser,
     };
     this.$store.commit('base/setEnv', envPayload);
-    window.chrome.windows.getLastFocused((windowObj: any) => {
-      console.log('popup lastFocused Window=', windowObj);
-    });
 
-
-    /* Get this window details */
-    window.chrome.runtime.sendMessage({ type: 'getMyWindow', setLastFocused: false }, (res: any) => {
-      vm.$store.commit('base/setExtensionIds', res);
-    });
-
-    /* Check if sidebar is set */
-    window.chrome.runtime.sendMessage({ type: 'getSidebar' });
-
-    window.chrome.runtime.sendMessage({ type: 'getLastFocused' }, (res: any) => {
-      // Set initial value of main window
-      vm.$store.commit('base/setExtensionLastFocused', res.lastFocusedWindowId);
-    });
 
     /* Listen for window update */
     const vm = this;
 
     /* Listeners */
     window.chrome.runtime.onMessage.addListener( function(response: any, sender: any, sendResponse: any) {
-      /* Listen for window update */
-      if (response.type === 'setSidebar') {
-        /* Listen for sidebar update */
-        const payload: IExtensionSidebarState = {
-          sidebarWindowId: response.sidebarWindowId,
-          sidebarTabId: response.sidebarTabId,
-        };
-        vm.$store.dispatch('base/setExtensionSidebar', payload);
-      } else if (response.type === 'setLastFocusedWindow') {
-        vm.$store.commit('base/setExtensionLastFocused', response.windowId);
-      }
+      // ADD listeners
     });
   },
   methods: {
     closePopup() {
-      window.close();
-    },
-
-    openSidebar(linkUrl: string, linkExternal: boolean): void {
-      const payload: IOpenSidebar = {
-        url: linkUrl,
-        vm: this,
-        env: this.env,
-        external: linkExternal,
-      };
-      this.$store.dispatch('tasks/openSidebar', payload);
       window.close();
     },
   },
@@ -149,8 +103,7 @@ export default Vue.extend({
         const payload: IBasePayload = {
           user: this.user,
         };
-        this.$store.dispatch('tasks/setTasks', payload);
-        this.$store.dispatch('tasks/setTemplates', payload);
+        /* DISPATCH */
       }
     },
   },

@@ -26,12 +26,6 @@ module.exports = {
       template: 'src/extension/popup.html',
       filename: 'popup.html',
       title: 'Popup'
-    },
-    sidebar: {
-      entry: 'src/extension/sidebar.ts',
-      template: 'src/extension/sidebar.html',
-      filename: 'sidebar.html',
-      title: 'Sidebar'
     }
   }
 }
