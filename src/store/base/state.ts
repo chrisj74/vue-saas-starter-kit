@@ -1,3 +1,5 @@
+import { IBaseState } from '@/types';
+
 export default function() {
   return {
     env: {
@@ -17,5 +19,5 @@ export default function() {
         sidebarTabId: null,
       },
     },
-  };
+  } as unknown as IBaseState;
 }

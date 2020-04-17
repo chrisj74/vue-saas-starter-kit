@@ -1,10 +1,17 @@
-import { ITask, ITaskLink } from './task';
-import { ITemplate } from './template';
+import { IWorkBook, IWorkBookPage } from './workbook';
 
- /* tslint:disable-next-line:interface-over-type-literal */
+/* tslint:disable-next-line:interface-over-type-literal */
 type Dictionary < T > = { [key: string]: T };
 
 /* BASE STATE */
+
+export interface IBaseState {
+  env: IEnvState;
+  leftDrawerOpen: boolean;
+  loading: boolean;
+  error: string;
+  extension: IExtensionState;
+}
 export interface IEnvState {
   platform: EnvPlatformsEnum;
   browser: IEnvBrowser;
@@ -65,32 +72,29 @@ export interface ILoginData {
   redirect?: Dictionary<string | Array<string | null>>;
 }
 
-/* TASKS STATE */
-export interface IBasePayload {
-  user: IUser;
+/* WORKBOOK STATE */
+
+export interface IWorkBookState {
+  workBooks: IWorkBook[];
+  workBook: IWorkBook;
+  workBookPages: IWorkBookPage[];
+  workBookPage: IWorkBookPage;
+  currentPage: string;
+  modes: {
+    mode: modesEnum,
+    subMode: modesEnum,
+  };
+  settings: {
+    showThumbs: boolean;
+  };
+  toolAction: toolActionEnum;
 }
 
-export interface IUpdateTask {
-  user: IUser;
-  task: ITask;
+export enum toolActionEnum {
+  ADD_TEXT = 'addText',
+  DELETE_TEXT = 'deleteText',
 }
 
-export interface IUpdateTemplate {
-  user: IUser;
-  template: ITemplate;
-}
-
-export interface IUpdateTaskLinks {
-  vm: Vue;
-  user: IUser;
-  taskId: string;
-  links: ITaskLink[];
-  deleteId?: string;
-}
-
-export interface IOpenSidebar {
-  url: string;
-  vm: Vue;
-  env: IEnvState;
-  external: boolean;
+export enum modesEnum {
+  TEXT = 'text',
 }

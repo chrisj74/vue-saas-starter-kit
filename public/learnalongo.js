@@ -17,7 +17,7 @@ function interceptClickEvent(e) {
 
       //put your logic here...
       if (href.indexOf('.pdf') !== -1) {
-        console.log('pdf clicked');
+        console.log('pdf clicked', extensionPath + encodeURI(href));
         //tell the browser not to respond to the link click
         e.preventDefault();
         var bodyTag = document.getElementsByTagName('body')[0];
@@ -26,6 +26,7 @@ function interceptClickEvent(e) {
         var learnalongoIframe = document.createElement('iframe');
         learnalongoIframe.setAttribute('src', extensionPath + encodeURI(href));
         learnalongoIframe.setAttribute('style', 'width: 100%; height: 100vh;');
+        learnalongoIframe.setAttribute('name', 'learnalongoViewer');
 
         var learnalongoDiv = document.createElement('div');
         learnalongoDiv.setAttribute('style', 'width: 70%;');
@@ -35,6 +36,7 @@ function interceptClickEvent(e) {
         var parentIframe = document.createElement('iframe');
         parentIframe.setAttribute('src', window.location.href);
         parentIframe.setAttribute('style', 'width: 100%; height: 100vh;');
+        learnalongoIframe.setAttribute('name', 'learnalongoParent');
 
         var parentDiv = document.createElement('div');
         parentDiv.setAttribute('style', 'width: 30%;');

@@ -49,7 +49,7 @@
           </v-alert>
 
           <v-card-text>
-            <p style="text-align: center;">(No account?  )</p>
+            <p style="text-align: center;">(No account?  <a @click.prevent="tab = 'tab-2'" :href="{ path: 'register' }">Register now</a>)</p>
             <p class="forgotten-password" @click="showForgottenPassword()">Forgotten password?</p>
           </v-card-text>
         </v-card>

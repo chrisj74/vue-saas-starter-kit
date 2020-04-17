@@ -1,7 +1,6 @@
 <template>
   <v-app id="vApp" v-if="authSet">
     <v-navigation-drawer
-      v-if="user"
       v-model="leftDrawerOpen"
       app
       :mobile-break-point="768"
@@ -28,9 +27,16 @@
         </v-list-item>
       </v-list>
       <!-- LOGOUT -->
-      <template v-slot:append>
+      <template v-slot:append v-if="user">
         <div class="pa-2">
           <v-btn block @click="onLogout()" color="red lighten-2" dark>Logout <v-icon dark right>mdi-power-standby</v-icon></v-btn>
+        </div>
+      </template>
+
+      <!-- LOGOUT -->
+      <template v-slot:append v-if="!user">
+        <div class="pa-2">
+          <v-btn block @click="onLogin()" dark>Login <v-icon dark right>mdi-power-standby</v-icon></v-btn>
         </div>
       </template>
     </v-navigation-drawer>
@@ -38,11 +44,11 @@
     <v-app-bar
       :clipped-left="$vuetify.breakpoint.mdAndUp"
       app
-      color="secondary"
-      dark
+      color="white"
+      light
       height="40"
       >
-      <v-app-bar-nav-icon v-if="user" @click.stop="toggleLeftDawer()" />
+      <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
       <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title>
     </v-app-bar>
 
@@ -92,6 +98,9 @@ export default Vue.extend({
     },
     onLogout() {
       this.$store.dispatch('user/logout', this as Vue);
+    },
+    onLogin() {
+      this.$router.push('/');
     },
   },
 });

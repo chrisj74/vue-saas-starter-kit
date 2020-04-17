@@ -3,6 +3,7 @@ import Vuex from 'vuex';
 import VuexPersist from 'vuex-persist';
 import base from './base';
 import user from './user';
+import workBook from './workbook';
 
 /* const vuexPersist = new VuexPersist({
   key: 'workalongo-extension',
@@ -17,6 +18,7 @@ export default new Vuex.Store({
   modules: {
     base,
     user,
+    workBook,
   },
 
   // enable strict mode (adds overhead!)

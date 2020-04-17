@@ -19,7 +19,7 @@ import ViewPdf from '@/components/editor/ViewPdf.vue';
 import { appStrings } from '@/utils';
 
 export default Vue.extend({
-  name: 'ViewPage',
+  name: 'Editor',
   components: { ViewPdf },
   data() {
     return {
@@ -31,6 +31,8 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
+      workBook: 'workBook/getWorkBook',
+      pages: 'workBook/getWorkBookPages',
     }),
   },
   methods: {

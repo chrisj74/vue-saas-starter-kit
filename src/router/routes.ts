@@ -12,7 +12,7 @@ const routes: RouteConfig[] = [
       },
       {
         path: 'editor',
-        component: () => import('../pages/editor/View.vue'),
+        component: () => import('../pages/editor/Editor.vue'),
         meta: { requiresAuth: false },
       },
     ],
