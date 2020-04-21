@@ -1,11 +1,6 @@
 <template>
-  <v-container fluid>
-    <div class="editor-wrapper">
-      <toolbar></toolbar>
-      <thumbs></thumbs>
-      <page></page>
-    </div>
-  </v-container>
+  <div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -13,21 +8,31 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
+/* Libs */
+import { uuid } from 'uuidv4';
+
 /* App components */
-import Page from '@/components/editor/Page.vue';
-import Thumbs from '@/components/editor/Thumbs.vue';
-import Toolbar from '@/components/editor/Toolbar.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
+import { IWorkBook, IWorkBookPage } from '@/types';
 
 export default Vue.extend({
-  name: 'Editor',
-  components: { Page, Thumbs, Toolbar },
+  name: 'TextEditor',
+  components: {  },
   data() {
     return {
       appStrings,
+      pdfPath: null,
+      currentPage: 0,
+      pageCount: 0,
     };
+  },
+  created() {
+    // Created
+  },
+  mounted() {
+    // Mounted
   },
   computed: {
     ...mapGetters({
@@ -35,11 +40,13 @@ export default Vue.extend({
       error: 'base/getError',
       user: 'user/user',
       workBook: 'workBook/getWorkBook',
-      pages: 'workBook/getWorkBookPages',
+      workBookPages: 'workBook/getWorkBookPages',
+      workBookPage: 'workBook/getWorkBookPage',
+
     }),
   },
   methods: {
-    //
+    // Methods
   },
 });
 </script>

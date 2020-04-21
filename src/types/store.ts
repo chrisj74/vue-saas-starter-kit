@@ -74,12 +74,24 @@ export interface ILoginData {
 
 /* WORKBOOK STATE */
 
+export interface IWorkBookPageDimensions {
+  maxWidth: number;
+  maxWidthRatio: number;
+  maxHeightRatio: number;
+  height: number;
+  width: number;
+  zoom: number;
+  pixelRatio: number;
+}
+
 export interface IWorkBookState {
   workBooks: IWorkBook[];
-  workBook: IWorkBook;
+  workBook: IWorkBook | undefined;
+  workBookData: Uint8Array | undefined;
   workBookPages: IWorkBookPage[];
   workBookPage: IWorkBookPage;
-  currentPage: string;
+  currentPage: string | undefined;
+  currentPageDimensions: IWorkBookPageDimensions;
   modes: {
     mode: modesEnum,
     subMode: modesEnum,
@@ -93,6 +105,7 @@ export interface IWorkBookState {
 export enum toolActionEnum {
   ADD_TEXT = 'addText',
   DELETE_TEXT = 'deleteText',
+  PAGE_LOADED = 'pageLoaded',
 }
 
 export enum modesEnum {

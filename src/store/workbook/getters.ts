@@ -8,14 +8,35 @@ export const getWorkBook = (state: IWorkBookState) => {
   return state.workBook;
 };
 
-export const getWorkBookPages = (state: IWorkBookState): IWorkBookPage[] => {
-  return state.workBookPages;
+export const getWorkBookData = (state: IWorkBookState) => {
+  return state.workBookData;
+};
+
+export const getWorkBookPages = (state: IWorkBookState): IWorkBookPage[] | undefined => {
+  return state.workBook?.pages;
 };
 
 export const getWorkBookPage = (state: IWorkBookState) => {
-  return state.workBook.pages.find((page: IWorkBookPage) => {
-    return page.id === state.currentPage;
-  });
+  let currentPage: IWorkBookPage | undefined;
+  if (state.workBook && state .workBook.pages) {
+    currentPage = state.workBook.pages.find((page: IWorkBookPage) => {
+      return page.id === state.currentPage;
+    });
+  }
+  if (currentPage) {
+    return currentPage;
+  } else {
+    return null;
+  }
+};
+
+export const getCurrentPageDimensions = (state: IWorkBookState) => {
+  return state.currentPageDimensions;
+};
+
+
+export const getCurrentPageId = (state: IWorkBookState) => {
+  return state.currentPage;
 };
 
 export const getSettings = (state: IWorkBookState) => {

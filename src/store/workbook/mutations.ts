@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { IWorkBook, IWorkBookState, IWorkBookPage, modesEnum, toolActionEnum } from '@/types';
+import { IWorkBook, IWorkBookState, IWorkBookPage, modesEnum, toolActionEnum, IWorkBookPageDimensions } from '@/types';
 
 export const setWorkBooks = (state: IWorkBookState, payload: IWorkBook[]) => {
   Vue.set(state, 'workBooks', [...payload]);
@@ -13,8 +13,20 @@ export const setWorkBook = (state: IWorkBookState, payload: IWorkBook) => {
   Vue.set(state, 'workBook', {...payload});
 };
 
+export const setWorkBookData = (state: IWorkBookState, payload: Uint8Array) => {
+  state.workBookData = payload;
+};
+
 export const setCurrentPage = (state: IWorkBookState, payload: string) => {
   state.currentPage = payload;
+};
+
+export const setCurrentPageByIndex = (state: IWorkBookState, payload: number) => {
+  state.currentPage = state.workBook?.pages[payload].id;
+};
+
+export const setCurrentPageDimensions = (state: IWorkBookState, payload: IWorkBookPageDimensions) => {
+  state.currentPageDimensions = {...state.currentPageDimensions, ...payload};
 };
 
 export const setWorkBookPages = (state: IWorkBookState, payload: IWorkBookPage[]) => {

@@ -4,9 +4,11 @@ export default function() {
   return {
     workBooks: [],
     workBook: null,
+    workBookData: null,
     workBookPages: null,
     workBookPage: null,
     currentPage: null,
+    currentPageDimensions: null,
     modes: {
       mode: 'draw',
       subMode: 'brush',

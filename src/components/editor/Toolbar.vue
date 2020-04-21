@@ -1,11 +1,7 @@
 <template>
-  <v-container fluid>
-    <div class="editor-wrapper">
-      <toolbar></toolbar>
-      <thumbs></thumbs>
-      <page></page>
-    </div>
-  </v-container>
+  <div class="toolbar-wrapper">
+
+  </div>
 </template>
 
 <script lang="ts">
@@ -14,16 +10,13 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* App components */
-import Page from '@/components/editor/Page.vue';
-import Thumbs from '@/components/editor/Thumbs.vue';
-import Toolbar from '@/components/editor/Toolbar.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
 
 export default Vue.extend({
-  name: 'Editor',
-  components: { Page, Thumbs, Toolbar },
+  name: 'Toolbar',
+  components: {  },
   data() {
     return {
       appStrings,

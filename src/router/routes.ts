@@ -10,8 +10,14 @@ const routes: RouteConfig[] = [
         name: 'Home',
         component: () => import('../pages/Home.vue'),
       },
+    ],
+  },
+  {
+    path: '/editor',
+    component: () => import('../layouts/Editor.vue'),
+    children: [
       {
-        path: 'editor',
+        path: '',
         component: () => import('../pages/editor/Editor.vue'),
         meta: { requiresAuth: false },
       },
