@@ -1,7 +1,16 @@
 <template>
   <div class="page-wrapper" ref="page">
-    <view-pdf>
-    </view-pdf>
+    <page-setup></page-setup>
+    <div
+      v-if="pageDimensions"
+      class="page"
+      :style="{width: pageDimensions.width+'px', height: pageDimensions.height+'px'}">
+      <view-pdf>
+      </view-pdf>
+
+      <drawing-canvas>
+      </drawing-canvas>
+    </div>
   </div>
 </template>
 
@@ -13,6 +22,8 @@ import { mapGetters } from 'vuex';
 /* App components */
 import ViewPdf from '@/components/editor/page/ViewPdf.vue';
 import Thumbs from '@/components/editor/page/ViewPdf.vue';
+import DrawingCanvas from '@/components/editor/page/DrawingCanvas.vue';
+import PageSetup from '@/components/editor/page/PageSetup.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
@@ -20,7 +31,7 @@ import { IWorkBookPageDimensions, toolActionEnum } from '@/types';
 
 export default Vue.extend({
   name: 'Page',
-  components: { ViewPdf },
+  components: { ViewPdf, DrawingCanvas, PageSetup },
   data() {
     return {
       appStrings,
@@ -153,5 +164,9 @@ export default Vue.extend({
   justify-content: center;
   display: flex;
   overflow: auto;
+  position: relative;
+  .page {
+    position: relative;
+  }
 }
 </style>

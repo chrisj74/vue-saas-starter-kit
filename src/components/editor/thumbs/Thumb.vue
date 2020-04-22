@@ -54,7 +54,8 @@ export default Vue.extend({
   },
   methods: {
     setPage() {
-      this.$store.commit('workBook/setCurrentPageByIndex', this.pageIndex);
+      // this.$store.commit('workBook/setCurrentPageByIndex', this.pageIndex);
+      this.$router.push('/editor/' + this.workBook.id + '/' + this.workBook.pages[this.pageIndex].id);
     },
   },
 });

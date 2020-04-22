@@ -8,7 +8,6 @@
       v-if="workBook && workBookData && workBookPage"
       :src="workBookData"
       :page="workBookPage.order + 1"
-      @num-pages="pageCount = $event"
       @page-loaded="loaded = $event"
     ></pdf>
     <div v-if="loaded === 0" class="loader-wrapper">
@@ -43,26 +42,11 @@ export default Vue.extend({
   data() {
     return {
       appStrings,
-      pdfPath: null,
-      currentPage: 0,
-      pageCount: 0,
-      docData: null,
       loaded: 0,
     };
   },
   created() {
-    if (this.$route.query.pdf) {
-      const payload = {
-        url: this.$route.query.pdf,
-        newWorkBook: null,
-      };
-      this.$store.dispatch('workBook/setWorkBook', this.$route.query.pdf)
-        .then((hasWorkBook: boolean) => {
-          if (!hasWorkBook) {
-            this.addWorkBook(this.$route.query.pdf);
-          }
-        });
-    }
+    // Created
   },
   mounted() {
     // Mounted
@@ -74,72 +58,18 @@ export default Vue.extend({
       user: 'user/user',
       workBook: 'workBook/getWorkBook',
       workBookData: 'workBook/getWorkBookData',
-      workBookPages: 'workBook/getWorkBookPages',
       workBookPage: 'workBook/getWorkBookPage',
       pageDimensions: 'workBook/getCurrentPageDimensions',
-
     }),
   },
   methods: {
-    addWorkBook(url: string) {
-      const loadingTask = pdf.createLoadingTask(url)
-        .promise
-        .then(async (result: any) => {
-          console.log('result=', result.getData());
-          result.getData().then((data: Uint8Array) => {
-            this.$store.commit('workBook/setWorkBookData', data);
-          });
-          const newWorkBook: IWorkBook = {
-            members: [],
-            template: false,
-            sourceId: null,
-            keywords: [],
-            categories: [],
-            public: false,
-            commit: 0,
-            url,
-            modified: new Date(),
-            id: uuid(),
-            pages: [],
-          };
-          for (let i: number = 0; i < result.numPages; i++) {
-            await result.getPage(i + 1)
-            .then((page: any) => {
-              console.log('page=', page);
-              const newPage: IWorkBookPage = {
-                textLayers: [],
-                dimensions: {
-                  width: page.view[2],
-                  height: page.view[3],
-                },
-                commit: 0,
-                modified: new Date(),
-                order: i,
-                id: uuid(),
-              };
-              newWorkBook.pages.push(newPage);
-            });
-          }
-          if (this.user) {
-            newWorkBook.author = {
-              name: this.user.name,
-              avatar: this.user.photoUrl,
-            };
-            newWorkBook.members = [this.user.email];
-          }
-          this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
-          const payload = {
-            url: null,
-            newWorkBook,
-          };
-          this.$store.dispatch('workBook/setWorkBook', payload);
-        });
-    },
+    // Methods
   },
   watch: {
     loaded: {
       handler(newLoaded, oldLoaded) {
         if (oldLoaded === 0) {
+          /* Only trigger after initial page load */
           this.$store.commit('workBook/setToolAction', toolActionEnum.PAGE_LOADED);
         }
       },

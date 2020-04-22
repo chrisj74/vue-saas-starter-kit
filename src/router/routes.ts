@@ -21,6 +21,16 @@ const routes: RouteConfig[] = [
         component: () => import('../pages/editor/Editor.vue'),
         meta: { requiresAuth: false },
       },
+      {
+        path: ':workBookId',
+        component: () => import('../pages/editor/Editor.vue'),
+        meta: { requiresAuth: false },
+      },
+      {
+        path: ':workBookId/:pageId',
+        component: () => import('../pages/editor/Editor.vue'),
+        meta: { requiresAuth: false },
+      },
     ],
   },
   {

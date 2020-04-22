@@ -46,7 +46,7 @@ import * as Bowser from 'bowser';
 import HomeAuth from '@/components/home/HomeAuth.vue';
 
 /* Models */
-import { IBasePayload, IOpenSidebar, IExtensionSidebarState, IEnvState, EnvPlatformsEnum, IEnvBrowser  } from '@/types';
+import { IBasePayload, IExtensionSidebarState, IEnvState, EnvPlatformsEnum, IEnvBrowser  } from '@/types';
 
 export default Vue.extend({
   name: 'ExtensionPopup',

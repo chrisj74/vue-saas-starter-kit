@@ -17,6 +17,7 @@
     "get-video-id": "^3.1.4",
     "lodash": "^4.17.15",
     "pdfjs-dist": "2.1.266",
+    "signature_pad": "^3.0.0-beta.3",
     "tinymce": "^5.2.1",
     "uuidv4": "^6.0.5",
     "vue": "^2.6.11",

@@ -5,6 +5,17 @@
         icon
         small
         light
+        @click="setDraw()"
+        >
+        <v-icon>mdi-lead-pencil</v-icon>
+      </v-btn>
+    </div>
+
+    <div class="v-btn-toggle v-item-group">
+      <v-btn
+        icon
+        small
+        light
         :disabled="!pageDimensions || pageDimensions.zoom <= pageDimensions.maxHeightRatio"
         @click="setZoomOut()"
         >
@@ -39,6 +50,7 @@ import { mapGetters } from 'vuex';
 
 /* Utils */
 import { appStrings } from '@/utils';
+import { modesEnum, subModesEnum } from '../../../types';
 
 export default Vue.extend({
   name: 'TopToolbar',
@@ -55,6 +67,7 @@ export default Vue.extend({
       workBook: 'workBook/getWorkBook',
       pages: 'workBook/getWorkBookPages',
       pageDimensions: 'workBook/getCurrentPageDimensions',
+      modes: 'workBook/getModes',
     }),
   },
   methods: {
@@ -64,6 +77,11 @@ export default Vue.extend({
 
     setZoomOut() {
       this.$store.commit('workBook/setToolAction', 'zoomOut');
+    },
+
+    setDraw() {
+      this.$store.commit('workBook/setMode', modesEnum.DRAW);
+      this.$store.commit('workBook/setSubMode', subModesEnum.BRUSH);
     },
   },
 });

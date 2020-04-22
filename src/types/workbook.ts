@@ -37,6 +37,7 @@ export interface IWorkBook {
 
 export interface IWorkBookPage {
   textLayers: ITextLayer[];
+  drawingLayer: IDrawingLayer;
   dimensions: IPageDimensions;
   commit: number;
   modified?: Date;
@@ -47,6 +48,12 @@ export interface IWorkBookPage {
 export interface IPageDimensions {
   width: number;
   height: number;
+}
+
+export interface IDrawingLayer {
+  drawingCanvasImage: string | null;
+  penWidth: number;
+  penColor: string;
 }
 
 export interface ITextLayer {

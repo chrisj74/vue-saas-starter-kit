@@ -1,5 +1,6 @@
 import Vue from 'vue';
-import { IWorkBook, IWorkBookState, IWorkBookPage, modesEnum, toolActionEnum, IWorkBookPageDimensions } from '@/types';
+import { IWorkBook, IWorkBookState, IWorkBookPage, modesEnum,
+  toolActionEnum, IWorkBookPageDimensions, subModesEnum, IUpdateWorkBookPage } from '@/types';
 
 export const setWorkBooks = (state: IWorkBookState, payload: IWorkBook[]) => {
   Vue.set(state, 'workBooks', [...payload]);
@@ -41,7 +42,7 @@ export const setMode = (state: IWorkBookState, payload: modesEnum) => {
   state.modes.mode = payload;
 };
 
-export const setSubMode = (state: IWorkBookState, payload: modesEnum) => {
+export const setSubMode = (state: IWorkBookState, payload: subModesEnum) => {
   state.modes.subMode = payload;
 };
 

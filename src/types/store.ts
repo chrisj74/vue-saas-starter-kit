@@ -12,6 +12,10 @@ export interface IBaseState {
   error: string;
   extension: IExtensionState;
 }
+
+export interface IBasePayload {
+  user: IUser;
+}
 export interface IEnvState {
   platform: EnvPlatformsEnum;
   browser: IEnvBrowser;
@@ -94,12 +98,20 @@ export interface IWorkBookState {
   currentPageDimensions: IWorkBookPageDimensions;
   modes: {
     mode: modesEnum,
-    subMode: modesEnum,
+    subMode: subModesEnum,
   };
   settings: {
     showThumbs: boolean;
+    color: string;
+    brushWidth: number;
   };
   toolAction: toolActionEnum;
+}
+
+export interface IUpdateWorkBookPage {
+  workBookId: string;
+  workbookPageId: string;
+  page: IWorkBookPage | Partial<IWorkBookPage>;
 }
 
 export enum toolActionEnum {
@@ -110,4 +122,10 @@ export enum toolActionEnum {
 
 export enum modesEnum {
   TEXT = 'text',
+  DRAW = 'draw',
+}
+
+export enum subModesEnum {
+  BRUSH = 'brush',
+  ERASER = 'eraser',
 }

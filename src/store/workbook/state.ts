@@ -1,4 +1,4 @@
-import { IWorkBookState } from '@/types';
+import { IWorkBookState, modesEnum, subModesEnum } from '@/types';
 
 export default function() {
   return {
@@ -10,11 +10,13 @@ export default function() {
     currentPage: null,
     currentPageDimensions: null,
     modes: {
-      mode: 'draw',
-      subMode: 'brush',
+      mode: modesEnum.DRAW,
+      subMode: subModesEnum.BRUSH,
     },
     settings: {
       showThumbs: false,
+      color: '#000000',
+      brushWidth: 2,
     },
     toolAction: null,
   } as unknown as IWorkBookState;
