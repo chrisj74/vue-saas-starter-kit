@@ -112,7 +112,9 @@ export default Vue.extend({
       this.ctx = this.drawingCanvas.getContext('2d');
       this.drawingCanvas.width = this.pageDimensions.width * ratio;
       this.drawingCanvas.height = this.pageDimensions.height  * ratio;
-      this.drawingPad.fromDataURL(this.workBookPage.drawingLayer.drawingCanvasImage);
+      if (this.workBookPage.drawingLayer.drawingCanvasImage) {
+        this.drawingPad.fromDataURL(this.workBookPage.drawingLayer.drawingCanvasImage);
+      }
       this.dataCache = this.workBookPage.drawingLayer.drawingCanvasImage;
 
       this.ctx.scale(ratio, ratio);

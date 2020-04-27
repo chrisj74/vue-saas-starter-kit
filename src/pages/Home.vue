@@ -45,7 +45,7 @@ export default Vue.extend({
         max = 4;
       }
       return max;
-    }
+    },
   },
   methods: {
     //

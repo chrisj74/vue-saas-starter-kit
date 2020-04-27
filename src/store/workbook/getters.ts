@@ -50,3 +50,7 @@ export const getModes = (state: IWorkBookState) => {
 export const getToolAction = (state: IWorkBookState) => {
   return state.toolAction;
 };
+
+export const getDialogs = (state: IWorkBookState) => {
+  return state.dialogs;
+};

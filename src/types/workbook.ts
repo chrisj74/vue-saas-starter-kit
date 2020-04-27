@@ -69,4 +69,10 @@ export interface ITextLayer {
   opacity?: number;
 }
 
+export enum exportTypesEnum {
+  UPLOAD_PAGE = 'uploadPage',
+  PDF = 'pdf',
+  DOWNLOAD_PAGE = 'downloadPage',
+}
+
 

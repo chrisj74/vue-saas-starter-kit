@@ -1,6 +1,7 @@
 <template>
   <div class="page-wrapper" ref="page">
     <page-setup></page-setup>
+    <download></download>
     <div
       v-if="pageDimensions"
       class="page"
@@ -20,10 +21,12 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* App components */
+import Download from '@/components/editor/download/Download.vue';
 import ViewPdf from '@/components/editor/page/ViewPdf.vue';
 import Thumbs from '@/components/editor/page/ViewPdf.vue';
 import DrawingCanvas from '@/components/editor/page/DrawingCanvas.vue';
 import PageSetup from '@/components/editor/page/PageSetup.vue';
+
 
 /* Utils */
 import { appStrings } from '@/utils';
@@ -31,7 +34,7 @@ import { IWorkBookPageDimensions, toolActionEnum } from '@/types';
 
 export default Vue.extend({
   name: 'Page',
-  components: { ViewPdf, DrawingCanvas, PageSetup },
+  components: { ViewPdf, DrawingCanvas, PageSetup, Download },
   data() {
     return {
       appStrings,
@@ -63,7 +66,7 @@ export default Vue.extend({
     window.addEventListener('resize', function(event) {
       vm.windowWidth = window.innerWidth;
       vm.$nextTick()
-          .then(function () {
+          .then(function() {
               // DOM updated
               vm.setDefaultZoom();
           });

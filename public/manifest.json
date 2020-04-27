@@ -24,13 +24,16 @@
     {
       "matches": ["*://*/*"],
       "run_at": "document_idle",
-      "js": ["learnalongo.js"],
+      "js": ["learnalongo.js", "popper.js"],
+      "css": ["learnalongo.css"],
       "all_frames": false
     }
   ],
 
   "web_accessible_resources": [
-    "index.html"
+    "index.html",
+    "embed-icons/*",
+    "js/*"
   ],
 
   "permissions": [
@@ -40,5 +43,5 @@
     "tabs"
   ],
 
-  "content_security_policy": "script-src 'self' https://cdn.tiny.cloud;"
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.tiny.cloud;"
 }

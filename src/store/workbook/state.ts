@@ -18,6 +18,9 @@ export default function() {
       color: '#000000',
       brushWidth: 2,
     },
+    dialogs: {
+      export: false,
+    },
     toolAction: null,
   } as unknown as IWorkBookState;
 }

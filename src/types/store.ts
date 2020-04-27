@@ -105,6 +105,9 @@ export interface IWorkBookState {
     color: string;
     brushWidth: number;
   };
+  dialogs: {
+    export: boolean;
+  };
   toolAction: toolActionEnum;
 }
 
@@ -117,7 +120,12 @@ export interface IUpdateWorkBookPage {
 export enum toolActionEnum {
   ADD_TEXT = 'addText',
   DELETE_TEXT = 'deleteText',
+
   PAGE_LOADED = 'pageLoaded',
+
+  CLEAR_DRAWING = 'clearDrawing',
+
+  GENERATE_PDF = 'generatePdf',
 }
 
 export enum modesEnum {

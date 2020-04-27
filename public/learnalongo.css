@@ -1,0 +1,62 @@
+.learnalongo-pdf-link{
+  position: relative;
+}
+
+.learnalongo-actions {
+  display: inline-flex;
+  box-shadow: 3px 3px 3px 1px rgba(0,0,0,.2);
+  min-width: 100px;
+  border: solid 1px rgba(0,0,0,.4);
+  padding: 2px;
+  height: 24px;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 2px;
+  display: none;
+}
+
+.learnalongo-actions[data-show] {
+  display: flex;
+}
+
+.learnalongo-split, .learnalongo-full, .learnalongo-download {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-color: #ccc;
+  border-radius: 2px;
+}
+
+.learnalongo-split {
+  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/call-split.svg);
+}
+
+.learnalongo-full {
+  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/fullscreen.svg);
+}
+
+.learnalongo-download {
+  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/download-outline.svg);
+}
+
+.learnalongo-container {
+  display: flex;
+}
+
+.learnalongo-split-container {
+  width: 70%;
+}
+
+.learnalongo-parent-container {
+  width: 30%;
+}
+
+.learnalongo-iframe {
+  width: 100%;
+  height: 100vh;
+}
+

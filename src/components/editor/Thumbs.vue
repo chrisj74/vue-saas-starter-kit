@@ -1,5 +1,5 @@
 <template>
-  <div class="thumbs-wrapper">
+  <div class="thumbs-wrapper" v-if="workBookData">
     <thumb
       class="thumb-wrapper"
       v-for="(page, index) in pages"
@@ -41,6 +41,7 @@ export default Vue.extend({
       error: 'base/getError',
       user: 'user/user',
       workBook: 'workBook/getWorkBook',
+      workBookData: 'workBook/getWorkBookData',
       pages: 'workBook/getWorkBookPages',
       toolAction: 'workBook/getToolAction',
     }),
@@ -58,7 +59,7 @@ export default Vue.extend({
       },
       deep: true,
     },
-  }
+  },
 });
 </script>
 
@@ -73,5 +74,8 @@ export default Vue.extend({
   background-color: #fff;
   overflow: auto;
   z-index: 99;
+  .thumb-wrapper {
+    margin-bottom: 5px;
+  }
 }
 </style>

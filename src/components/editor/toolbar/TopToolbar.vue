@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tools-wrapper">
     <div class="v-btn-toggle v-item-group">
       <v-btn
         icon
@@ -35,6 +35,7 @@
       icon
       small
       light
+      @click.stop="setDownload()"
       >
       <v-icon>mdi-download</v-icon>
     </v-btn>
@@ -50,7 +51,7 @@ import { mapGetters } from 'vuex';
 
 /* Utils */
 import { appStrings } from '@/utils';
-import { modesEnum, subModesEnum } from '../../../types';
+import { modesEnum, subModesEnum, toolActionEnum } from '@/types';
 
 export default Vue.extend({
   name: 'TopToolbar',
@@ -83,10 +84,19 @@ export default Vue.extend({
       this.$store.commit('workBook/setMode', modesEnum.DRAW);
       this.$store.commit('workBook/setSubMode', subModesEnum.BRUSH);
     },
+
+    setDownload() {
+      const payload = {
+        export: true,
+      };
+      this.$store.commit('workBook/setDialogs', payload);
+    },
   },
 });
 </script>
 
 <style lang="scss">
-
+  .tools-wrapper {
+    display: flex;
+  }
 </style>

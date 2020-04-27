@@ -1,7 +1,7 @@
+/* Libs */
 import merge from 'lodash/merge';
-
+/* Models */
 import { IWorkBook, IWorkBookPage, IWorkBookState, IUpdateWorkBookPage } from '@/types';
-
 
 export const setWorkBooks = (
   {state, commit, dispatch }: {state: IWorkBookState, commit: any, dispatch: any},

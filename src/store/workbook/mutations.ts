@@ -50,6 +50,11 @@ export const setSettings = (state: IWorkBookState, payload: {[key: string]: any}
   Vue.set(state, 'workBookPage', {...state.settings, ...payload});
 };
 
+export const setDialogs = (state: IWorkBookState, payload: {[key: string]: any}) => {
+  Vue.set(state, 'dialogs', {...state.dialogs, ...payload});
+};
+
 export const setToolAction = (state: IWorkBookState, payload: toolActionEnum) => {
+  console.log('set', payload);
   state.toolAction = payload;
 };
