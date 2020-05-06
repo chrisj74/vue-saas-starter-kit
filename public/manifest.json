@@ -24,7 +24,7 @@
     {
       "matches": ["*://*/*"],
       "run_at": "document_idle",
-      "js": ["learnalongo.js", "popper.js"],
+      "js": ["learnalongo.js", "popper.js", "split.js"],
       "css": ["learnalongo.css"],
       "all_frames": false
     }

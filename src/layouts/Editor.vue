@@ -47,10 +47,10 @@
       color="white"
       light
       height="40"
+      elevation="0"
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
       <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title>
-      <v-spacer />
       <top-toolbar></top-toolbar>
     </v-app-bar>
 

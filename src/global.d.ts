@@ -5,3 +5,4 @@ declare module 'vue-pdf';
 declare module 'pdfmake/build/pdfmake';
 declare module 'pdfmake/build/vfs_fonts';
 declare module 'vue-html2canvas';
+declare module 'vue-swatches';

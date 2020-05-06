@@ -31,7 +31,7 @@ export interface IWorkBook {
   profile?: string[];
   modified?: Date;
   publishId?: string;
-  id?: string | null;
+  id: string;
   pages: IWorkBookPage[];
 }
 

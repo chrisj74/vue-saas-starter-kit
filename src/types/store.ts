@@ -104,6 +104,7 @@ export interface IWorkBookState {
     showThumbs: boolean;
     color: string;
     brushWidth: number;
+    showDrawingExtras: boolean;
   };
   dialogs: {
     export: boolean;
@@ -118,6 +119,8 @@ export interface IUpdateWorkBookPage {
 }
 
 export enum toolActionEnum {
+  ZOOM_IN = 'zoomIn',
+  ZOOM_OUT = 'zoomOut',
   ADD_TEXT = 'addText',
   DELETE_TEXT = 'deleteText',
 
@@ -134,6 +137,9 @@ export enum modesEnum {
 }
 
 export enum subModesEnum {
-  BRUSH = 'brush',
+  INK = 'ink',
   ERASER = 'eraser',
+  MARKER = 'marker',
+  HIGHLIGHTER = 'highlighter',
+  TYPE = 'type',
 }

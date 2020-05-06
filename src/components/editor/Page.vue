@@ -135,9 +135,10 @@ export default Vue.extend({
   watch: {
      workBookPage: {
       handler(newPage, oldPage) {
-        if ((!this.pageDimensions && this.workBookPage.dimensions)
-        || (oldPage.dimensions.height !== newPage.dimensions.height)
-        || (oldPage.dimensions.width !== newPage.dimensions.width)) {
+        if (this.workBookPage
+        && ((!this.pageDimensions && this.workBookPage.dimensions)
+        || (oldPage && oldPage.dimensions.height !== newPage.dimensions.height)
+        || (oldPage && oldPage.dimensions.width !== newPage.dimensions.width))) {
           this.setDefaultZoom();
         }
       },

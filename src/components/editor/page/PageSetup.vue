@@ -32,28 +32,18 @@ export default Vue.extend({
       appStrings,
     };
   },
-  created() {
-    console.log('PageSetup created');
-    if (this.$route.query.pdf) {
-      const payload = {
-        url: this.$route.query.pdf,
-        newWorkBook: null,
-      };
-      this.$store.dispatch('workBook/setWorkBook', this.$route.query.pdf)
-        .then((hasWorkBook: boolean) => {
-          if (!hasWorkBook) {
-            this.addWorkBook(this.$route.query.pdf);
-          }
-        });
-    } else if (this.$route.params.workBookId && this.workBook && this.workBook.id !== this.$route.params.workBookId) {
-      // coming in for first time
-      this.setupPage();
-    } else {
-      console.log('no workbooks');
-    }
-  },
   mounted() {
-    // Mounted
+    if (this.workBooks) {
+      /* Store loaded */
+      if (this.$route.query.pdf) {
+        this.checkPdfExisits();
+      } else if (this.$route.params.workBookId && this.workBook && this.workBook.id !== this.$route.params.workBookId) {
+        // coming in for first time
+        this.setupPage();
+      } else if (this.$route.params.workBookId && this.workBooks) {
+        this.setupPage();
+      }
+    }
   },
   computed: {
     ...mapGetters({
@@ -65,36 +55,67 @@ export default Vue.extend({
       workBookData: 'workBook/getWorkBookData',
       workBookPage: 'workBook/getWorkBookPage',
       pageDimensions: 'workBook/getCurrentPageDimensions',
+      currentPageId: 'workBook/getCurrentPageId',
     }),
   },
   methods: {
+    checkPdfExisits() {
+      if (this.workBooks) {
+        /* TODO update to filter and cater for multiple matches */
+        const existingWorkBook = this.workBooks.find((workBook: IWorkBook) => {
+          return workBook.url === this.$route.query.pdf;
+        });
+        if (existingWorkBook) {
+          /* Has workbook so redirect */
+          this.$router.push('/editor/' + existingWorkBook.id);
+        } else {
+          /* Missing so create new */
+          this.addWorkBook(this.$route.query.pdf);
+        }
+      }
+    },
+
     setupPage() {
       const newWorkBook: IWorkBook | undefined = this.workBooks.find((workBook: IWorkBook) => {
         return workBook.id === this.$route.params.workBookId;
       });
-      if (newWorkBook && !this.$route.params.pageId) {
-        /* Missing page Id so set to first page */
-        this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
-        if (newWorkBook.id !== this.$route.params.workBookId) {
-          const payload = {
-            url: null,
-            newWorkBook,
-          };
-          this.$store.dispatch('workBook/setWorkBook', payload);
+
+      if (newWorkBook && (!this.workBook || newWorkBook.id !== this.workBook.id)) {
+        /* New workbook so setup */
+          const loadingTask = pdf.createLoadingTask(newWorkBook.url)
+          .promise
+          .then(async (result: any) => {
+            result.getData().then((data: Uint8Array) => {
+              /* Takes time to fetch pdf data - fetch first */
+              this.$store.commit('workBook/setWorkBookData', data);
+
+              const payload = newWorkBook.id;
+              this.$store.dispatch('workBook/setWorkBook', payload);
+              /* Set page */
+              console.log('pageSetup setupPage() ');
+              if (newWorkBook && newWorkBook.pages && !this.$route.params.pageId) {
+                /* Missing page Id so set to first page */
+                this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
+              } else if (newWorkBook && this.$route.params.pageId) {
+                this.$store.commit('workBook/setCurrentPage', this.$route.params.pageId);
+              } else {
+                // TODO
+                console.error('PageSetup loading task complete but no matching workbook');
+              }
+            });
+          }, (error: any) => {
+            console.error('Issue getting pdf in setupPage:', error);
+          });
+        } else {
+          /* Change page on same workBook */
+          if (this.$route.params.pageId) {
+            this.$store.commit('workBook/setCurrentPage', this.$route.params.pageId);
+          } else if (newWorkBook && newWorkBook.pages && !this.$route.params.pageId) {
+            /* Missing page Id so set to first page */
+            this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
+          }
+
         }
-      } else if (newWorkBook && this.$route.params.pageId) {
-        this.$store.commit('workBook/setCurrentPage', this.$route.params.pageId);
-        if (newWorkBook.id !== this.$route.params.workBookId) {
-          const payload = {
-            url: null,
-            newWorkBook,
-          };
-          this.$store.dispatch('workBook/setWorkBook', payload);
-        }
-      } else {
-        // TODO
-        console.log('no matching workbook');
-      }
     },
 
     addWorkBook(url: string) {
@@ -149,12 +170,12 @@ export default Vue.extend({
             };
             newWorkBook.members = [this.user.email];
           }
-          this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
+          // this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
           payload = {
             url: null,
             newWorkBook,
           };
-          this.$store.dispatch('workBook/setWorkBook', payload)
+          this.$store.dispatch('workBook/addWorkBook', newWorkBook)
           .then((resp: any) => {
               this.$router.push('editor/' + newWorkBook.id);
             });
@@ -164,7 +185,35 @@ export default Vue.extend({
   watch: {
     $route: {
       handler(from, to) {
-        this.setupPage();
+        if (this.$route.query.pdf) {
+          this.checkPdfExisits();
+        } else {
+          this.setupPage();
+        }
+
+        /* Reset extra tools */
+        const payload: any = {
+          showDrawingExtras: false,
+        };
+        this.$store.commit('workBook/setSettings', payload);
+      },
+      deep: true,
+    },
+    workBooks: {
+      handler(oldVal, newVal) {
+        if (this.$route.query.pdf) {
+          this.checkPdfExisits();
+        } else if ((this.$route.params.workBookId
+          && this.workBook
+          && this.workBook.id !== this.$route.params.workBookId)
+          || (this.$route.params.workBookId
+          && this.workBook && !this.currentPageId)
+        ) {
+          // coming in for first time
+          this.setupPage();
+        } else if (this.$route.params.workBookId) {
+          this.setupPage();
+        }
       },
       deep: true,
     },

@@ -31,7 +31,7 @@ import SignaturePad from 'signature_pad';
 
 /* Utils */
 import { appStrings } from '@/utils';
-import { IWorkBook, IWorkBookPage, IUpdateWorkBookPage, modesEnum } from '@/types';
+import { IWorkBook, IWorkBookPage, IUpdateWorkBookPage, modesEnum, toolActionEnum, subModesEnum } from '@/types';
 
 export default Vue.extend({
   name: 'DrawingCanvas',
@@ -74,24 +74,29 @@ export default Vue.extend({
       modes: 'workBook/getModes',
       pageDimensions: 'workBook/getCurrentPageDimensions',
       settings: 'workBook/getSettings',
+      toolAction: 'workBook/getToolAction',
     }),
   },
   methods: {
     initCanvas() {
+      this.setCssColor();
       const vm = this;
       this.drawingCanvas = document.querySelector('#drawing-canvas');
       this.drawingPad = new SignaturePad(this.drawingCanvas, {
         backgroundColor: 'rgba(255, 255, 255, 0)',
-        penColor: vm.settings.color,
+        penColor: vm.getColor(),
         maxWidth: vm.settings.brushWidth * vm.pageDimensions.zoom,
+        minWidth: 0.5,
         minDistance: 1,
         dotSize: vm.getDotSize(),
         throttle: 16,
         onBegin() {
-          const payload = {
-            showBrushWidth: false,
-          };
-          // vm.$store.commit('setSettings', payload);
+          if (vm.settings.showDrawingExtras) {
+            const payload: any = {
+              showDrawingExtras: false,
+            };
+            vm.$store.commit('workBook/setSettings', payload);
+          }
         },
         onEnd() {
           vm.dataCache = this.toDataURL('image/png', 1);
@@ -112,19 +117,28 @@ export default Vue.extend({
       this.ctx = this.drawingCanvas.getContext('2d');
       this.drawingCanvas.width = this.pageDimensions.width * ratio;
       this.drawingCanvas.height = this.pageDimensions.height  * ratio;
+      this.ctx.scale(ratio, ratio);
       if (this.workBookPage.drawingLayer.drawingCanvasImage) {
         this.drawingPad.fromDataURL(this.workBookPage.drawingLayer.drawingCanvasImage);
+        this.dataCache = this.workBookPage.drawingLayer.drawingCanvasImage;
       }
-      this.dataCache = this.workBookPage.drawingLayer.drawingCanvasImage;
-
-      this.ctx.scale(ratio, ratio);
     },
 
     clearDrawing() {
       this.drawingPad.clear();
       this.dataCache = this.drawingPad.toDataURL('image/png', 1);
       this.savePage();
-      this.$store.commit('setToolAction', null);
+      this.$store.commit('workBook/setToolAction', null);
+    },
+
+    getColor() {
+      /* convert opcity to hex */
+      let hexOpacity = (Math.round(this.settings.brushOpacity * 255)).toString(16);
+      while (hexOpacity.length < 2) {
+        hexOpacity = '0' + hexOpacity;
+      }
+      /* manipulate color to include opacity */
+      return this.settings.color.substring(0, 7) + hexOpacity;
     },
 
     savePage() {
@@ -142,6 +156,11 @@ export default Vue.extend({
         };
         this.$store.dispatch('workBook/updateWorkBookPage', payload);
       }
+    },
+
+    setCssColor() {
+      const root = document.documentElement;
+      root.style.setProperty('--tool-color', this.getColor());
     },
   },
   watch: {
@@ -165,8 +184,10 @@ export default Vue.extend({
       handler(newPage, oldPage) {
         if (!this.drawingPad && this.pageDimensions) {
           this.initCanvas();
-        } else if (newPage.drawingLayer && (newPage.drawingLayer.drawingCanvasImage !== this.dataCache)) {
-          this.resizeCanvas();
+        } else if (this.workBookPage && this.workBookPage.drawingLayer) {
+          if (this.workBookPage.drawingLayer.drawingCanvasImage !== this.dataCache) {
+            this.resizeCanvas();
+          }
         }
       },
       deep: true,
@@ -176,9 +197,17 @@ export default Vue.extend({
         if (this.settings.brushWidth * this.pageDimensions.zoom !== this.drawingPad.maxWidth) {
           this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
           this.drawingPad.dotSize = this.getDotSize();
+          if (this.modes.subMode === subModesEnum.INK) {
+            this.drawingPad.minWidth = 0.5;
+          } else if (this.modes.subMode === subModesEnum.MARKER
+            || this.modes.subMode === subModesEnum.ERASER
+            || this.modes.subMode === subModesEnum.HIGHLIGHTER) {
+            this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          }
         }
-        if (this.settings.color !== this.drawingPad.penColor) {
-          this.drawingPad.penColor = this.settings.color;
+        if (this.getColor() !== this.drawingPad.penColor) {
+          this.setCssColor();
+          this.drawingPad.penColor = this.getColor();
         }
       },
       deep: true,
@@ -198,19 +227,42 @@ export default Vue.extend({
     modes: {
       handler(newMode, oldMode) {
         let ctx: any;
-        if (this.modes.subMode === 'eraser' && this.drawingCanvas) {
+        if (this.modes.subMode === subModesEnum.ERASER && this.drawingCanvas) {
           ctx = this.drawingCanvas.getContext('2d');
           ctx.globalCompositeOperation = 'destination-out';
-        } else if (this.modes.subMode === 'brush' && this.drawingCanvas) {
+          /* Increase brush size */
+          this.drawingPad.maxWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
+          this.drawingPad.minWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
+          this.drawingPad.dotSize = this.getDotSize();
+        } else if (this.modes.subMode === subModesEnum.INK && this.drawingCanvas) {
           ctx = this.drawingCanvas.getContext('2d');
           ctx.globalCompositeOperation = 'source-over';
+          /* Reset brush size */
+          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          this.drawingPad.minWidth = 0.5;
+          this.drawingPad.dotSize = this.getDotSize();
+        } else if (this.modes.subMode === subModesEnum.MARKER && this.drawingCanvas) {
+          ctx = this.drawingCanvas.getContext('2d');
+          ctx.globalCompositeOperation = 'source-over';
+          /* Reset brush size */
+          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          this.drawingPad.dotSize = this.getDotSize();
+        } else if (this.modes.subMode === subModesEnum.HIGHLIGHTER && this.drawingCanvas) {
+          ctx = this.drawingCanvas.getContext('2d');
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.globalAlpha = 0.2;
+          /* Reset brush size */
+          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+          this.drawingPad.dotSize = this.getDotSize();
         }
       },
       deep: true,
     },
     toolAction: {
       handler(newAction, oldAction) {
-        if (this.toolAction === 'clearDrawing') {
+        if (this.toolAction === toolActionEnum.CLEAR_DRAWING) {
           this.clearDrawing();
         }
       },

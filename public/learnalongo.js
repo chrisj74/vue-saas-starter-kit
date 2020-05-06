@@ -157,6 +157,10 @@ function splitScreen(href) {
   containerDiv.appendChild(learnalongoDiv);
   containerDiv.appendChild(parentDiv);
   bodyTag.appendChild(containerDiv);
+  Split([learnalongoDiv,parentDiv],{
+    sizes: [70, 30],
+    minSize: 200,
+  })
 }
 
 /* ADD EVENT LISTENERS */

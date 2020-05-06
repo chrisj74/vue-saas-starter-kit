@@ -24,8 +24,8 @@
       </div>
 
       <!-- Download pdf link -->
-      <div class="download-link" v-if="pdfSrc">
-        <a :href="pdfSrc" ref="pdfDownloadLink" download="page">Download</a>
+      <div class="download-link" v-if="dataUrl">
+        <a :href="dataUrl" ref="pdfDownloadLink" download="page">Download</a>
       </div>
     </div>
 
@@ -51,7 +51,7 @@
         </v-system-bar>
         <v-card-title class="headline">Export</v-card-title>
         <v-card-text>
-          <div v-if="!pdfSrc || pdfSrc.length === 0">
+          <div v-if="!dataUrl || dataUrl.length === 0">
             <v-progress-circular
               indeterminate
               color="primary"
@@ -103,7 +103,8 @@ export default Vue.extend({
       previewImages: [],
       previewSrc: '',
       photoImagesGenerated: true, // TODO
-      pdfSrc: null,
+      dataUrl: null,
+      blob: null,
       previewPageLoaded: null,
     };
   },
@@ -220,7 +221,7 @@ export default Vue.extend({
       const pdfDocGenerator = pdfMake
         .createPdf(docDefinition);
       pdfDocGenerator.getDataUrl((dataUrl: string) => {
-        vm.pdfSrc = dataUrl;
+        vm.dataUrl = dataUrl;
         vm.downloadPdf = false;
         vm.$store.commit('base/setLoading', false);
       });
@@ -251,7 +252,7 @@ export default Vue.extend({
     dialogs: {
       handler(newAction, oldAction) {
         if (this.dialogs.export) {
-          this.pdfSrc = '';
+          this.dataUrl = '';
           this.getPageImages(true, true);
         }
       },

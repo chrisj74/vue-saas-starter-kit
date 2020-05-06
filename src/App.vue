@@ -48,10 +48,7 @@ export default Vue.extend({
   },
   mounted() {
     if (this.user) {
-      const payload: IBasePayload = {
-        user: this.user,
-      };
-      // DISPATCH
+      this.$store.dispatch('workBook/setWorkBooks');
     }
   },
   computed: {

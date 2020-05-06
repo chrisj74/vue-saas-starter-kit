@@ -2,7 +2,7 @@ import { IWorkBookState, modesEnum, subModesEnum } from '@/types';
 
 export default function() {
   return {
-    workBooks: [],
+    workBooks: null,
     workBook: null,
     workBookData: null,
     workBookPages: null,
@@ -11,12 +11,14 @@ export default function() {
     currentPageDimensions: null,
     modes: {
       mode: modesEnum.DRAW,
-      subMode: subModesEnum.BRUSH,
+      subMode: subModesEnum.INK,
     },
     settings: {
       showThumbs: false,
       color: '#000000',
       brushWidth: 2,
+      brushOpacity: 1,
+      showDrawingExtras: false,
     },
     dialogs: {
       export: false,
