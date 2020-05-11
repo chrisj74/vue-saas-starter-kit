@@ -20,6 +20,7 @@
     "pdfjs-dist": "2.1.266",
     "pdfmake": "^0.1.65",
     "restructure": "^2.0.0",
+    "save": "^2.4.0",
     "signature_pad": "^3.0.0-beta.3",
     "tinymce": "^5.2.1",
     "uuidv4": "^6.0.5",

@@ -20,6 +20,8 @@
 import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
+/* Libs */
+
 /* App components */
 import Download from '@/components/editor/download/Download.vue';
 import ViewPdf from '@/components/editor/page/ViewPdf.vue';

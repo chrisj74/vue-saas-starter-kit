@@ -227,35 +227,60 @@ export default Vue.extend({
     modes: {
       handler(newMode, oldMode) {
         let ctx: any;
-        if (this.modes.subMode === subModesEnum.ERASER && this.drawingCanvas) {
-          ctx = this.drawingCanvas.getContext('2d');
-          ctx.globalCompositeOperation = 'destination-out';
-          /* Increase brush size */
-          this.drawingPad.maxWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
-          this.drawingPad.minWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
-          this.drawingPad.dotSize = this.getDotSize();
-        } else if (this.modes.subMode === subModesEnum.INK && this.drawingCanvas) {
-          ctx = this.drawingCanvas.getContext('2d');
-          ctx.globalCompositeOperation = 'source-over';
-          /* Reset brush size */
-          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
-          this.drawingPad.minWidth = 0.5;
-          this.drawingPad.dotSize = this.getDotSize();
-        } else if (this.modes.subMode === subModesEnum.MARKER && this.drawingCanvas) {
-          ctx = this.drawingCanvas.getContext('2d');
-          ctx.globalCompositeOperation = 'source-over';
-          /* Reset brush size */
-          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
-          this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
-          this.drawingPad.dotSize = this.getDotSize();
-        } else if (this.modes.subMode === subModesEnum.HIGHLIGHTER && this.drawingCanvas) {
-          ctx = this.drawingCanvas.getContext('2d');
-          ctx.globalCompositeOperation = 'source-over';
-          ctx.globalAlpha = 0.2;
-          /* Reset brush size */
-          this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
-          this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
-          this.drawingPad.dotSize = this.getDotSize();
+        if (this.modes.mode === modesEnum.DRAW) {
+          /* RESET COLOR IF NOT HIGHLIGHTER */
+          if (oldMode
+            && oldMode.subMode !== newMode.subMode
+            && oldMode.subMode === subModesEnum.HIGHLIGHTER
+          ) {
+            const payload: any = {
+              color: '#000000',
+              brushOpacity: 1,
+              brushWidth: 2,
+            };
+            this.$store.commit('workBook/setSettings', payload);
+          }
+
+          /* SUBMODE SPECIFIC SETTINGS */
+          if (this.modes.subMode === subModesEnum.ERASER && this.drawingCanvas) {
+            ctx = this.drawingCanvas.getContext('2d');
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.globalAlpha = 1;
+            /* Increase brush size */
+            this.drawingPad.maxWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
+            this.drawingPad.minWidth = (this.settings.brushWidth * 2) * this.pageDimensions.zoom;
+            this.drawingPad.dotSize = this.getDotSize();
+          } else if (this.modes.subMode === subModesEnum.INK && this.drawingCanvas) {
+            ctx = this.drawingCanvas.getContext('2d');
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1;
+            /* Reset brush size */
+            this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+            this.drawingPad.minWidth = 0.5;
+            this.drawingPad.dotSize = this.getDotSize();
+          } else if (this.modes.subMode === subModesEnum.MARKER && this.drawingCanvas) {
+            ctx = this.drawingCanvas.getContext('2d');
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 1;
+            /* Reset brush size */
+            this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+            this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+            this.drawingPad.dotSize = this.getDotSize();
+          } else if (this.modes.subMode === subModesEnum.HIGHLIGHTER && this.drawingCanvas) {
+            ctx = this.drawingCanvas.getContext('2d');
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.globalAlpha = 0.2;
+            /* Reset brush size */
+            this.drawingPad.maxWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+            this.drawingPad.minWidth = this.settings.brushWidth * this.pageDimensions.zoom;
+            this.drawingPad.dotSize = this.getDotSize();
+            const payload: any = {
+              color: '#41b906',
+              brushOpacity: 0.05,
+              brushWidth: 15,
+            };
+            this.$store.commit('workBook/setSettings', payload);
+          }
         }
       },
       deep: true,

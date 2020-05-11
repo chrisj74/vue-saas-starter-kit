@@ -1,6 +1,7 @@
 <template>
   <v-app id="vApp" v-if="authSet">
     <v-navigation-drawer
+      disable-resize-watcher
       v-model="leftDrawerOpen"
       app
       :mobile-break-point="768"
@@ -26,16 +27,12 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <!-- LOGOUT -->
-      <template v-slot:append v-if="user">
-        <div class="pa-2">
+            <!-- LOGIN/OUT -->
+      <template v-slot:append>
+        <div class="pa-2" v-if="user">
           <v-btn block @click="onLogout()" color="red lighten-2" dark>Logout <v-icon dark right>mdi-power-standby</v-icon></v-btn>
         </div>
-      </template>
-
-      <!-- LOGOUT -->
-      <template v-slot:append v-if="!user">
-        <div class="pa-2">
+        <div class="pa-2" v-else>
           <v-btn block @click="onLogin()" dark>Login <v-icon dark right>mdi-power-standby</v-icon></v-btn>
         </div>
       </template>

@@ -39,15 +39,18 @@ export const setWorkBookPage = (state: IWorkBookState, payload: IWorkBookPage) =
 };
 
 export const setMode = (state: IWorkBookState, payload: modesEnum) => {
-  state.modes.mode = payload;
+  Vue.set(state, 'modes', {
+    mode: payload,
+    subMode: state.modes.subMode});
 };
 
 export const setSubMode = (state: IWorkBookState, payload: subModesEnum) => {
-  state.modes.subMode = payload;
+  Vue.set(state, 'modes', {
+    mode: state.modes.mode,
+    subMode: payload});
 };
 
 export const setSettings = (state: IWorkBookState, payload: {[key: string]: any}) => {
-  console.log('mutation', JSON.parse(JSON.stringify(payload)));
   Vue.set(state, 'settings', {...state.settings, ...JSON.parse(JSON.stringify(payload))});
 };
 
@@ -56,6 +59,5 @@ export const setDialogs = (state: IWorkBookState, payload: {[key: string]: any})
 };
 
 export const setToolAction = (state: IWorkBookState, payload: toolActionEnum) => {
-  console.log('setToolAction', JSON.parse(JSON.stringify(payload)));
   state.toolAction = payload;
 };

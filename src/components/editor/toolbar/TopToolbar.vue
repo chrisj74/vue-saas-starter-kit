@@ -277,12 +277,6 @@ export default Vue.extend({
     setHighlighter() {
       this.$store.commit('workBook/setMode', modesEnum.DRAW);
       this.$store.commit('workBook/setSubMode', subModesEnum.HIGHLIGHTER);
-      const payload: any = {
-        color: '#41b906',
-        brushOpacity: 0.05,
-        brushWidth: 15,
-      };
-      this.$store.commit('workBook/setSettings', payload);
       this.resetDrawingExtras();
     },
 

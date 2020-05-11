@@ -1,5 +1,5 @@
 <template>
-  <div class="thumbs-wrapper" v-if="workBookData">
+  <div class="thumbs-wrapper" v-if="workBookData" v-show="!leftDrawerOpen">
     <thumb
       class="thumb-wrapper"
       v-for="(page, index) in pages"
@@ -39,6 +39,7 @@ export default Vue.extend({
     ...mapGetters({
       loading: 'base/getLoading',
       error: 'base/getError',
+      leftDrawerOpen: 'base/getLeftDrawerOpen',
       user: 'user/user',
       workBook: 'workBook/getWorkBook',
       workBookData: 'workBook/getWorkBookData',
