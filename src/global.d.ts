@@ -6,3 +6,4 @@ declare module 'pdfmake/build/pdfmake';
 declare module 'pdfmake/build/vfs_fonts';
 declare module 'vue-html2canvas';
 declare module 'vue-swatches';
+declare module 'vue-draggable-resizable';

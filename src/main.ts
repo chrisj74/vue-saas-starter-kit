@@ -12,6 +12,9 @@ Vue.config.productionTip = false;
 
 let vue: Vue | null = null;
 
+// Initialize Performance Monitoring and get a reference to the service
+const perf = firebase.performance();
+
 firebase.auth().onAuthStateChanged((user: any) => {
   if (user) {
     const payload = {

@@ -1,0 +1,40 @@
+<svg id="White" xmlns="http://www.w3.org/2000/svg" width="1047" height="345" viewBox="0 0 1047 345">
+  <defs>
+    <style>
+      .cls-1, .cls-3 {
+        font-size: 150px;
+        font-family: "Work Sans";
+        font-weight: 500;
+      }
+
+      .cls-1 {
+        fill: #fff;
+      }
+
+      .cls-2, .cls-4 {
+        fill: none;
+        stroke-width: 15px;
+        stroke-dasharray: 60 30;
+        fill-rule: evenodd;
+      }
+
+      .cls-2 {
+        stroke: #fff;
+      }
+
+      .cls-3 {
+        fill: #5d5ca9;
+      }
+
+      .cls-4 {
+        stroke: #5d5ca9;
+      }
+    </style>
+  </defs>
+  <text id="alongo" class="cls-1" x="543.981" y="210.966">alongo</text>
+  <text id="Learn" class="cls-1" x="2.911" y="212.294">Learn</text>
+  <path class="cls-2" d="M489,8V344"/>
+  <text id="alongo-2" data-name="alongo" class="cls-3" x="543.981" y="210.966">alongo</text>
+  <text id="Learn-2" data-name="Learn" class="cls-3" x="2.911" y="212.294">Learn</text>
+  <path class="cls-4" d="M489,8V344"/>
+</svg>

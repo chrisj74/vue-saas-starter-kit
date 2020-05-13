@@ -17,13 +17,23 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <!-- TASKS -->
-        <v-list-item link to="/tasks">
+        <!-- WORK BOOKS -->
+        <v-list-item link to="/workbooks">
           <v-list-item-action>
             <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>{{ appStrings.TASK }}s</v-list-item-title>
+            <v-list-item-title>{{ appStrings.TASK }} Work Books</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!-- NOTE BOOKS -->
+        <v-list-item link to="/notebooks">
+          <v-list-item-action>
+            <v-icon>mdi-check</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ appStrings.TASK }} Notes</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
@@ -47,7 +57,7 @@
       height="40"
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
-      <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title>
+      <v-toolbar-title><v-img src="@/assets/learnalongo-logo-purple.svg" max-width="115px"></v-img></v-toolbar-title>
     </v-app-bar>
 
     <v-content>

@@ -107,6 +107,7 @@ export const autoSignIn =  (state: any, payload: any) => {
     .doc(payload.user.uid);
 
   userDoc.get().then((docSnapshot: any) => {
+    console.log('FIREBASE READ User doc');
     if (docSnapshot.exists) {
       userObj.sessions = docSnapshot.data().sessions
         ? docSnapshot.data().sessions + 1

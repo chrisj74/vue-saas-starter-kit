@@ -34,6 +34,28 @@ const routes: RouteConfig[] = [
     ],
   },
   {
+    path: '/workbooks',
+    component: () => import('../layouts/Main.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../pages/collections/WorkBookHome.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/notebooks',
+    component: () => import('../layouts/Main.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../pages/collections/NoteBookHome.vue'),
+        meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('../layouts/Auth.vue'),

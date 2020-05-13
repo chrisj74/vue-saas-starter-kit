@@ -35,7 +35,8 @@ export const setWorkBookPages = (state: IWorkBookState, payload: IWorkBookPage[]
 };
 
 export const setWorkBookPage = (state: IWorkBookState, payload: IWorkBookPage) => {
-  Vue.set(state, 'workBookPage', {...payload});
+  Vue.set(state, 'workBookPage', payload);
+  Vue.set(state.workBookPage, 'textLayers', payload.textLayers);
 };
 
 export const setMode = (state: IWorkBookState, payload: modesEnum) => {

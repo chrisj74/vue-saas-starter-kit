@@ -17,17 +17,32 @@
             <v-list-item-title>Home</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
-        <!-- TASKS -->
-        <v-list-item link to="/tasks">
+        <!-- WORK BOOKS -->
+        <v-list-item link to="/workbooks">
           <v-list-item-action>
             <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>{{ appStrings.TASK }}s</v-list-item-title>
+            <v-list-item-title>{{ appStrings.TASK }} Work Books</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+
+        <!-- NOTE BOOKS -->
+        <v-list-item link to="/notebooks">
+          <v-list-item-action>
+            <v-icon>mdi-check</v-icon>
+          </v-list-item-action>
+          <v-list-item-content>
+            <v-list-item-title>{{ appStrings.TASK }} Notes</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
-            <!-- LOGIN/OUT -->
+
+      <template v-slot:prepend>
+        <v-img src="@/assets/learnalongo-logo-purple.svg" max-width="115px" class="mx-auto"></v-img>
+      </template>
+
+      <!-- LOGIN/OUT -->
       <template v-slot:append>
         <div class="pa-2" v-if="user">
           <v-btn block @click="onLogout()" color="red lighten-2" dark>Logout <v-icon dark right>mdi-power-standby</v-icon></v-btn>
@@ -47,7 +62,7 @@
       elevation="0"
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
-      <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title>
+      <!-- <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title> -->
       <top-toolbar></top-toolbar>
     </v-app-bar>
 
@@ -85,8 +100,6 @@ export default Vue.extend({
       error: 'base/getError',
       user: 'user/user',
       authSet: 'user/getAuthSet',
-      workBook: 'workBook/getWorkBook',
-      pages: 'workBook/getWorkBookPages',
     }),
     leftDrawerOpen: {
       get() {

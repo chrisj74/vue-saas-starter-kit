@@ -8,6 +8,10 @@ export const getWorkBook = (state: IWorkBookState) => {
   return state.workBook;
 };
 
+export const getWorkBookTextLayers = (state: IWorkBookState) => {
+  return state.workBookPage?.textLayers;
+};
+
 export const getWorkBookData = (state: IWorkBookState) => {
   return state.workBookData;
 };
@@ -17,17 +21,7 @@ export const getWorkBookPages = (state: IWorkBookState): IWorkBookPage[] | undef
 };
 
 export const getWorkBookPage = (state: IWorkBookState) => {
-  let currentPage: IWorkBookPage | undefined;
-  if (state.workBook && state .workBook.pages) {
-    currentPage = state.workBook.pages.find((page: IWorkBookPage) => {
-      return page.id === state.currentPage;
-    });
-  }
-  if (currentPage) {
-    return currentPage;
-  } else {
-    return null;
-  }
+  return state.workBookPage;
 };
 
 export const getCurrentPageDimensions = (state: IWorkBookState) => {

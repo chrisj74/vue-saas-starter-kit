@@ -1,4 +1,5 @@
-import { IWorkBook, IWorkBookPage } from './workbook';
+import { IWorkBook, IWorkBookPage } from './workBook';
+import { INoteBook } from './noteBook';
 
 /* tslint:disable-next-line:interface-over-type-literal */
 type Dictionary < T > = { [key: string]: T };
@@ -142,4 +143,11 @@ export enum subModesEnum {
   MARKER = 'marker',
   HIGHLIGHTER = 'highlighter',
   TYPE = 'type',
+}
+
+/* NOTES STATE */
+
+export interface INoteBookState {
+  noteBooks: INoteBook[];
+  noteBook: INoteBook;
 }

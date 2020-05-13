@@ -92,16 +92,15 @@ export default Vue.extend({
               const payload = newWorkBook.id;
               this.$store.dispatch('workBook/setWorkBook', payload);
               /* Set page */
-              console.log('pageSetup setupPage() ');
               if (newWorkBook && newWorkBook.pages && !this.$route.params.pageId) {
                 /* Missing page Id so set to first page */
-                this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
+                this.$store.dispatch('workBook/setCurrentPage', newWorkBook.pages[0].id);
               } else if (newWorkBook && this.$route.params.pageId) {
-                this.$store.commit('workBook/setCurrentPage', this.$route.params.pageId);
-              } else {
+                this.$store.dispatch('workBook/setCurrentPage', this.$route.params.pageId);
+              }/*  else {
                 // TODO
                 console.error('PageSetup loading task complete but no matching workbook');
-              }
+              } */
             });
           }, (error: any) => {
             console.error('Issue getting pdf in setupPage:', error);
@@ -109,10 +108,10 @@ export default Vue.extend({
         } else {
           /* Change page on same workBook */
           if (this.$route.params.pageId) {
-            this.$store.commit('workBook/setCurrentPage', this.$route.params.pageId);
+            this.$store.dispatch('workBook/setCurrentPage', this.$route.params.pageId);
           } else if (newWorkBook && newWorkBook.pages && !this.$route.params.pageId) {
             /* Missing page Id so set to first page */
-            this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
+            this.$store.dispatch('workBook/setCurrentPage', newWorkBook.pages[0].id);
           }
 
         }
@@ -170,7 +169,6 @@ export default Vue.extend({
             };
             newWorkBook.members = [this.user.email];
           }
-          // this.$store.commit('workBook/setCurrentPage', newWorkBook.pages[0].id);
           payload = {
             url: null,
             newWorkBook,

@@ -38,7 +38,7 @@ bodyTag.appendChild(containerSpan);
 let popperInstance = null;
 
 function learnalongoTooltipCreate(learnalongoLinks, learnalongoTooltip) {
-  Popper.createPopper(learnalongoLinks, learnalongoTooltip, {
+  popperInstance = Popper.createPopper(learnalongoLinks, learnalongoTooltip, {
     placement: 'top',
     modifiers: [
       {
@@ -68,7 +68,9 @@ function learnalongoTooltipShow() {
 
 function learnalongoTooltipHide() {
   var learnalongoTooltip = document.querySelector('.learnalongo-actions');
-  learnalongoTooltip.removeAttribute('data-show');
+  if (learnalongoTooltip) {
+    learnalongoTooltip.removeAttribute('data-show');
+  }
   learnalongoTooltipDestroy();
 }
 
@@ -80,11 +82,12 @@ function interceptClickEvent(e) {
       href = target.getAttribute('href');
       console.log('target classList=', target.classList);
       //put your logic here...
-      if (href.indexOf('.pdf') !== -1
-        && target.classList.contains('learnalongo-split')
+      if (target.classList.contains('learnalongo-split')
       ) {
         e.preventDefault();
-        splitScreen(href);
+        splitScreen(extensionPath + encodeURI(href));
+      } else if (href.indexOf('.pdf') !== -1) {
+        e.preventDefault();
       } else {
         console.log('not a pdf');
       }
@@ -93,9 +96,11 @@ function interceptClickEvent(e) {
 
 function interceptMouseoverEvent(e) {
   var href;
+  var download;
   var target = e.target || e.srcElement;
   if (target.tagName === 'A') {
     href = target.getAttribute('href');
+    download = target.getAttribute('download') ? target.getAttribute('download') : 'download';
     if (
       (href.indexOf('.pdf') !== -1)
       && !target.parentElement.classList.contains('learnalongo-actions')
@@ -108,8 +113,10 @@ function interceptMouseoverEvent(e) {
       target.classList.add('learnalongo-pdf-link');
 
       learnalongoSplit.setAttribute('href', href);
-      learnalongoFull.setAttribute('href', href);
+      learnalongoFull.setAttribute('href', extensionPath + encodeURI(href));
+      learnalongoFull.setAttribute('target', '_blank');
       learnalongoDownload.setAttribute('href', href);
+      learnalongoDownload.setAttribute('download', download);
 
       learnalongoTooltipShow();
     }
@@ -117,23 +124,22 @@ function interceptMouseoverEvent(e) {
     !target.classList.contains('learnalongo-actions')
     && (!target.parentElement || !target.parentElement.classList.contains('learnalongo-actions'))
   ) {
-    console.log('not learnalongo');
     var link = document.getElementsByClassName('learnalongo-pdf-link');
     if (link && link.length > 0) {
       link[0].classList.remove('learnalongo-pdf-link');
     }
     if (popperInstance) {
+      console.log('need to hide tooltip');
       learnalongoTooltipHide();
     }
   }
 }
 
 function splitScreen(href) {
-  console.log('pdf clicked', extensionPath + encodeURI(href));
   bodyTag.innerHTML = '';
   //  LEARNALONGO
   var learnalongoIframe = document.createElement('iframe');
-  learnalongoIframe.setAttribute('src', extensionPath + encodeURI(href));
+  learnalongoIframe.setAttribute('src', href);
   learnalongoIframe.classList.add('learnalongo-iframe');
   learnalongoIframe.setAttribute('name', 'learnalongoViewer');
 

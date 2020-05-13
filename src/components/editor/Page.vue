@@ -1,14 +1,52 @@
 <template>
   <div class="page-wrapper" ref="page">
+    <!-- PAGE TEXT EDITOR -->
+    <template v-if="pageDimensions">
+      <div
+
+        class="text-toolbar-wrapper"
+        :style="{width: (pageDimensions.maxWidth) + 'px', left: '15px'}">
+      </div>
+    </template>
+    <!-- PAGE SETUP -->
     <page-setup></page-setup>
+    <!-- DOWNLOAD -->
     <download></download>
+    <!-- PAGE WRAPPER -->
     <div
       v-if="pageDimensions"
       class="page"
       :style="{width: pageDimensions.width+'px', height: pageDimensions.height+'px'}">
+      <!-- PDF -->
       <view-pdf>
       </view-pdf>
-
+      <!-- TEXT -->
+      <div
+        v-if="pageDimensions"
+        :style="{
+        transform: 'scale(' + pageDimensions.zoom + ')',
+        transformOrigin: 'top left',
+        top: (35 * pageDimensions.zoom) + 'px',
+        height: (workBookPage.dimensions.height - 35)+'px',
+        width: workBookPage.dimensions.width+'px',
+        pointerEvents: textLayerActive ? 'all' : 'none',
+        userSelect: 'none'}"
+        class="text-layer"
+        @click="addTextBlock">
+        <template v-for="(textLayer, index) in workBookPage.textLayers">
+          <text-editor
+            v-if="textLayer.width"
+            :key="index"
+            :print="false"
+            :zoom="pageDimensions.zoom"
+            :pageWidth="workBookPage.dimensions.width"
+            :pageHeight="workBookPage.dimensions.height"
+            :textLayerIndex="index"
+            >
+          </text-editor>
+        </template>
+      </div>
+      <!-- DRAWING -->
       <drawing-canvas>
       </drawing-canvas>
     </div>
@@ -25,18 +63,18 @@ import { mapGetters } from 'vuex';
 /* App components */
 import Download from '@/components/editor/download/Download.vue';
 import ViewPdf from '@/components/editor/page/ViewPdf.vue';
-import Thumbs from '@/components/editor/page/ViewPdf.vue';
+import TextEditor from '@/components/editor/page/TextEditor.vue';
 import DrawingCanvas from '@/components/editor/page/DrawingCanvas.vue';
 import PageSetup from '@/components/editor/page/PageSetup.vue';
 
 
 /* Utils */
 import { appStrings } from '@/utils';
-import { IWorkBookPageDimensions, toolActionEnum } from '@/types';
+import { IWorkBookPageDimensions, toolActionEnum, modesEnum } from '@/types';
 
 export default Vue.extend({
   name: 'Page',
-  components: { ViewPdf, DrawingCanvas, PageSetup, Download },
+  components: { ViewPdf, DrawingCanvas, PageSetup, Download, TextEditor },
   data() {
     return {
       appStrings,
@@ -56,7 +94,12 @@ export default Vue.extend({
       workBookPage: 'workBook/getWorkBookPage',
       pageDimensions: 'workBook/getCurrentPageDimensions',
       toolAction: 'workBook/getToolAction',
+      modes: 'workBook/getModes',
+      settings: 'workBook/getSettings',
     }),
+    textLayerActive() {
+      return this.modes.mode === modesEnum.TEXT; // && this.modes.subMode === 'text'
+    },
   },
   mounted() {
     const vm = this;
@@ -133,6 +176,59 @@ export default Vue.extend({
       }
       this.$store.commit('workBook/setToolAction', null);
     },
+
+    addTextBlock(e: any) {
+      if (e
+        && e.target
+        && e.clientX
+        && e.clientY
+        && e.target.classList.contains('text-layer')
+        // && (!e.target.firstChild || e.target.firstChild.classList.contains('vdr'))
+      ) {
+        if (this.settings.activeEditor === null) {
+          const rect: any = e.target.getBoundingClientRect();
+          const x = e.clientX - rect.left; // x position within the element.
+          const y = e.clientY - rect.top;  // y position within the element.
+          const payload = {
+            workBookKey: this.workBook.id,
+            pageKey: this.workBookPage.id,
+            index: this.workBookPage.textLayers.length,
+            textLayer:  {
+              commit: 0,
+              text: '',
+              x: x / this.pageDimensions.zoom,
+              y: y / this.pageDimensions.zoom,
+              width: 'auto',
+              height: 'auto',
+              borderWidth: 0,
+              borderColor: '#000000',
+              opacity: 1,
+              backgroundColor: '#ffffff',
+            },
+          };
+          this.$store.dispatch('workBook/updatePageText', payload);
+        } else {
+          {
+            const settingsPayload = {
+              activeEditor: null,
+            };
+            this.$store.commit('workBook/setSettings', settingsPayload);
+          }
+        }
+      }
+    },
+
+    deleteTextBlock() {
+      const payload = {
+        user: this.user,
+        storyKey: this.workBook.id,
+        pageKey: this.workBookPage.id,
+        index: this.settings.activeEditor,
+        textLayer:  null,
+      };
+      this.$store.dispatch('workBook/updatePageText', payload);
+      this.$store.commit('setToolAction', null);
+    },
   },
   watch: {
      workBookPage: {
@@ -173,6 +269,26 @@ export default Vue.extend({
   position: relative;
   .page {
     position: relative;
+    .text-layer {
+      position: absolute;
+      z-index: 3;
+      top: 40px;
+      left: 0;
+      transform-origin: top left;
+    }
+  }
+}
+
+.text-toolbar-wrapper {
+  position: fixed;
+  top: 45px;
+  left: 110px;
+  width: 100%;
+  z-index: 101;
+  display: flex;
+  justify-content: center;
+  .tox-collection__item-label * {
+    line-height: 1em;
   }
 }
 </style>
