@@ -150,4 +150,7 @@ export enum subModesEnum {
 export interface INoteBookState {
   noteBooks: INoteBook[];
   noteBook: INoteBook;
+  settings: {
+    showAddNoteDialog: boolean;
+  };
 }

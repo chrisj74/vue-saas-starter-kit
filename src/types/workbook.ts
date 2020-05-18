@@ -27,7 +27,8 @@ export interface IWorkBook {
   title?: string;
   description?: string;
   commit: number;
-  url?: string;
+  srcDocUrl?: string;
+  connectedUrl?: string;
   profile?: string[];
   modified?: Date;
   publishId?: string;

@@ -21,6 +21,7 @@ export const setNoteBooks = (
         const noteBook: INoteBook = JSON.parse(JSON.stringify(doc.data()));
         noteBooks.push(noteBook);
       });
+      console.log('ACTION setNoteBooks = ', noteBooks);
       commit('setNoteBooks', noteBooks);
     }), (error: any) => {
       console.error('Problem accessing NoteBooks data: ', error);
@@ -30,7 +31,7 @@ export const setNoteBooks = (
 
 
 
-export const addWorkBook = (
+export const addNoteBook = (
   {state, commit, dispatch, rootState }: {state: INoteBookState, commit: any, dispatch: any, rootState: any},
   payload: INoteBook) => {
   return new Promise((resolve, reject) => {

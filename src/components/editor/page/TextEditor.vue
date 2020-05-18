@@ -383,10 +383,10 @@ export default Vue.extend({
   height: 100%;
   width: 100%;
   font-family: "Schoolbell";
-  padding: 3px;
   overflow: hidden;
   min-width: 20px;
   min-height: 1em;
+  line-height: 1;
 }
 [contenteditable]:focus {
     outline: 0px solid transparent;
@@ -406,7 +406,7 @@ export default Vue.extend({
     margin: 5px 0 10px 0;
   }
   p {
-    margin: 2px 0 5px 0;
+    margin: 2px 0 2px 0;
   }
   td {
     vertical-align: top;

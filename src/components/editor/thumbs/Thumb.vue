@@ -60,7 +60,7 @@ export default Vue.extend({
   methods: {
     setPage() {
       if (this.workBook.pages[this.pageIndex].id !== this.currentPageId) {
-        this.$router.push('/editor/' + this.workBook.id + '/' + this.workBook.pages[this.pageIndex].id);
+        this.$router.push('/workbook/' + this.workBook.id + '/' + this.workBook.pages[this.pageIndex].id);
       }
     },
   },

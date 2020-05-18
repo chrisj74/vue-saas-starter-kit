@@ -63,11 +63,11 @@ export default Vue.extend({
       if (this.workBooks) {
         /* TODO update to filter and cater for multiple matches */
         const existingWorkBook = this.workBooks.find((workBook: IWorkBook) => {
-          return workBook.url === this.$route.query.pdf;
+          return workBook.srcDocUrl === this.$route.query.pdf;
         });
-        if (existingWorkBook) {
+        if (existingWorkBook && this.$route.params.workBoodId !== existingWorkBook.id) {
           /* Has workbook so redirect */
-          this.$router.push('/editor/' + existingWorkBook.id);
+          this.$router.push('/workbook/' + existingWorkBook.id);
         } else {
           /* Missing so create new */
           this.addWorkBook(this.$route.query.pdf);
@@ -82,7 +82,7 @@ export default Vue.extend({
 
       if (newWorkBook && (!this.workBook || newWorkBook.id !== this.workBook.id)) {
         /* New workbook so setup */
-          const loadingTask = pdf.createLoadingTask(newWorkBook.url)
+          const loadingTask = pdf.createLoadingTask(newWorkBook.srcDocUrl)
           .promise
           .then(async (result: any) => {
             result.getData().then((data: Uint8Array) => {
@@ -97,10 +97,7 @@ export default Vue.extend({
                 this.$store.dispatch('workBook/setCurrentPage', newWorkBook.pages[0].id);
               } else if (newWorkBook && this.$route.params.pageId) {
                 this.$store.dispatch('workBook/setCurrentPage', this.$route.params.pageId);
-              }/*  else {
-                // TODO
-                console.error('PageSetup loading task complete but no matching workbook');
-              } */
+              }
             });
           }, (error: any) => {
             console.error('Issue getting pdf in setupPage:', error);
@@ -121,10 +118,13 @@ export default Vue.extend({
       const loadingTask = pdf.createLoadingTask(url)
         .promise
         .then(async (result: any) => {
-          result.getData().then((data: Uint8Array) => {
-            /* Takes time to fetch pdf data - fetch first */
-            this.$store.commit('workBook/setWorkBookData', data);
-          });
+          if (!this.user) {
+            result.getData().then((data: Uint8Array) => {
+              /* Takes time to fetch pdf data - fetch first */
+              this.$store.commit('workBook/setWorkBookData', data);
+            });
+          }
+          const connectedUrl = this.$route.query.connectTo ? this.$route.query.connectTo : null;
           const newWorkBook: IWorkBook = {
             members: [],
             template: false,
@@ -133,7 +133,8 @@ export default Vue.extend({
             categories: [],
             public: false,
             commit: 0,
-            url,
+            srcDocUrl: url,
+            connectedUrl,
             modified: new Date(),
             id: uuid(),
             pages: [],
@@ -175,7 +176,8 @@ export default Vue.extend({
           };
           this.$store.dispatch('workBook/addWorkBook', newWorkBook)
           .then((resp: any) => {
-              this.$router.push('editor/' + newWorkBook.id);
+              // DO NOT REDIRECT AS CHECK EXISTING PDF HANDLES THIS
+              // this.$router.push('/workbook/' + newWorkBook.id);
             });
         });
     },

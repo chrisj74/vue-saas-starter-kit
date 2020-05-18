@@ -1,5 +1,5 @@
 <template>
-  <div class="thumbs-wrapper" v-if="workBookData" v-show="!leftDrawerOpen">
+  <div class="thumbs-wrapper" v-if="workBookData && workBook && pages" v-show="!leftDrawerOpen">
     <thumb
       class="thumb-wrapper"
       v-for="(page, index) in pages"
@@ -7,7 +7,6 @@
       :pageIndex="index"
       :pageLoaded="pageLoaded"
       >
-
     </thumb>
   </div>
 </template>

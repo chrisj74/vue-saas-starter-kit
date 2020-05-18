@@ -4,8 +4,8 @@
       <h2>Recent Learnalongs</h2>
       <v-row>
         <v-col v-for="(workBook) in workBooks" :key="workBook.id">
-          <p>{{ workBook.url }}</p>
-          <v-btn :to="'/editor/' + workBook.id">View</v-btn>
+          <p>{{ workBook.srcDocUrl }}</p>
+          <v-btn :to="'/workbook/' + workBook.id">View</v-btn>
         </v-col>
       </v-row>
     </div>

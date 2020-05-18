@@ -15,7 +15,7 @@ export const setWorkBook = (state: IWorkBookState, payload: IWorkBook) => {
 };
 
 export const setWorkBookData = (state: IWorkBookState, payload: Uint8Array) => {
-  state.workBookData = payload;
+  Vue.set(state, 'workBookData', payload);
 };
 
 export const setCurrentPage = (state: IWorkBookState, payload: string) => {
@@ -31,7 +31,7 @@ export const setCurrentPageDimensions = (state: IWorkBookState, payload: IWorkBo
 };
 
 export const setWorkBookPages = (state: IWorkBookState, payload: IWorkBookPage[]) => {
-  Vue.set(state, 'workBookPages', [...payload]);
+  Vue.set(state, 'workBookPages', payload);
 };
 
 export const setWorkBookPage = (state: IWorkBookState, payload: IWorkBookPage) => {

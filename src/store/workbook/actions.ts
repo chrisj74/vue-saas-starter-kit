@@ -71,12 +71,12 @@ export const setWorkBook = (
           .onSnapshot(function(workBookRef: any) {
             console.log('FIREBASE READ workBook DOC');
             const workBook: IWorkBook = JSON.parse(JSON.stringify(workBookRef.data()));
-            workBook.pages = [];
             const pagesRef = workBookRef.ref.collection('pages/')
             .orderBy('order', 'asc')/* .get() */;
             console.log('GET pages');
             // pagesRef.then((pages: any) => {
             pagesRef.onSnapshot((pages: any) => {
+              workBook.pages = [];
               console.log('FIREBASE READ workBook PAGE DOC');
               pages.forEach((page: any) => {
                 workBook.pages.push(JSON.parse(JSON.stringify(page.data())));
@@ -121,12 +121,14 @@ export const setCurrentPage = (
     return new Promise((resolve, reject) => {
       commit('setCurrentPage', payload);
       dispatch('setWorkBookPage');
+      resolve();
     });
 };
 
 export const setWorkBookPages = (
   {state, commit, dispatch }: {state: IWorkBookState, commit: any, dispatch: any},
   payload: IWorkBookPage[]) => {
+  console.log('ACTION set pages', payload);
   commit('setWorkBookPages', payload);
 };
 
@@ -209,6 +211,7 @@ export const updatePageText = (
 export const addWorkBook = (
   {state, commit, dispatch, rootState }: {state: IWorkBookState, commit: any, dispatch: any, rootState: any},
   payload: IWorkBook) => {
+  console.log('ACTION add workbook');
   return new Promise((resolve, reject) => {
     if (rootState.user.user) {
       const pages = JSON.parse(JSON.stringify(payload.pages));
@@ -222,7 +225,6 @@ export const addWorkBook = (
           pages.forEach((page: IWorkBookPage) => {
             pagesCollection.doc(page.id).set(page);
           });
-          newDocRef.update({modified: new Date()});
           resolve(payload.id);
         })
         .catch(function(error) {

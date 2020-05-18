@@ -11,7 +11,7 @@ if (window.name.indexOf('learnalongo') !== -1) {
 // el.setAttribute('src', 'https://unpkg.com/@popperjs/core@2');
 // document.documentElement.appendChild(el);
 
-var extensionPath = 'chrome-extension://' + window.chrome.runtime.id + '/index.html#/editor?pdf=';
+var extensionPath = 'chrome-extension://' + window.chrome.runtime.id + '/index.html#/workbook?pdf=';
 var bodyTag = document.getElementsByTagName('body')[0];
 
 /* CREATE DOM ELEMENTS FOR TOOLTIP */
@@ -85,7 +85,7 @@ function interceptClickEvent(e) {
       if (target.classList.contains('learnalongo-split')
       ) {
         e.preventDefault();
-        splitScreen(extensionPath + encodeURI(href));
+        splitScreen(extensionPath + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
       } else if (href.indexOf('.pdf') !== -1) {
         e.preventDefault();
       } else {
@@ -113,7 +113,7 @@ function interceptMouseoverEvent(e) {
       target.classList.add('learnalongo-pdf-link');
 
       learnalongoSplit.setAttribute('href', href);
-      learnalongoFull.setAttribute('href', extensionPath + encodeURI(href));
+      learnalongoFull.setAttribute('href', extensionPath + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
       learnalongoFull.setAttribute('target', '_blank');
       learnalongoDownload.setAttribute('href', href);
       learnalongoDownload.setAttribute('download', download);

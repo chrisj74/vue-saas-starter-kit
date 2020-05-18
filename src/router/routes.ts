@@ -13,7 +13,7 @@ const routes: RouteConfig[] = [
     ],
   },
   {
-    path: '/editor',
+    path: '/workbook',
     component: () => import('../layouts/Editor.vue'),
     children: [
       {
@@ -52,6 +52,22 @@ const routes: RouteConfig[] = [
         path: '',
         component: () => import('../pages/collections/NoteBookHome.vue'),
         meta: { requiresAuth: true },
+      },
+    ],
+  },
+  {
+    path: '/notebook',
+    component: () => import('../layouts/Editor.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('../pages/editor/Editor.vue'),
+        meta: { requiresAuth: false },
+      },
+      {
+        path: ':noyeBookId',
+        component: () => import('../pages/editor/Editor.vue'),
+        meta: { requiresAuth: false },
       },
     ],
   },

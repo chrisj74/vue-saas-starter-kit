@@ -1,5 +1,5 @@
 <template>
-  <div class="tools-wrapper">
+  <div class="tools-wrapper" v-if="modes">
     <div class="tools-icons-wrapper">
       <!-- TYPING -->
       <div

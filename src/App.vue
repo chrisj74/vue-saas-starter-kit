@@ -49,6 +49,7 @@ export default Vue.extend({
   mounted() {
     if (this.user) {
       this.$store.dispatch('workBook/setWorkBooks');
+      this.$store.dispatch('noteBook/setNoteBooks');
     }
   },
   computed: {
@@ -69,9 +70,9 @@ export default Vue.extend({
           const payload: IBasePayload = {
             user: this.user,
           };
-          // DISPATCH
+          // TODO DISPATCH
         } else if (!newVal) {
-          // DISPATCH CLEAR
+          // TODO DISPATCH CLEAR
         }
       },
       immediate: true,

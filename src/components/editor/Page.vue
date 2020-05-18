@@ -187,8 +187,8 @@ export default Vue.extend({
       ) {
         if (this.settings.activeEditor === null) {
           const rect: any = e.target.getBoundingClientRect();
-          const x = e.clientX - rect.left; // x position within the element.
-          const y = e.clientY - rect.top;  // y position within the element.
+          const x = (e.clientX - 0) - rect.left; // x position within the element.
+          const y = (e.clientY - 5) - rect.top;  // y position within the element.
           const payload = {
             workBookKey: this.workBook.id,
             pageKey: this.workBookPage.id,
