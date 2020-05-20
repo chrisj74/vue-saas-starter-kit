@@ -33,7 +33,7 @@
             <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>{{ appStrings.TASK }} Notes</v-list-item-title>
+            <v-list-item-title>{{ appStrings.TASK }} Note Books</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>

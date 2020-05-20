@@ -63,7 +63,8 @@
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
       <!-- <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title> -->
-      <top-toolbar></top-toolbar>
+      <top-toolbar v-if="isWorkBook"></top-toolbar>
+      <note-book-toolbar v-if="isNoteBook"></note-book-toolbar>
     </v-app-bar>
 
     <v-content>
@@ -85,10 +86,11 @@ import { appStrings } from '@/utils';
 
 /* App components */
 import TopToolbar from '@/components/editor/toolbar/TopToolbar.vue';
+import NoteBookToolbar from '@/components/noteBooks/toolbar/NoteBookToolbar.vue';
 
 export default Vue.extend({
   name: 'EditorLayout',
-  components: { TopToolbar },
+  components: { TopToolbar, NoteBookToolbar },
   data() {
     return {
       appStrings,
@@ -108,6 +110,12 @@ export default Vue.extend({
       set(val) {
         this.$store.commit('base/setLeftDrawerOpen', val);
       },
+    },
+    isWorkBook() {
+      return this.$route.params.workBookId;
+    },
+    isNoteBook() {
+      return this.$route.params.noteBookId;
     },
   },
   methods: {

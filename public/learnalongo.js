@@ -1,6 +1,15 @@
-/* Prevent frame busting */
-console.log('name=', window.name);
-console.log('chrome extension=', window.chrome.runtime.id);
+window.chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
+  // ADD listeners
+  console.log('message=', message);
+  switch(message.type) {
+    case "newNote":
+      newNote();
+      sendResponse('done');
+    break;
+  }
+
+});
+
 if (window.name.indexOf('learnalongo') !== -1) {
 
   // el.textContent = "if (top !== self) {window.self = window.top;}";
@@ -11,7 +20,7 @@ if (window.name.indexOf('learnalongo') !== -1) {
 // el.setAttribute('src', 'https://unpkg.com/@popperjs/core@2');
 // document.documentElement.appendChild(el);
 
-var extensionPath = 'chrome-extension://' + window.chrome.runtime.id + '/index.html#/workbook?pdf=';
+var extensionPath = 'chrome-extension://' + window.chrome.runtime.id;
 var bodyTag = document.getElementsByTagName('body')[0];
 
 /* CREATE DOM ELEMENTS FOR TOOLTIP */
@@ -85,7 +94,7 @@ function interceptClickEvent(e) {
       if (target.classList.contains('learnalongo-split')
       ) {
         e.preventDefault();
-        splitScreen(extensionPath + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
+        splitScreen(extensionPath + '/index.html#/workbook?pdf=' + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
       } else if (href.indexOf('.pdf') !== -1) {
         e.preventDefault();
       } else {
@@ -133,6 +142,13 @@ function interceptMouseoverEvent(e) {
       learnalongoTooltipHide();
     }
   }
+}
+
+function newNote() {
+  var title = document.title;
+  var url = top.location.href;
+  console.log('/index.html#/notebook?title=' + encodeURI(title) + '&connectedUrl=' + encodeURI(url));
+  splitScreen(extensionPath + '/index.html#/notebook?title=' + encodeURI(title) + '&connectedUrl=' + encodeURI(url));
 }
 
 function splitScreen(href) {

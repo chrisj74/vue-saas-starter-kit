@@ -13,7 +13,7 @@ export default new Vuetify({
   theme: {
     themes: {
       light: {
-        primary: '#2fb8ac',
+        primary: '#5f4dee',
         secondary: '#fad600',
         accent: colors.shades.black,
       } as Partial<UserVuetifyPreset>,

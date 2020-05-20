@@ -40,7 +40,7 @@ export default Vue.extend({
       } else if (this.$route.params.workBookId && this.workBook && this.workBook.id !== this.$route.params.workBookId) {
         // coming in for first time
         this.setupPage();
-      } else if (this.$route.params.workBookId && this.workBooks) {
+      } else if (this.$route.params.workBookId) {
         this.setupPage();
       }
     }

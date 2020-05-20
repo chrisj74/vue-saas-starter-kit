@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import routes from './routes';
 import firebase from 'firebase';
+import store from '@/store';
 
 Vue.use(VueRouter);
 
@@ -22,6 +23,7 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresAuth)) {
+    store.commit('base/setLeftDrawerOpen', false);
     if (!firebase.auth().currentUser) {
       next({
         path: '/',

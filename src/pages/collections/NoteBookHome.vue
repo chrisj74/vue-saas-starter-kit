@@ -5,7 +5,7 @@
       <v-row>
         <v-col v-for="(noteBook) in noteBooks" :key="noteBook.id">
           <p>{{ noteBook.title }}</p>
-          <v-btn :to="'/editor/' + noteBook.id">View</v-btn>
+          <v-btn :to="'/notebook/' + noteBook.id">View</v-btn>
         </v-col>
       </v-row>
     </div>
@@ -23,7 +23,7 @@ import { mapGetters } from 'vuex';
 import { uuid } from 'uuidv4';
 
 /* App components */
-import AddNoteBook from '@/components/noteBooks/AddNoteBook.vue';
+import AddNoteBook from '@/components/noteBooks/modals/AddNoteBook.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
@@ -63,7 +63,7 @@ export default Vue.extend({
         showAddNoteDialog: true,
       };
       this.$store.commit('noteBook/setSettings', payload);
-    }
+    },
   },
 });
 </script>

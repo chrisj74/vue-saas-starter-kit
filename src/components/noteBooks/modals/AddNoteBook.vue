@@ -2,7 +2,7 @@
   <v-dialog v-model="settings.showAddNoteDialog" persistent width="800px" max-width="95%">
     <v-card v-if="formObj">
       <v-system-bar
-      color="indigo darken-2"
+      color="primary"
       dark
     >
       <v-spacer></v-spacer>
@@ -119,20 +119,22 @@ export default Vue.extend({
         showAddNoteDialog: false,
       };
       this.$store.commit('noteBook/setSettings', payload);
+      if (this.$route.name && this.$route.name === 'NoteBookRoot') {
+        this.$router.push('/notebooks');
+      }
     },
 
     saveNote() {
       if (this.$refs.form.validate()) {
-        console.log('valid');
         this.addNoteBook();
       }
     },
 
     setFormObj() {
       this.formObj = {
-        title: '',
-        description: '',
-        connectedUrl: '',
+        title: this.$route.query.title ? this.$route.query.title : '',
+        description: this.$route.query.description ? this.$route.query.description : '',
+        connectedUrl: this.$route.query.connectedUrl ? this.$route.query.connectedUrl : '',
         categories: [],
         keywords: [],
       } as Partial<INoteBook>;
@@ -165,12 +167,17 @@ export default Vue.extend({
       payload = {
         newNoteBook,
       };
+      const vm = this;
       this.$store.dispatch('noteBook/addNoteBook', newNoteBook)
       .then((resp: any) => {
-          this.setFormObj();
-          this.close();
-          this.$router.push('/notebook/' + newNoteBook.id);
-        });
+          this.$router.push('/notebook/' + newNoteBook.id, () => {
+            vm.setFormObj();
+            vm.close();
+          });
+        })
+      .catch((error: any) => {
+        console.error('Error creating note book:', error);
+      });
     },
   },
 });

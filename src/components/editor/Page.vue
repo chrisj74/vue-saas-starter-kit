@@ -3,7 +3,6 @@
     <!-- PAGE TEXT EDITOR -->
     <template v-if="pageDimensions">
       <div
-
         class="text-toolbar-wrapper"
         :style="{width: (pageDimensions.maxWidth) + 'px', left: '15px'}">
       </div>
@@ -61,7 +60,7 @@ import { mapGetters } from 'vuex';
 /* Libs */
 
 /* App components */
-import Download from '@/components/editor/download/Download.vue';
+import Download from '@/components/editor/modals/Download.vue';
 import ViewPdf from '@/components/editor/page/ViewPdf.vue';
 import TextEditor from '@/components/editor/page/TextEditor.vue';
 import DrawingCanvas from '@/components/editor/page/DrawingCanvas.vue';

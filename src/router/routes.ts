@@ -61,13 +61,15 @@ const routes: RouteConfig[] = [
     children: [
       {
         path: '',
-        component: () => import('../pages/editor/Editor.vue'),
-        meta: { requiresAuth: false },
+        name: 'NoteBookRoot',
+        component: () => import('../pages/noteBook/NoteBook.vue'),
+        meta: { requiresAuth: true },
       },
       {
-        path: ':noyeBookId',
-        component: () => import('../pages/editor/Editor.vue'),
-        meta: { requiresAuth: false },
+        path: ':noteBookId',
+        name: 'NoteBook',
+        component: () => import('../pages/noteBook/NoteBook.vue'),
+        meta: { requiresAuth: true },
       },
     ],
   },
