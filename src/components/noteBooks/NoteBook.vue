@@ -1,7 +1,7 @@
 <template>
   <div class="page-wrapper" ref="page">
     <note-book-setup></note-book-setup>
-    <note-book-editor></note-book-editor>
+    <note-book-editor v-if="noteBook"></note-book-editor>
   </div>
 </template>
 
@@ -34,7 +34,7 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
-      workBook: 'noteBook/getNoteBook',
+      noteBook: 'noteBook/getNoteBook',
       settings: 'noteBook/getNoteBookSettings',
     }),
   },

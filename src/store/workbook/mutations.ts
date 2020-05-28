@@ -7,7 +7,7 @@ export const setWorkBooks = (state: IWorkBookState, payload: IWorkBook[]) => {
 };
 
 export const addWorkBook = (state: IWorkBookState, payload: IWorkBook) => {
-  Vue.set(state, 'workBooks', [payload, ...state.workBooks]);
+  Vue.set(state, 'workBooks', [payload]);
 };
 
 export const setWorkBook = (state: IWorkBookState, payload: IWorkBook) => {

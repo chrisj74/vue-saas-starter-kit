@@ -113,6 +113,7 @@ export default Vue.extend({
     },
 
     resizeCanvas() {
+      console.log('resize canvas', this.workBookPage.drawingLayer);
       const ratio =  Math.max(window.devicePixelRatio || 1, 1);
       this.ctx = this.drawingCanvas.getContext('2d');
       this.drawingCanvas.width = this.pageDimensions.width * ratio;
@@ -174,7 +175,7 @@ export default Vue.extend({
           if (!this.drawingPad) {
             this.initCanvas();
           } else {
-            this.drawingPad.clear();
+            this.resizeCanvas();
           }
         }
       },

@@ -12,7 +12,6 @@ if (window.chrome && window.chrome.runtime.id) {
 } else {
   extension = false;
 }
-console.log('extension=', extension);
 const router = new VueRouter({
   scrollBehavior: () => ({ x: 0, y: 0 }),
   mode: extension ? 'hash' : 'history',

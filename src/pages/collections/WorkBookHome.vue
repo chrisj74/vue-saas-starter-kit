@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <div v-if="user">
-      <h2>Recent Learnalongs</h2>
+      <h2>Learnalong Work Books</h2>
       <v-row>
         <v-col v-for="(workBook) in workBooks" :key="workBook.id">
           <p>{{ workBook.srcDocUrl }}</p>

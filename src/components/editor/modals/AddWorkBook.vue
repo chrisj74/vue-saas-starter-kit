@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="settings.showAddNoteDialog" persistent width="800px" max-width="95%">
+  <v-dialog v-model="settings.showAddWorkBookDialog" persistent width="800px" max-width="95%">
     <v-card v-if="formObj">
       <v-system-bar
       color="primary"
@@ -10,10 +10,11 @@
     </v-system-bar>
 
     <v-card-title>
-      <span class="headline">Add Note</span>
+      <span class="headline">Add Work Book</span>
     </v-card-title>
 
-    <v-card-text>
+    <v-card-text
+      style="max-height: 80vh; overflow: auto;">
       <v-container>
         <v-form
           ref="form"
@@ -38,6 +39,10 @@
             <v-col cols="12">
               <v-text-field placeholder="https://" label="Connect to page" :rules="[rules.url]" v-model="formObj.connectedUrl"></v-text-field>
             </v-col>
+            <!-- SRC DOC -->
+            <v-col cols="12">
+              <v-text-field :readonly="srcDocUrlReadOnly" placeholder="https://" label="Source document" :rules="[rules.url]" v-model="formObj.srcDocUrl"></v-text-field>
+            </v-col>
           </v-row>
         </v-form>
       </v-container>
@@ -47,7 +52,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="blue darken-1" text @click="close()">Close</v-btn>
-      <v-btn color="blue darken-1" text @click="saveNote()">Save</v-btn>
+      <v-btn color="blue darken-1" text @click="saveWorkBook()">Save</v-btn>
     </v-card-actions>
     </v-card>
   </v-dialog>
@@ -59,18 +64,19 @@ import Vue from 'vue';
 import { mapGetters } from 'vuex';
 
 /* Libs */
+import pdf from 'vue-pdf';
 import { uuid } from 'uuidv4';
 
 /* App components */
 
 /* Utils */
 import { appStrings } from '@/utils';
-import { INoteBook } from '@/types';
+import { IWorkBook, IWorkBookPage } from '@/types';
 
 const urlRegex = /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i;
 
 export default Vue.extend({
-  name: 'AddNoteBook',
+  name: 'AddWorkBook',
   data() {
     return {
       appStrings,
@@ -98,9 +104,12 @@ export default Vue.extend({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
-      noteBooks: 'noteBook/getNoteBooks',
-      settings: 'noteBook/getNoteBookSettings',
+      workBooks: 'workBook/getWorkBooks',
+      settings: 'workBook/getSettings',
     }),
+    srcDocUrlReadOnly() {
+      return this.$route.params.pdf;
+    },
     maxCols() {
       let max: number = 1;
       if (this.$vuetify.breakpoint.name === 'md') {
@@ -116,17 +125,17 @@ export default Vue.extend({
   methods: {
     close() {
       const payload = {
-        showAddNoteDialog: false,
+        showAddWorkBookDialog: false,
       };
-      this.$store.commit('noteBook/setSettings', payload);
-      if (this.$route.name && this.$route.name === 'NoteBookRoot') {
-        this.$router.replace('/notebooks');
+      this.$store.commit('workBook/setSettings', payload);
+      if (this.$route.name && this.$route.name === 'WorkBookRoot') {
+        this.$router.replace('/workbooks');
       }
     },
 
-    saveNote() {
+    saveWorkBook() {
       if (this.$refs.form.validate()) {
-        this.addNoteBook();
+        this.addWorkBook();
       }
     },
 
@@ -135,49 +144,87 @@ export default Vue.extend({
         title: this.$route.query.title ? this.$route.query.title : '',
         description: this.$route.query.description ? this.$route.query.description : '',
         connectedUrl: this.$route.query.connectedUrl ? this.$route.query.connectedUrl : '',
+        srcDocUrl: this.$route.query.pdf ? this.$route.query.pdf : '',
         categories: [],
         keywords: [],
-      } as Partial<INoteBook>;
+      } as Partial<IWorkBook>;
     },
 
-    addNoteBook(url: string) {
-      const newNoteBook: INoteBook = {
-        title: this.formObj.title,
-        description: this.formObj.description,
-        connectedUrl: this.formObj.connectedUrl,
-        members: [],
-        template: false,
-        sourceId: null,
-        keywords: [],
-        categories: [],
-        public: false,
-        commit: 0,
-        modified: new Date(),
-        id: uuid(),
-        text: '',
-      };
-      let payload;
-      if (this.user) {
-        newNoteBook.author = {
-          name: this.user.name,
-          avatar: this.user.photoUrl,
-        };
-        newNoteBook.members = [this.user.email];
-      }
-      payload = {
-        newNoteBook,
-      };
-      const vm = this;
-      this.$store.dispatch('noteBook/addNoteBook', newNoteBook)
-      .then((resp: any) => {
-          this.$router.replace('/notebook/' + newNoteBook.id, () => {
-            vm.setFormObj();
-            vm.close();
+    addWorkBook() {
+      const loadingTask = pdf.createLoadingTask(this.formObj.srcDocUrl)
+        .promise
+        .then(async (result: any) => {
+          if (!this.user) {
+            result.getData().then((data: Uint8Array) => {
+              /* Takes time to fetch pdf data - fetch first */
+              this.$store.commit('workBook/setWorkBookData', data);
+            });
+          }
+          const connectedUrl = this.$route.query.connectTo ? this.$route.query.connectTo : null;
+          const newWorkBook: IWorkBook = {
+            title: this.formObj.title,
+            description: this.formObj.description,
+            connectedUrl: this.formObj.connectedUrl,
+            srcDocUrl: this.formObj.srcDocUrl,
+            members: [],
+            template: false,
+            sourceId: null,
+            keywords: [],
+            categories: [],
+            public: false,
+            commit: 0,
+            modified: new Date(),
+            id: uuid(),
+            pages: [],
+          };
+          for (let i: number = 0; i < result.numPages; i++) {
+            await result.getPage(i + 1)
+            .then((page: any) => {
+              /* use pdf dimensions to set paghe dimensions */
+              const newPage: IWorkBookPage = {
+                textLayers: [],
+                drawingLayer: {
+                  drawingCanvasImage: null,
+                  penWidth: 1,
+                  penColor: '#000000',
+                },
+                dimensions: {
+                  width: page.view[2],
+                  height: page.view[3],
+                },
+                commit: 0,
+                modified: new Date(),
+                order: i,
+                id: uuid(),
+              };
+              newWorkBook.pages.push(newPage);
+            });
+          }
+          let payload;
+          if (this.user) {
+            newWorkBook.author = {
+              name: this.user.name,
+              avatar: this.user.photoUrl,
+            };
+            newWorkBook.members = [this.user.email];
+          }
+          payload = {
+            url: null,
+            newWorkBook,
+          };
+          const vm = this;
+          this.$store.dispatch('workBook/addWorkBook', newWorkBook)
+          .then((resp: any) => {
+              this.$router.replace('/workbook/' + newWorkBook.id, () => {
+                console.log('router push done');
+                vm.setFormObj();
+                vm.close();
+              });
+          })
+          .catch((error: any) => {
+            console.error('Error creating work book:', error);
           });
-        })
-      .catch((error: any) => {
-        console.error('Error creating note book:', error);
-      });
+        });
     },
   },
 });

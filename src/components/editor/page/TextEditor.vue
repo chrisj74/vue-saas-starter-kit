@@ -97,6 +97,7 @@ export default Vue.extend({
     }
 
     if (this.workBookPage) {
+      this.editorCommits = this.workBookPage.textLayers[this.layerIndex].commit;
       this.editorContent = this.workBookPage.textLayers[this.layerIndex].text;
       this.layerWidth = this.workBookPage.textLayers[this.layerIndex].width;
       this.layerHeight = this.workBookPage.textLayers[this.layerIndex].height;
@@ -191,6 +192,8 @@ export default Vue.extend({
       if (this.layerIndex === this.settings.activeEditor
         && !event.target.hasFocus() && this.modes.mode === modesEnum.TEXT) {
         editor.focus();
+        editor.selection.select(editor.getBody(), true);
+        editor.selection.collapse(false);
       }
     },
 
@@ -334,6 +337,8 @@ export default Vue.extend({
           if (this.settings.activeEditor === this.layerIndex) {
             this.active = true;
             this.editor.focus();
+            this.editor.selection.select(this.editor.getBody(), true);
+            this.editor.selection.collapse(false);
           }
         }
       },

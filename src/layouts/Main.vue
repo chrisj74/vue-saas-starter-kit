@@ -57,7 +57,7 @@
       height="40"
       >
       <v-app-bar-nav-icon @click.stop="toggleLeftDawer()" />
-      <v-toolbar-title><v-img src="@/assets/learnalongo-logo-purple.svg" max-width="115px"></v-img></v-toolbar-title>
+      <v-toolbar-title><v-img src="@/assets/learnalongo-logo-purple.png" max-width="115px"></v-img></v-toolbar-title>
     </v-app-bar>
 
     <v-content>
@@ -65,6 +65,8 @@
         fluid
       >
         <router-view></router-view>
+
+        <extension-alert></extension-alert>
       </v-container>
     </v-content>
   </v-app>
@@ -73,6 +75,9 @@
 <script lang="ts">
 import { mapGetters } from 'vuex';
 import Vue from 'vue';
+
+/* Components */
+import ExtensionAlert from '@/components/misc/ExtensionAlert.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
@@ -83,12 +88,15 @@ export default Vue.extend({
       appStrings,
     };
   },
+  components: { ExtensionAlert },
   computed: {
     ...mapGetters({
       loading: 'base/getLoading',
       error: 'base/getError',
       user: 'user/user',
       authSet: 'user/getAuthSet',
+      extensionInstalled: 'base/getExtensionInstalled',
+      env: 'base/getEnv',
       // leftDrawerOpen: 'base/getLeftDrawerOpen',
     }),
     leftDrawerOpen: {

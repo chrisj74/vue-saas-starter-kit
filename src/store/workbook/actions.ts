@@ -161,6 +161,7 @@ export const updateWorkBookPage = (
     if (currentPage) {
       currentPage = merge(currentPage, payload.page);
       commit('setWorkBook', newWorkBook);
+      dispatch('setWorkBookPage');
       if (rootState.user.user ) {
         firebase
           .firestore()
@@ -229,9 +230,11 @@ export const addWorkBook = (
         })
         .catch(function(error) {
           console.error('Error adding document: ', error);
+          reject();
         });
     } else {
       commit('addWorkBook', payload);
+      resolve(payload.id);
     }
   });
 };

@@ -33,13 +33,13 @@
             <v-icon>mdi-check</v-icon>
           </v-list-item-action>
           <v-list-item-content>
-            <v-list-item-title>{{ appStrings.TASK }} Notes</v-list-item-title>
+            <v-list-item-title>{{ appStrings.TASK }} Note Books</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
       </v-list>
 
       <template v-slot:prepend>
-        <v-img src="@/assets/learnalongo-logo-purple.svg" max-width="115px" class="mx-auto"></v-img>
+        <v-img src="@/assets/learnalongo-logo-purple.png" max-width="115px" class="mx-auto"></v-img>
       </template>
 
       <!-- LOGIN/OUT -->
@@ -65,6 +65,7 @@
       <!-- <v-toolbar-title>{{ appStrings.APP_NAME }}</v-toolbar-title> -->
       <top-toolbar v-if="isWorkBook"></top-toolbar>
       <note-book-toolbar v-if="isNoteBook"></note-book-toolbar>
+
     </v-app-bar>
 
     <v-content>
@@ -72,6 +73,8 @@
         fluid
       >
         <router-view></router-view>
+
+        <extension-alert></extension-alert>
       </v-container>
     </v-content>
   </v-app>
@@ -87,10 +90,11 @@ import { appStrings } from '@/utils';
 /* App components */
 import TopToolbar from '@/components/editor/toolbar/TopToolbar.vue';
 import NoteBookToolbar from '@/components/noteBooks/toolbar/NoteBookToolbar.vue';
+import ExtensionAlert from '@/components/misc/ExtensionAlert.vue';
 
 export default Vue.extend({
   name: 'EditorLayout',
-  components: { TopToolbar, NoteBookToolbar },
+  components: { TopToolbar, NoteBookToolbar, ExtensionAlert },
   data() {
     return {
       appStrings,
@@ -122,9 +126,11 @@ export default Vue.extend({
     toggleLeftDawer() {
       this.$store.dispatch('base/toggleLeftDrawerOpen');
     },
+
     onLogout() {
       this.$store.dispatch('user/logout', this as Vue);
     },
+
     onLogin() {
       this.$router.push('/');
     },

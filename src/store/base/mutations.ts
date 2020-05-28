@@ -1,8 +1,12 @@
 import Vue from 'vue';
-import { IEnvState, IExtensionSidebarState, IExtensionIds } from '@/types';
+import { IEnvState, IExtensionSidebarState, IExtensionIds, IBaseState } from '@/types';
 
 export const setEnv = (state: any, payload: IEnvState) => {
   Vue.set(state, 'env', payload);
+};
+
+export const setExtensionInstalled = (state: IBaseState, payload: boolean) => {
+  state.extensionInstalled = payload;
 };
 
 export const setExtensionId = (state: any, payload: string | number) => {
@@ -20,6 +24,10 @@ export const setExtensionIds = (state: any, payload: IExtensionIds) => {
 
 export const setExtensionLastFocused = (state: any, payload: number) => {
   Vue.set(state.extension, 'lastFocusedWindow', payload);
+};
+
+export const setExtensionCurrentTabUrl = (state: any, payload: string) => {
+  Vue.set(state.extension, 'currentTabUrl', payload);
 };
 
 export const setLeftDrawerOpen = (state: any, payload: boolean) => {

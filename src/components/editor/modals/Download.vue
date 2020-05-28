@@ -21,6 +21,27 @@
           v-if="pages[previewIndex].drawingLayer['drawingCanvasImage']"
           :src="pages[previewIndex].drawingLayer['drawingCanvasImage']"
           class="preview-drawing" />
+
+        <div
+          class="preview-text"
+          :style="{
+            width: pages[previewIndex].dimensions.width + 'px',
+            height: pages[previewIndex].dimensions.height + 'px',
+          }"
+        >
+          <div
+            v-for="(pageText, tIndex) of pages[previewIndex].textLayers"
+            :key="currentPageId+'text'+tIndex"
+            :style="{
+              top: pageText.y + 'px',
+              left: pageText.x + 'px',
+              width: pageText.width +'px',
+              height: pageText.height + 'px',
+            }"
+            class="preview-text-block text-render"
+            v-html="pageText.text"
+          ></div>
+        </div>
       </div>
 
       <!-- Download pdf link -->
@@ -155,7 +176,7 @@ export default Vue.extend({
 
         const waitForPage = (timeoutms: number) => new Promise((r, j) => {
           const check = () => {
-            console.warn('checking')
+            console.warn('checking');
             if (vm.previewPageLoaded === vm.previewIndex + 1) {
               console.log('equal');
               r();
@@ -281,6 +302,16 @@ export default Vue.extend({
       top: 0;
       left: 0;
       z-index: 3;
+    }
+  }
+  .preview-text {
+    position: absolute;
+    z-index: 4;
+    transform-origin: top left;
+    overflow: hidden;
+
+    .preview-text-block {
+      position: absolute;
     }
   }
 }

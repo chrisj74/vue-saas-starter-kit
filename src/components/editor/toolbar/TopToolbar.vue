@@ -168,14 +168,49 @@
         <v-icon>mdi-magnify-plus</v-icon>
       </v-btn>
     </div>
-    <v-btn
-      icon
-      small
-      light
-      @click.stop="setDownload()"
-      >
-      <v-icon>mdi-download</v-icon>
-    </v-btn>
+    <!-- Extra menu -->
+    <v-menu offset-y :close-on-click="true">
+      <template v-slot:activator="{ on }">
+        <v-btn
+          v-on="on"
+          dense
+          fab
+          small
+          icon
+        >
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
+      </template>
+      <v-list dense>
+        <!-- Close -->
+        <v-list-item @click="removeSplit()" v-if="inIframe">
+          <v-list-item-content>
+            <v-list-item-title>Close</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-icon>
+            <v-icon small>mdi-close</v-icon>
+          </v-list-item-icon>
+        </v-list-item>
+        <!-- Open tab -->
+        <v-list-item :href="window.location.href" target="_blank" v-if="inIframe">
+          <v-list-item-content>
+            <v-list-item-title>Open In New Tab</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-icon>
+            <v-icon small>mdi-tab-plus</v-icon>
+          </v-list-item-icon>
+        </v-list-item>
+        <!-- Open sidebar -->
+        <v-list-item @click="setDownload()">
+          <v-list-item-content>
+            <v-list-item-title>Export</v-list-item-title>
+          </v-list-item-content>
+          <v-list-item-icon>
+            <v-icon small>mdi-download</v-icon>
+          </v-list-item-icon>
+        </v-list-item>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
@@ -201,6 +236,7 @@ export default Vue.extend({
       appStrings,
       modesEnum,
       subModesEnum,
+      window,
     };
   },
   computed: {
@@ -214,8 +250,19 @@ export default Vue.extend({
       modes: 'workBook/getModes',
       settings: 'workBook/getSettings',
     }),
+    inIframe() {
+      try {
+        return window.self !== window.top;
+      } catch (e) {
+          return true;
+      }
+    },
   },
   methods: {
+    removeSplit() {
+      parent.postMessage('removeSplit', '*');
+    },
+
     changeWidth(data: any) {
       const payload: any =  {
         brushWidth: data,
@@ -332,13 +379,13 @@ export default Vue.extend({
   .svg-icon-wrapper {
     display: block;
     position: relative;
-    top: -7px;
+    top: 0px;
     transition: top 0.5s;
     width: 50px;
     height: 0px;
     cursor: pointer;
     &.active-tool {
-      top: 5px;
+      top: 20px;
         .svg-icon-tool{
         filter: drop-shadow(0 2px 4px #20212442);
       }
@@ -358,7 +405,7 @@ export default Vue.extend({
   .svg-icon-highlighter {
     position: absolute;
     right: 0;
-    top: -28px;
+    top: -18px;
     height: calc(100px * 0.7);
     width: calc(50px * 0.7);
   }
@@ -366,7 +413,7 @@ export default Vue.extend({
     width: 40px;
     height: 40px;
     position: absolute;
-    top: -5px;
+    top: 0;
     right: 0;
   }
 
@@ -446,6 +493,7 @@ export default Vue.extend({
   .sub-tool-wrapper {
     position: relative;
     display: flex;
+    top: 5px;
     .sub-tool-details-wrapper {
       position: absolute;
       top: 40px;

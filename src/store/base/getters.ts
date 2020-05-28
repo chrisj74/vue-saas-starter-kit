@@ -1,26 +1,30 @@
-import { windowTypeEnum, EnvPlatformsEnum } from '@/types';
+import { windowTypeEnum, EnvPlatformsEnum, IBaseState } from '@/types';
 
-export const getLeftDrawerOpen = (state: any) => {
+export const getLeftDrawerOpen = (state: IBaseState) => {
   return state.leftDrawerOpen;
 };
 
-export const getLoading = (state: any) => {
+export const getLoading = (state: IBaseState) => {
   return state.loading;
 };
 
-export const getError = (state: any) => {
+export const getError = (state: IBaseState) => {
   return state.error;
 };
 
-export const getEnv = (state: any) => {
+export const getEnv = (state: IBaseState) => {
   return state.env;
 };
 
-export const getExtension = (state: any) => {
+export const getExtension = (state: IBaseState) => {
   return state.extension;
 };
 
-export const getWindowType = (state: any, getters: any, rootState: any, rootGetters: any) => {
+export const getExtensionInstalled = (state: IBaseState) => {
+  return state.extensionInstalled;
+};
+
+export const getWindowType = (state: IBaseState, getters: any, rootState: any, rootGetters: any) => {
   if (
     state.extension.tabId
     && state.extension.sidebar.sidebarTabId

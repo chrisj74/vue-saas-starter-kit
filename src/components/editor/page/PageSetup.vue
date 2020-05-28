@@ -30,13 +30,14 @@ export default Vue.extend({
   data() {
     return {
       appStrings,
+      loaded: false,
     };
   },
   mounted() {
-    if (this.workBooks) {
+    if (this.workBooks || !this.user) {
       /* Store loaded */
       if (this.$route.query.pdf) {
-        this.checkPdfExisits();
+        this.addWorkBook(this.$route.query.pdf);
       } else if (this.$route.params.workBookId && this.workBook && this.workBook.id !== this.$route.params.workBookId) {
         // coming in for first time
         this.setupPage();
@@ -59,32 +60,22 @@ export default Vue.extend({
     }),
   },
   methods: {
-    checkPdfExisits() {
-      if (this.workBooks) {
-        /* TODO update to filter and cater for multiple matches */
-        const existingWorkBook = this.workBooks.find((workBook: IWorkBook) => {
-          return workBook.srcDocUrl === this.$route.query.pdf;
-        });
-        if (existingWorkBook && this.$route.params.workBoodId !== existingWorkBook.id) {
-          /* Has workbook so redirect */
-          this.$router.push('/workbook/' + existingWorkBook.id);
-        } else {
-          /* Missing so create new */
-          this.addWorkBook(this.$route.query.pdf);
-        }
-      }
-    },
 
     setupPage() {
       const newWorkBook: IWorkBook | undefined = this.workBooks.find((workBook: IWorkBook) => {
         return workBook.id === this.$route.params.workBookId;
       });
 
-      if (newWorkBook && (!this.workBook || newWorkBook.id !== this.workBook.id)) {
+      console.log('newWorkBook=', newWorkBook);
+
+      if (newWorkBook && (!this.workBook || newWorkBook.id !== this.workBook.id || !this.loaded)) {
+          console.log('create page');
         /* New workbook so setup */
           const loadingTask = pdf.createLoadingTask(newWorkBook.srcDocUrl)
           .promise
           .then(async (result: any) => {
+            console.log('pageloaded');
+            this.loaded = true;
             result.getData().then((data: Uint8Array) => {
               /* Takes time to fetch pdf data - fetch first */
               this.$store.commit('workBook/setWorkBookData', data);
@@ -115,7 +106,14 @@ export default Vue.extend({
     },
 
     addWorkBook(url: string) {
-      const loadingTask = pdf.createLoadingTask(url)
+      if (this.user || !this.user) {
+        const payload = {
+          showAddWorkBookDialog: true,
+        };
+        this.$store.commit('workBook/setSettings', payload);
+      } else {
+        console.log('no user, pdf=', url);
+        const loadingTask = pdf.createLoadingTask(url)
         .promise
         .then(async (result: any) => {
           if (!this.user) {
@@ -176,17 +174,17 @@ export default Vue.extend({
           };
           this.$store.dispatch('workBook/addWorkBook', newWorkBook)
           .then((resp: any) => {
-              // DO NOT REDIRECT AS CHECK EXISTING PDF HANDLES THIS
-              // this.$router.push('/workbook/' + newWorkBook.id);
+              this.$router.replace('/workbook/' + newWorkBook.id);
             });
         });
+      }
     },
   },
   watch: {
     $route: {
       handler(from, to) {
         if (this.$route.query.pdf) {
-          this.checkPdfExisits();
+          this.addWorkBook(this.$route.query.pdf);
         } else {
           this.setupPage();
         }
@@ -202,7 +200,7 @@ export default Vue.extend({
     workBooks: {
       handler(oldVal, newVal) {
         if (this.$route.query.pdf) {
-          this.checkPdfExisits();
+          this.addWorkBook(this.$route.query.pdf);
         } else if ((this.$route.params.workBookId
           && this.workBook
           && this.workBook.id !== this.$route.params.workBookId)

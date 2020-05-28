@@ -11,6 +11,26 @@
         v-if="pages[pageIndex].drawingLayer['drawingCanvasImage']"
         :src="pages[pageIndex].drawingLayer['drawingCanvasImage']"
         class="thumb-drawing" />
+      <div
+        class="thumb-text"
+        :style="{
+          width: pages[pageIndex].dimensions.width + 'px',
+          height: pages[pageIndex].dimensions.height + 'px',
+        }"
+      >
+        <div
+          v-for="(pageText, tIndex) of pages[pageIndex].textLayers"
+          :key="currentPageId+'text'+tIndex"
+          :style="{
+            top: pageText.y + 'px',
+            left: pageText.x + 'px',
+            width: pageText.width +'px',
+            height: pageText.height + 'px',
+          }"
+          class="thumb-text-block text-render"
+          v-html="pageText.text"
+        ></div>
+      </div>
     </div>
     <div v-if="loaded === 0" class="loader-wrapper">
       <v-progress-circular
@@ -88,6 +108,19 @@ export default Vue.extend({
     top: 0;
     left: 0;
     z-index: 3;
+  }
+  .thumb-text {
+    position: absolute;
+    z-index: 4;
+    transform: scale(0.15);
+    transform-origin: top left;
+    overflow: hidden;
+    top: calc(40px * 0.15);
+
+    .thumb-text-block {
+      position: absolute;
+      border-style: solid;
+    }
   }
 }
 

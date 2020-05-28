@@ -47,18 +47,24 @@ export const setNoteBook = (
           .collection('noteBooks')
           .doc(payload)
           .onSnapshot(function(noteBookRef: any) {
-            const noteBook: INoteBook = JSON.parse(JSON.stringify(noteBookRef.data()));
-            if (existingNoteBook
-              && (!state.noteBook
-                || state.noteBook.id !== noteBook.id
-                || !noteBook.commit
-                || noteBook.commit === 0
-                || (state.noteBook.id === noteBook.id && noteBook.commit > state.noteBook.commit) )
-            ) {
-              commit('setNoteBook', noteBook);
-              resolve(noteBook);
+            if (noteBookRef && noteBookRef.data()) {
+              const noteBook: INoteBook = JSON.parse(JSON.stringify(noteBookRef.data()));
+              if (existingNoteBook
+                && (!state.noteBook
+                  || state.noteBook.id !== noteBook.id
+                  || !noteBook.commit
+                  || noteBook.commit === 0
+                  || (state.noteBook.id === noteBook.id && noteBook.commit > state.noteBook.commit) )
+              ) {
+                commit('setNoteBook', noteBook);
+                resolve(noteBook);
+              } else {
+                resolve(noteBook);
+              }
             } else {
-              resolve(noteBook);
+              /* It has been deleted */
+              commit('setNoteBook', null);
+              resolve(null);
             }
           }, (error: any) => {
             console.error('Problem accessing Set NoteBook data: ', error);
@@ -80,6 +86,7 @@ export const setNoteBook = (
 export const updateNoteBook = (
   {state, commit, dispatch, rootState }: {state: INoteBookState, commit: any, dispatch: any, rootState: any},
   payload: Partial<INoteBook>) => {
+  console.log('ACTION updateNoteBook');
   const newNoteBook: INoteBook = merge(JSON.parse(JSON.stringify(state.noteBook)), payload);
   newNoteBook.commit++;
   commit('setNoteBook', newNoteBook);
@@ -111,6 +118,30 @@ export const addNoteBook = (
     } else {
       commit('addNoteBook', payload);
       resolve();
+    }
+  });
+};
+
+export const deleteNoteBook = (
+  {state, commit, dispatch, rootState }: {state: INoteBookState, commit: any, dispatch: any, rootState: any},
+  payload: INoteBook) => {
+  return new Promise((resolve, reject) => {
+    if (rootState.user.user) {
+      const newDocRef = firebase
+        .firestore()
+        .collection('noteBooks').doc(payload.id);
+      newDocRef.delete()
+        .then(() => {
+          resolve();
+        })
+        .catch(function(error) {
+          console.error('Error deleting Note document: ', error);
+          reject();
+        });
+    } else {
+      // commit('addNoteBook', payload);
+      // resolve();
+      /* No delete for non auth */
     }
   });
 };

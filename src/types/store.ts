@@ -11,6 +11,7 @@ export interface IBaseState {
   leftDrawerOpen: boolean;
   loading: boolean;
   error: string;
+  extensionInstalled: boolean;
   extension: IExtensionState;
 }
 
@@ -32,6 +33,7 @@ export interface IExtensionIds {
   tabId: number;
 }
 export interface IExtensionState {
+  currentTabUrl: string;
   extensionId: string | number;
   windowId: number;
   tabId: number;
@@ -106,6 +108,7 @@ export interface IWorkBookState {
     color: string;
     brushWidth: number;
     showDrawingExtras: boolean;
+    showAddWorkBookDialog: boolean;
   };
   dialogs: {
     export: boolean;

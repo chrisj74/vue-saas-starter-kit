@@ -20,6 +20,10 @@
     "default_popup": "popup.html"
   },
 
+  "externally_connectable": {
+    "matches": ["http://localhost/*", "https://learnalongo-app.web.app/*", "https://*.learnalongo.com/*"]
+  },
+
   "content_scripts": [
     {
       "matches": ["*://*/*"],

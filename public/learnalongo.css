@@ -9,7 +9,7 @@
   border: solid 1px rgba(0,0,0,.4);
   padding: 2px;
   height: 24px;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   background-color: #fff;
   border-radius: 2px;
@@ -18,6 +18,13 @@
 
 .learnalongo-actions[data-show] {
   display: flex;
+  padding: 0;
+  margin: 0;
+}
+
+.learnalongo-actions a {
+  padding: 0;
+  margin: 0;
 }
 
 .learnalongo-split, .learnalongo-full, .learnalongo-download {
@@ -32,15 +39,15 @@
 }
 
 .learnalongo-split {
-  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/call-split.svg);
+  background-image: url(embed-icons/arrow-split-vertical.svg);
 }
 
 .learnalongo-full {
-  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/fullscreen.svg);
+  background-image: url(embed-icons/fullscreen.svg);
 }
 
 .learnalongo-download {
-  background-image: url(chrome-extension://kjgfkclnoeklafdfjjhhdmmihgjpfhha/embed-icons/download-outline.svg);
+  background-image: url(embed-icons/download-outline.svg);
 }
 
 .learnalongo-container {
@@ -62,7 +69,7 @@
 }
 
 .gutter {
-  border-right: #5f4dee dashed 5px;
-  border-left: #5f4dee dashed 5px;
+  border-right: #5f4dee solid 3px;
+  border-left: #5f4dee solid 3px;
   cursor: ew-resize;
 }

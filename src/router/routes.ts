@@ -18,6 +18,7 @@ const routes: RouteConfig[] = [
     children: [
       {
         path: '',
+        name: 'WorkBookRoot',
         component: () => import('../pages/editor/Editor.vue'),
         meta: { requiresAuth: false },
       },

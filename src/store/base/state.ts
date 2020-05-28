@@ -9,7 +9,9 @@ export default function() {
     leftDrawerOpen: false,
     loading: false,
     error: null,
+    extensionInstalled: false,
     extension: {
+      currentTabUrl: null,
       extensionId: null,
       windowId: null,
       tabId: null,

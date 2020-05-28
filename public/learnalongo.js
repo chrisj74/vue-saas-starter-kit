@@ -1,14 +1,26 @@
-window.chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
-  // ADD listeners
-  console.log('message=', message);
-  switch(message.type) {
-    case "newNote":
-      newNote();
-      sendResponse('done');
-    break;
-  }
+if (window.chrome && window.chrome.runtime && window.chrome.runtime.onMessage) {
+  window.chrome.runtime.onMessage.addListener( function(message, sender, sendResponse) {
+    // ADD listeners
+    switch(message.type) {
+      case "newNote":
+        newNote();
+        sendResponse('done');
+        break;
+      case "openNote":
+        openNote(message.noteId);
+        sendResponse('done');
+        break;
+      case "openWorkBook":
+        openWorkBook(message.workBookId);
+        sendResponse('done');
+        break;
+    }
+  });
+}
 
-});
+window.learnalongo = true;
+console.log('extension=', learnalongo);
+
 
 if (window.name.indexOf('learnalongo') !== -1) {
 
@@ -16,11 +28,13 @@ if (window.name.indexOf('learnalongo') !== -1) {
   // document.documentElement.appendChild(el);
 }
 
-// var el = document.createElement("script");
-// el.setAttribute('src', 'https://unpkg.com/@popperjs/core@2');
-// document.documentElement.appendChild(el);
 
-var extensionPath = 'chrome-extension://' + window.chrome.runtime.id;
+var basePath = 'https://learnalongo-app.web.app';
+var baseImagePath = 'https://learnalongo-app.web.app';
+if (window.chrome && window.chrome.runtime.id) {
+  basePath = 'chrome-extension://' + window.chrome.runtime.id + "/index.html#";
+  baseImagePath = 'chrome-extension://' + window.chrome.runtime.id;
+}
 var bodyTag = document.getElementsByTagName('body')[0];
 
 /* CREATE DOM ELEMENTS FOR TOOLTIP */
@@ -30,12 +44,15 @@ containerSpan.classList.add('learnalongo-actions')
 /* Split button */
 var learnalongoSplit = document.createElement('a');
 learnalongoSplit.classList.add('learnalongo-split');
+learnalongoSplit.style.backgroundImage = "url(" + baseImagePath + "/embed-icons/arrow-split-vertical.svg" + ")";
 /* FullScreen button */
 var learnalongoFull = document.createElement('a');
 learnalongoFull.classList.add('learnalongo-full');
+learnalongoFull.style.backgroundImage = "url(" + baseImagePath + "/embed-icons/fullscreen.svg" + ")";
 /* Download button */
 var learnalongoDownload = document.createElement('a');
 learnalongoDownload.classList.add('learnalongo-download');
+learnalongoDownload.style.backgroundImage = "url(" + baseImagePath + "/embed-icons/download-outline.svg" + ")";
 /* Combine */
 containerSpan.appendChild(learnalongoSplit);
 containerSpan.appendChild(learnalongoFull);
@@ -70,7 +87,6 @@ function learnalongoTooltipDestroy() {
 function learnalongoTooltipShow() {
   var learnalongoLinks = document.querySelector('.learnalongo-pdf-link');
   var learnalongoTooltip = document.querySelector('.learnalongo-actions');
-  console.log('learnalongoTooltip=', learnalongoTooltip);
   learnalongoTooltip.setAttribute('data-show', '');
   learnalongoTooltipCreate(learnalongoLinks, learnalongoTooltip);
 }
@@ -89,16 +105,17 @@ function interceptClickEvent(e) {
   var target = e.target || e.srcElement;
   if (target.tagName === 'A') {
       href = target.getAttribute('href');
-      console.log('target classList=', target.classList);
       //put your logic here...
       if (target.classList.contains('learnalongo-split')
       ) {
         e.preventDefault();
-        splitScreen(extensionPath + '/index.html#/workbook?pdf=' + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
-      } else if (href.indexOf('.pdf') !== -1) {
+        var headingElement = document.querySelector('h1');
+        var headingText = headingElement ? headingElement.innerText : '';
+        var title = headingText.length > 0 ? headingText : document.title;
+        var url = top.location.href;
+        splitScreen(basePath + '/workbook?pdf=' + encodeURIComponent(href) + '&title=' + encodeURIComponent(title) + '&connectedUrl=' + encodeURIComponent(url));
+      } else if (href.indexOf('.pdf') !== -1 && !target.classList.contains('learnalongo-full')) {
         e.preventDefault();
-      } else {
-        console.log('not a pdf');
       }
   }
 }
@@ -117,12 +134,15 @@ function interceptMouseoverEvent(e) {
       && !target.parentElement.classList.contains('learnalongo-pdf-link')
       && !target.parentElement.parentElement.classList.contains('learnalongo-pdf-link')
     ) {
-      console.log('elodie we made it past the test')
+      var headingElement = document.querySelector('h1');
+      var headingText = headingElement ? headingElement.innerText : '';
+      var title = headingText.length > 0 ? headingText : document.title;
+      var url = top.location.href;
       /* Identify link element */
       target.classList.add('learnalongo-pdf-link');
 
       learnalongoSplit.setAttribute('href', href);
-      learnalongoFull.setAttribute('href', extensionPath + encodeURI(href) + '&connectTo=' + encodeURI(top.location.href));
+      learnalongoFull.setAttribute('href',  basePath + '/workbook?pdf=' + encodeURIComponent(href) + '&title=' + encodeURIComponent(title) + '&connectedUrl=' + encodeURIComponent(url));
       learnalongoFull.setAttribute('target', '_blank');
       learnalongoDownload.setAttribute('href', href);
       learnalongoDownload.setAttribute('download', download);
@@ -138,51 +158,72 @@ function interceptMouseoverEvent(e) {
       link[0].classList.remove('learnalongo-pdf-link');
     }
     if (popperInstance) {
-      console.log('need to hide tooltip');
       learnalongoTooltipHide();
     }
   }
 }
 
 function newNote() {
-  var title = document.title;
+  var headingElement = document.querySelector('h1');
+  var headingText = headingElement ? headingElement.innerText : '';
+  var title = headingText.length > 0 ? headingText : document.title;
   var url = top.location.href;
-  console.log('/index.html#/notebook?title=' + encodeURI(title) + '&connectedUrl=' + encodeURI(url));
-  splitScreen(extensionPath + '/index.html#/notebook?title=' + encodeURI(title) + '&connectedUrl=' + encodeURI(url));
+  splitScreen(basePath + '/notebook?title=' + encodeURIComponent(title) + '&connectedUrl=' + encodeURIComponent(url));
+}
+
+function openNote(noteId) {
+  splitScreen(basePath + '/notebook/' + noteId);
+}
+
+function openWorkBook(workBookId) {
+  splitScreen(basePath + '/workbook/' + workBookId);
 }
 
 function splitScreen(href) {
-  bodyTag.innerHTML = '';
-  //  LEARNALONGO
-  var learnalongoIframe = document.createElement('iframe');
-  learnalongoIframe.setAttribute('src', href);
-  learnalongoIframe.classList.add('learnalongo-iframe');
-  learnalongoIframe.setAttribute('name', 'learnalongoViewer');
+  var splitFrame = document.querySelector('.learnalongo-iframe');
+  if (!splitFrame) {
+    bodyTag.innerHTML = '';
+    //  LEARNALONGO
+    var learnalongoIframe = document.createElement('iframe');
+    learnalongoIframe.setAttribute('src', href);
+    learnalongoIframe.classList.add('learnalongo-iframe');
+    learnalongoIframe.setAttribute('name', 'learnalongoViewer');
 
-  var learnalongoDiv = document.createElement('div');
-  learnalongoDiv.classList.add('learnalongo-split-container');
-  learnalongoDiv.appendChild(learnalongoIframe);
+    var learnalongoDiv = document.createElement('div');
+    learnalongoDiv.classList.add('learnalongo-split-container');
+    learnalongoDiv.appendChild(learnalongoIframe);
 
-  // PARENT
-  var parentIframe = document.createElement('iframe');
-  parentIframe.setAttribute('src', window.location.href);
-  parentIframe.classList.add('learnalongo-iframe');
-  learnalongoIframe.setAttribute('name', 'learnalongoParent');
+    // PARENT
+    var parentIframe = document.createElement('iframe');
+    parentIframe.setAttribute('src', window.location.href);
+    parentIframe.classList.add('learnalongo-iframe');
+    parentIframe.classList.add('learnalongo-parent-iframe');
+    learnalongoIframe.setAttribute('name', 'learnalongoParent');
 
-  var parentDiv = document.createElement('div');
-  parentDiv.classList.add('learnalongo-parent-container');
-  parentDiv.appendChild(parentIframe);
+    var parentDiv = document.createElement('div');
+    parentDiv.classList.add('learnalongo-parent-container');
+    parentDiv.appendChild(parentIframe);
 
-  // CONTAINER
-  var containerDiv = document.createElement('div');
-  containerDiv.classList.add('learnalongo-container');
-  containerDiv.appendChild(learnalongoDiv);
-  containerDiv.appendChild(parentDiv);
-  bodyTag.appendChild(containerDiv);
-  Split([learnalongoDiv,parentDiv],{
-    sizes: [70, 30],
-    minSize: 200,
-  })
+    // CONTAINER
+    var containerDiv = document.createElement('div');
+    containerDiv.classList.add('learnalongo-container');
+    containerDiv.appendChild(learnalongoDiv);
+    containerDiv.appendChild(parentDiv);
+    bodyTag.appendChild(containerDiv);
+    Split([learnalongoDiv,parentDiv],{
+      sizes: [70, 30],
+      minSize: 200,
+    });
+  } else {
+    splitFrame.setAttribute('src', href);
+  }
+}
+
+function removeSplit() {
+  var iframeElem = document.querySelector('.learnalongo-parent-iframe');
+  if (iframeElem) {
+    top.location = iframeElem.contentWindow.location.href;
+  }
 }
 
 /* ADD EVENT LISTENERS */
@@ -198,3 +239,19 @@ if (document.addEventListener) {
 } else if (document.attachEvent) {
   document.attachEvent('mouseover', interceptMouseoverEvent);
 }
+
+var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+var eventer = window[eventMethod];
+var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+// Listen to message from child window
+eventer(messageEvent,function(e) {
+    var key = e.message ? "message" : "data";
+    var data = e[key];
+    //run function//
+    switch (data) {
+      case 'removeSplit':
+        removeSplit();
+        break;
+    }
+},false);

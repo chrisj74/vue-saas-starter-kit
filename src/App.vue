@@ -21,7 +21,10 @@ export default Vue.extend({
   created() {
     const browser = Bowser.getParser(window.navigator.userAgent);
     const vm = this;
-    if (window.chrome && window.chrome.runtime.id) {
+    if (browser.getBrowser().name === 'chrome'
+      && window.chrome
+      && window.chrome.runtime
+      && window.chrome.runtime.id) {
       this.$store.dispatch('base/setExtensionId', window.chrome.runtime.id);
       const envPayload: IEnvState = {
         platform: EnvPlatformsEnum.EXTENSION,
@@ -44,6 +47,16 @@ export default Vue.extend({
         browser: browser.getBrowser() as IEnvBrowser,
       };
       this.$store.commit('base/setEnv', envPayload);
+      if (browser.getBrowser().name === 'chrome'
+        && window.chrome
+        && window.chrome.runtime) {
+        window.chrome.runtime.sendMessage('kjgfkclnoeklafdfjjhhdmmihgjpfhha',
+        { type: 'ping' }, function(response: any) {
+          if (response && response.type === 'pong') {
+            vm.$store.commit('base/setExtensionInstalled', true);
+          }
+        });
+      }
     }
   },
   mounted() {

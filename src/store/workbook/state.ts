@@ -19,6 +19,7 @@ export default function() {
       brushWidth: 2,
       brushOpacity: 1,
       showDrawingExtras: false,
+      showAddWorkBookDialog: false,
     },
     dialogs: {
       export: false,

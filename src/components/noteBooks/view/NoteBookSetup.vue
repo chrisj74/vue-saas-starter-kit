@@ -31,7 +31,7 @@ export default Vue.extend({
       noteBook: 'noteBook/getNoteBook',
       noteBooks: 'noteBook/getNoteBooks',
       settings: 'noteBook/getNoteBookSettings',
-    })
+    }),
   },
   mounted() {
     const vm = this;
@@ -96,7 +96,7 @@ export default Vue.extend({
         }
       },
       deep: true,
-    }
+    },
   },
 });
 </script>

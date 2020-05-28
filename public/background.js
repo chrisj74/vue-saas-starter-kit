@@ -56,12 +56,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 );
 
 /* MESSAGES */
-chrome.extension.onMessage.addListener(function(message, sender, sendResponse) {
-  if (message.type == "xxx") {
-
-    chrome.runtime.sendMessage({
-      type: 'xxx',
-
+chrome.extension.onMessageExternal.addListener(function(message, sender, sendResponse) {
+  if (message.type == "ping") {
+    sendResponse({
+      type: 'pong',
     });
   }
 });

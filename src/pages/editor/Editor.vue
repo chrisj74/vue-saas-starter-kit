@@ -4,6 +4,7 @@
       <toolbar></toolbar>
       <thumbs></thumbs>
       <page></page>
+      <add-work-book></add-work-book>
     </div>
   </v-container>
 </template>
@@ -17,13 +18,14 @@ import { mapGetters } from 'vuex';
 import Page from '@/components/editor/Page.vue';
 import Thumbs from '@/components/editor/Thumbs.vue';
 import Toolbar from '@/components/editor/Toolbar.vue';
+import AddWorkBook from '@/components/editor/modals/AddWorkBook.vue';
 
 /* Utils */
 import { appStrings } from '@/utils';
 
 export default Vue.extend({
   name: 'Editor',
-  components: { Page, Thumbs, Toolbar },
+  components: { Page, Thumbs, Toolbar, AddWorkBook },
   data() {
     return {
       appStrings,

@@ -1,5 +1,7 @@
 <template>
   <div v-if="noteBook" class="container">
+    <note-book-details></note-book-details>
+
     <div class="note-editor-wrapper elevation-2">
       <tinymce-editor
         :key="noteBook.id"
@@ -23,13 +25,13 @@ import { mapGetters } from 'vuex';
 import Editor from '@tinymce/tinymce-vue';
 import debounce from 'lodash/debounce';
 /* App components */
-
+import NoteBookDetails from './NoteDetails.vue';
 /* Utils */
 import { appStrings } from '@/utils';
 
 export default Vue.extend({
   name: 'NoteBookEditor',
-  components: { 'tinymce-editor': Editor },
+  components: { 'tinymce-editor': Editor, NoteBookDetails },
   data() {
     return {
       appStrings,
@@ -50,6 +52,12 @@ export default Vue.extend({
     }),
   },
   mounted() {
+    if (this.noteBook && this.noteBook.commit) {
+      console.log('editor mounted', this.noteBook);
+      this.editorCommits = this.noteBook.commit;
+      this.editorContent = this.noteBook.text;
+    }
+
     this.editorConfig = {
       plugins: 'wordcount, table, media, emoticons, lists',
       inline: true,
@@ -73,6 +81,8 @@ export default Vue.extend({
       this.editor = editor;
       this.contentSet = true;
       editor.focus();
+      editor.selection.select(editor.getBody(), true);
+      editor.selection.collapse(false);
     },
 
     updateText: debounce(function() {
@@ -84,9 +94,20 @@ export default Vue.extend({
     }, 1000),
   },
   watch: {
-     noteBook: {
+    $route: {
       handler(oldPage, newPage) {
-        if (this.noteBook.commit > this.editorCommits) {
+        console.log('watch route', this.editorCommits);
+        if (this.noteBook.commit && this.noteBook.commit > this.editorCommits) {
+          this.editorCommits = this.noteBook.commit;
+          this.editorContent = this.noteBook.text;
+        }
+      },
+      deep: true,
+    },
+    noteBook: {
+      handler(oldPage, newPage) {
+        console.log('watch noteBook', this.editorCommits);
+        if (this.noteBook.commit && this.noteBook.commit > this.editorCommits) {
           this.editorCommits = this.noteBook.commit;
           this.editorContent = this.noteBook.text;
         }
@@ -95,6 +116,7 @@ export default Vue.extend({
     },
     editorContent: {
       handler(oldText, newText) {
+        console.log('watch editorConetnt', this.editorCommits);
         if (this.editorContent !== this.noteBook.text) {
           this.updateText();
         }
