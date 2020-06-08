@@ -217,14 +217,14 @@ export default Vue.extend({
 
     /* DRAG RESIZE METHODS */
     beforeResize() {
-      console.log('BEFORE resize');
+      console.log('BEFORE resize width=', this.layerWidth);
     },
 
     startResize() {
-      console.log('START resize');
+      console.log('START resize width=', this.layerWidth);
       if (this.layerWidth === 'auto') {
-        // this.$refs.dragWrapper.width = this.$refs.textWrapper.clientWidth;
-        // this.$refs.dragWrapper.height = this.$refs.textWrapper.clientHeight;
+        // this.layerWidth = this.$refs.textWrapper.clientWidth + 5;
+        // this.layerHeight = this.$refs.textWrapper.clientHeight + 5;
         // this.$refs.dragWrapper.right =
         //   (this.parentWidth - this.$refs.dragWrapper.left - this.$refs.dragWrapper.width);
         // this.$refs.dragWrapper.bottom =
@@ -324,7 +324,7 @@ export default Vue.extend({
         if (this.workBookPage.textLayers[this.layerIndex]
           && this.editorContent !== this.workBookPage.textLayers[this.layerIndex].text
         ) {
-          this.setMinDimensions();
+          // this.setMinDimensions();
           this.updateText();
         }
       },
@@ -358,7 +358,7 @@ export default Vue.extend({
   left: -10px;
   right: -10px;
   bottom: -10px;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.05);
   cursor: grab;
 }
 .dragging {

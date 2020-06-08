@@ -24,6 +24,10 @@ export const getExtensionInstalled = (state: IBaseState) => {
   return state.extensionInstalled;
 };
 
+export const getInIframe = (state: IBaseState) => {
+  return state.inIframe;
+};
+
 export const getWindowType = (state: IBaseState, getters: any, rootState: any, rootGetters: any) => {
   if (
     state.extension.tabId

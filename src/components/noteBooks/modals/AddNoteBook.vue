@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="settings.showAddNoteDialog" persistent width="800px" max-width="95%">
+  <v-dialog v-model="settings.showAddNoteDialog" persistent width="800px" max-width="95%" max-height="80vh">
     <v-card v-if="formObj">
       <v-system-bar
       color="primary"
@@ -21,21 +21,26 @@
           lazy-validation
         >
           <v-row>
+            <v-col cols="12" v-if="!user">
+              <p>Hey, just letting you know, you need to export your note book before you leave this page.</p>
+              <p>You're changes are not saved anywhere, so don't forget!</p>
+            </v-col>
             <!-- TITLE -->
             <v-col cols="12">
               <v-text-field label="Title *" required :rules="[rules.required]" v-model="formObj.title"></v-text-field>
             </v-col>
             <!-- DESCRIPTION -->
-            <v-col cols="12">
+            <v-col cols="12" v-if="user">
               <v-textarea
                 v-model="formObj.description"
                 filled
                 label="Description"
+                :rows="1"
                 auto-grow
               ></v-textarea>
             </v-col>
             <!-- CONNECTED TO -->
-            <v-col cols="12">
+            <v-col cols="12" v-if="user">
               <v-text-field placeholder="https://" label="Connect to page" :rules="[rules.url]" v-model="formObj.connectedUrl"></v-text-field>
             </v-col>
           </v-row>
@@ -46,8 +51,8 @@
     <!-- ACTIONS -->
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="close()">Close</v-btn>
-      <v-btn color="blue darken-1" text @click="saveNote()">Save</v-btn>
+      <v-btn color="blue darken-1" text @click="close()">Cancel</v-btn>
+      <v-btn color="blue darken-1" text @click="saveNote()">Start</v-btn>
     </v-card-actions>
     </v-card>
   </v-dialog>
@@ -115,13 +120,21 @@ export default Vue.extend({
   },
   methods: {
     close() {
-      const payload = {
-        showAddNoteDialog: false,
-      };
-      this.$store.commit('noteBook/setSettings', payload);
-      if (this.$route.name && this.$route.name === 'NoteBookRoot') {
-        this.$router.replace('/notebooks');
+      if (this.inIframe && !this.user) {
+        this.removeSplit();
+      } else {
+        const payload = {
+          showAddNoteDialog: false,
+        };
+        this.$store.commit('noteBook/setSettings', payload);
+        if (this.$route.name && this.$route.name === 'NoteBookRoot') {
+          this.$router.replace('/notebooks');
+        }
       }
+    },
+
+    removeSplit() {
+      parent.postMessage({type: 'removeSplit'}, '*');
     },
 
     saveNote() {

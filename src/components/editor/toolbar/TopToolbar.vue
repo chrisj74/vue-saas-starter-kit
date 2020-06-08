@@ -249,18 +249,12 @@ export default Vue.extend({
       pageDimensions: 'workBook/getCurrentPageDimensions',
       modes: 'workBook/getModes',
       settings: 'workBook/getSettings',
+      inIframe: 'base/getInIframe',
     }),
-    inIframe() {
-      try {
-        return window.self !== window.top;
-      } catch (e) {
-          return true;
-      }
-    },
   },
   methods: {
     removeSplit() {
-      parent.postMessage('removeSplit', '*');
+      parent.postMessage({type: 'removeSplit'}, '*');
     },
 
     changeWidth(data: any) {

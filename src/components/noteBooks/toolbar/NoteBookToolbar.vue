@@ -124,14 +124,8 @@ export default Vue.extend({
       user: 'user/user',
       noteBook: 'noteBook/getNoteBook',
       settings: 'noteBook/getNoteBookSettings',
+      inIframe: 'base/getInIframe',
     }),
-    inIframe() {
-      try {
-        return window.self !== window.top;
-      } catch (e) {
-          return true;
-      }
-    },
   },
   mounted() {
     const vm = this;
@@ -139,7 +133,7 @@ export default Vue.extend({
   },
   methods: {
     removeSplit() {
-      parent.postMessage('removeSplit', '*');
+      parent.postMessage({type: 'removeSplit'}, '*');
     },
 
     deleteNoteBook() {

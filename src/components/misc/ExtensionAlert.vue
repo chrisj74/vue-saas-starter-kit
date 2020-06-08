@@ -37,7 +37,6 @@ export default Vue.extend({
     ...mapGetters({
       extensionInstalled: 'base/getExtensionInstalled',
       env: 'base/getEnv',
-      // leftDrawerOpen: 'base/getLeftDrawerOpen',
     }),
   },
   methods: {

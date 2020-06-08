@@ -6,7 +6,7 @@ export const setNoteBooks = (state: INoteBookState, payload: INoteBook[]) => {
 };
 
 export const addNoteBook = (state: INoteBookState, payload: INoteBook) => {
-  Vue.set(state, 'noteBooks', [payload, ...state.noteBooks]);
+  Vue.set(state, 'noteBooks', [payload]);
 };
 
 export const setNoteBook = (state: INoteBookState, payload: INoteBook) => {

@@ -12,6 +12,7 @@ export interface IBaseState {
   loading: boolean;
   error: string;
   extensionInstalled: boolean;
+  inIframe: boolean;
   extension: IExtensionState;
 }
 
@@ -109,6 +110,7 @@ export interface IWorkBookState {
     brushWidth: number;
     showDrawingExtras: boolean;
     showAddWorkBookDialog: boolean;
+    activeEditor: number;
   };
   dialogs: {
     export: boolean;

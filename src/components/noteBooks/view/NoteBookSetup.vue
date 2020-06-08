@@ -35,7 +35,7 @@ export default Vue.extend({
   },
   mounted() {
     const vm = this;
-    if (this.noteBooks) {
+    if (this.noteBooks || !this.user) {
       if (!this.$route.params.noteBookId) {
         this.showAddNoteBook();
       } else if (

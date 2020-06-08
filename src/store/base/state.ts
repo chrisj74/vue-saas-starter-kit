@@ -10,6 +10,7 @@ export default function() {
     loading: false,
     error: null,
     extensionInstalled: false,
+    inIframe: false,
     extension: {
       currentTabUrl: null,
       extensionId: null,

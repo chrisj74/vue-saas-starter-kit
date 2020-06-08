@@ -9,6 +9,10 @@ export const setExtensionInstalled = (state: IBaseState, payload: boolean) => {
   state.extensionInstalled = payload;
 };
 
+export const setInIframe = (state: IBaseState, payload: boolean) => {
+  state.inIframe = payload;
+};
+
 export const setExtensionId = (state: any, payload: string | number) => {
   Vue.set(state.extension, 'extensionId', payload);
 };

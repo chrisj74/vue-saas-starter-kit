@@ -86,17 +86,22 @@ export const setNoteBook = (
 export const updateNoteBook = (
   {state, commit, dispatch, rootState }: {state: INoteBookState, commit: any, dispatch: any, rootState: any},
   payload: Partial<INoteBook>) => {
-  console.log('ACTION updateNoteBook');
   const newNoteBook: INoteBook = merge(JSON.parse(JSON.stringify(state.noteBook)), payload);
   newNoteBook.commit++;
   commit('setNoteBook', newNoteBook);
-  return new Promise((resolve, reject) => {
-    const noteBookRef = firebase
-    .firestore()
-    .collection('noteBooks/').doc(newNoteBook.id);
-    noteBookRef.update(newNoteBook);
-    resolve();
-  });
+  if (rootState.user.user) {
+    return new Promise((resolve, reject) => {
+      const noteBookRef = firebase
+      .firestore()
+      .collection('noteBooks/').doc(newNoteBook.id);
+      noteBookRef.update(newNoteBook);
+      resolve();
+    });
+  } else {
+    return new Promise((resolve, reject) => {
+      resolve();
+    });
+  }
 };
 
 export const addNoteBook = (

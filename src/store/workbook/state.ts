@@ -20,6 +20,7 @@ export default function() {
       brushOpacity: 1,
       showDrawingExtras: false,
       showAddWorkBookDialog: false,
+      activeEditor: null,
     },
     dialogs: {
       export: false,

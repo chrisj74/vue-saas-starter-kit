@@ -40,7 +40,7 @@ export default Vue.extend({
   },
   mounted() {
     const vm = this;
-
+    console.log('noteBook');
   },
   methods: {
     //

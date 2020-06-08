@@ -19,9 +19,6 @@ if (window.chrome && window.chrome.runtime && window.chrome.runtime.onMessage) {
 }
 
 window.learnalongo = true;
-console.log('extension=', learnalongo);
-
-
 if (window.name.indexOf('learnalongo') !== -1) {
 
   // el.textContent = "if (top !== self) {window.self = window.top;}";
@@ -31,7 +28,9 @@ if (window.name.indexOf('learnalongo') !== -1) {
 
 var basePath = 'https://learnalongo-app.web.app';
 var baseImagePath = 'https://learnalongo-app.web.app';
+var hasExtension = false;
 if (window.chrome && window.chrome.runtime.id) {
+  hasExtension = true;
   basePath = 'chrome-extension://' + window.chrome.runtime.id + "/index.html#";
   baseImagePath = 'chrome-extension://' + window.chrome.runtime.id;
 }
@@ -105,17 +104,19 @@ function interceptClickEvent(e) {
   var target = e.target || e.srcElement;
   if (target.tagName === 'A') {
       href = target.getAttribute('href');
-      //put your logic here...
+      var headingElement = document.querySelector('h1');
+      var headingText = headingElement ? headingElement.innerText : '';
+      var title = headingText.length > 0 ? headingText : document.title;
+      var url = top.location.href;
       if (target.classList.contains('learnalongo-split')
       ) {
         e.preventDefault();
-        var headingElement = document.querySelector('h1');
-        var headingText = headingElement ? headingElement.innerText : '';
-        var title = headingText.length > 0 ? headingText : document.title;
-        var url = top.location.href;
         splitScreen(basePath + '/workbook?pdf=' + encodeURIComponent(href) + '&title=' + encodeURIComponent(title) + '&connectedUrl=' + encodeURIComponent(url));
-      } else if (href.indexOf('.pdf') !== -1 && !target.classList.contains('learnalongo-full')) {
+      } else if (href.indexOf('pdf') !== -1 && !target.classList.contains('learnalongo-full') && !target.classList.contains('learnalongo-download')) {
         e.preventDefault();
+      } else if (target.classList.contains('learnalongo-note')) {
+        e.preventDefault();
+        newNote();
       }
   }
 }
@@ -126,9 +127,12 @@ function interceptMouseoverEvent(e) {
   var target = e.target || e.srcElement;
   if (target.tagName === 'A') {
     href = target.getAttribute('href');
+    if (!href.startsWith('https://')) {
+      href = 'https://' + href.substring(href.indexOf('//') + 2);
+    }
     download = target.getAttribute('download') ? target.getAttribute('download') : 'download';
     if (
-      (href.indexOf('.pdf') !== -1)
+      (href.indexOf('pdf') !== -1)
       && !target.parentElement.classList.contains('learnalongo-actions')
       && !target.classList.contains('learnalongo-pdf-link')
       && !target.parentElement.classList.contains('learnalongo-pdf-link')
@@ -180,8 +184,9 @@ function openWorkBook(workBookId) {
 }
 
 function splitScreen(href) {
+  console.log('href=', href);
   var splitFrame = document.querySelector('.learnalongo-iframe');
-  if (!splitFrame) {
+  if (!splitFrame && window.name !== 'learnalongoParent') {
     bodyTag.innerHTML = '';
     //  LEARNALONGO
     var learnalongoIframe = document.createElement('iframe');
@@ -198,7 +203,7 @@ function splitScreen(href) {
     parentIframe.setAttribute('src', window.location.href);
     parentIframe.classList.add('learnalongo-iframe');
     parentIframe.classList.add('learnalongo-parent-iframe');
-    learnalongoIframe.setAttribute('name', 'learnalongoParent');
+    parentIframe.setAttribute('name', 'learnalongoParent');
 
     var parentDiv = document.createElement('div');
     parentDiv.classList.add('learnalongo-parent-container');
@@ -211,18 +216,24 @@ function splitScreen(href) {
     containerDiv.appendChild(parentDiv);
     bodyTag.appendChild(containerDiv);
     Split([learnalongoDiv,parentDiv],{
-      sizes: [70, 30],
+      sizes: [60, 40],
       minSize: 200,
     });
-  } else {
+  } else if (splitFrame) {
     splitFrame.setAttribute('src', href);
+  } else if (window.name === 'learnalongoParent') {
+    parent.postMessage({type: 'splitScreen', href: href}, '*');
   }
 }
 
 function removeSplit() {
   var iframeElem = document.querySelector('.learnalongo-parent-iframe');
   if (iframeElem) {
-    top.location = iframeElem.contentWindow.location.href;
+    if (top.location.href == iframeElem.contentWindow.location.href) {
+      top.location.reload();
+    } else {
+      top.location.href = iframeElem.contentWindow.location.href;
+    }
   }
 }
 
@@ -248,10 +259,9 @@ var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 eventer(messageEvent,function(e) {
     var key = e.message ? "message" : "data";
     var data = e[key];
-    //run function//
-    switch (data) {
-      case 'removeSplit':
-        removeSplit();
-        break;
+    if (data.type === 'removeSplit') {
+      removeSplit();
+    } else if (data.type === 'splitScreen') {
+      splitScreen(data.href);
     }
 },false);

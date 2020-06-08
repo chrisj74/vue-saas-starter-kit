@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="settings.showAddWorkBookDialog" persistent width="800px" max-width="95%">
+  <v-dialog v-model="settings.showAddWorkBookDialog" persistent width="800px" max-width="95%" max-height="80vh">
     <v-card v-if="formObj">
       <v-system-bar
       color="primary"
@@ -10,12 +10,16 @@
     </v-system-bar>
 
     <v-card-title>
-      <span class="headline">Add Work Book</span>
+      <span class="headline">New Work Book</span>
     </v-card-title>
 
     <v-card-text
       style="max-height: 80vh; overflow: auto;">
       <v-container>
+        <div v-if="!user">
+          <p>Hey, just letting you know, you need to export your work book before you leave this page.</p>
+          <p>You're changes are not saved anywhere, so don't forget!</p>
+        </div>
         <v-form
           ref="form"
           v-model="valid"
@@ -27,22 +31,24 @@
               <v-text-field label="Title *" required :rules="[rules.required]" v-model="formObj.title"></v-text-field>
             </v-col>
             <!-- DESCRIPTION -->
-            <v-col cols="12">
+            <v-col cols="12" v-if="user">
               <v-textarea
                 v-model="formObj.description"
                 filled
                 label="Description"
                 auto-grow
+                :rows="1"
               ></v-textarea>
             </v-col>
             <!-- CONNECTED TO -->
-            <v-col cols="12">
+            <v-col cols="12" v-if="user">
               <v-text-field placeholder="https://" label="Connect to page" :rules="[rules.url]" v-model="formObj.connectedUrl"></v-text-field>
             </v-col>
-            <!-- SRC DOC -->
+            <!-- SRC DOC
             <v-col cols="12">
               <v-text-field :readonly="srcDocUrlReadOnly" placeholder="https://" label="Source document" :rules="[rules.url]" v-model="formObj.srcDocUrl"></v-text-field>
             </v-col>
+            -->
           </v-row>
         </v-form>
       </v-container>
@@ -51,8 +57,8 @@
     <!-- ACTIONS -->
     <v-card-actions>
       <v-spacer></v-spacer>
-      <v-btn color="blue darken-1" text @click="close()">Close</v-btn>
-      <v-btn color="blue darken-1" text @click="saveWorkBook()">Save</v-btn>
+      <v-btn color="blue darken-1" text @click="close()">Cancel</v-btn>
+      <v-btn color="blue darken-1" text @click="saveWorkBook()">Start</v-btn>
     </v-card-actions>
     </v-card>
   </v-dialog>
@@ -106,6 +112,9 @@ export default Vue.extend({
       user: 'user/user',
       workBooks: 'workBook/getWorkBooks',
       settings: 'workBook/getSettings',
+      inIframe: 'base/getInIframe',
+      env: 'base/getEnv',
+      extensionInstalled: 'base/getExtensionInstalled',
     }),
     srcDocUrlReadOnly() {
       return this.$route.params.pdf;
@@ -124,13 +133,21 @@ export default Vue.extend({
   },
   methods: {
     close() {
-      const payload = {
-        showAddWorkBookDialog: false,
-      };
-      this.$store.commit('workBook/setSettings', payload);
-      if (this.$route.name && this.$route.name === 'WorkBookRoot') {
-        this.$router.replace('/workbooks');
+      if (this.inIframe && !this.user) {
+        this.removeSplit();
+      } else {
+        const payload = {
+          showAddWorkBookDialog: false,
+        };
+        this.$store.commit('workBook/setSettings', payload);
+        if (this.$route.name && this.$route.name === 'WorkBookRoot') {
+          this.$router.replace('/workbooks');
+        }
       }
+    },
+
+    removeSplit() {
+      parent.postMessage({type: 'removeSplit'}, '*');
     },
 
     saveWorkBook() {
